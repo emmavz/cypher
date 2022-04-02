@@ -1,45 +1,50 @@
 # quillmates
 Database tables + commands
 
+users
+
 | Property  | Type |
 | ------------- | ------------- |
-| User_ID  | PK  |
-| Username | String |
-| Author status  | Boolean  |
-| Wallet Addresss | FK |
-| Balance | |
-| pfp_image | URL |
-| Followers | # |
-| Following | # |
-| User bio | String |
+| user_id  | PK  |
+| name | String |
+| status  | Boolean  |
+| wallet | FK |
+| balance | |
+| profile_img | URL |
+| bio | String |
 | datestamp | time |
 
-article
+
+
+articles
 
 | Property  | Type |
 | ------------- | ------------- |
-| Article_ID  | PK  |
-| User_ID  | FK  |
-| post_date | datetime |
-| Title | String |
+| article_id | PK  |
+| user_id  | FK  |
+| postdate | datetime |
+| title | String |
 | header_img | URL |
-| Description | String |
-| Content_body | String |
+| description | String |
+| category | String |
+| hashtag | String |
+| minutes | # |
+| content | String |
 | liquidation_days | String |
 | price | # |
-| Invested_T | # |
-| updated_date | datetime |
+| invested | # |
+| updatedate | datetime |
 
 article_token
 
 | Property  | Type |
 | ------------- | ------------- |
-| Article_ID  | PK  |
+| article_id  | PK  |
 | num_tokens  | #  |
 | timestamp | datetime |
 
 
-follower_id
+follows
 
 | Property  | Type |
 | ------------- | ------------- |
@@ -53,7 +58,7 @@ user_article
 | ------------- | ------------- |
 | user_id | PK  |
 | article_id  | FK  |
-| invested_T | # |
+| invetsed | # |
 | timestamp | datetime |
 
 transactions
