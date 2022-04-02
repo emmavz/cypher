@@ -9,7 +9,7 @@ users
 | name | String |
 | status  | Boolean  |
 | wallet | FK |
-| balance | |
+| balance | # |
 | profile_img | URL |
 | bio | String |
 | datestamp | time |
@@ -72,7 +72,7 @@ transactions
 | tx_amount | # |
 | tx_type | string |
 
-bonding curve
+bonding curve (NO USE)
 
 | Property  | Type |
 | ------------- | ------------- |
