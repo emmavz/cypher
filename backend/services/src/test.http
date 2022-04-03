@@ -1,0 +1,11 @@
+POST http://192.168.1.15:3000/api/get_article_list_and_view
+content-type: application/json
+
+{
+    "user_id": "123",
+    "start_index": "1",
+    "number_of_article": "5"
+}
+
+###
+GET http://192.168.1.15:3000/
