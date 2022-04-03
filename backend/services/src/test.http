@@ -1,4 +1,4 @@
-POST http://192.168.1.15:3000/api/get_article_list_and_view
+POST http://localhost:3000/api/get_article_list_and_view
 content-type: application/json
 
 {
@@ -7,7 +7,7 @@ content-type: application/json
     "number_of_article": "5"
 }
 ###
-POST http://192.168.1.15:3000/api/query_article_list
+POST http://localhost:3000/api/query_article_list
 content-type: application/json
 
 {
@@ -21,7 +21,7 @@ return
   [
     {qqwerqwer},
     {erwquroer},
-    
+
   ]
 }
 ###
