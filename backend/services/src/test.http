@@ -12,17 +12,13 @@ content-type: application/json
 
 {
     "user_id": 1,
-    "start_index": 1,
+    "start_index": 1,       
     "number_of_articles": 5
 }
 ###
 return
 {
-    "article_one_id": 34567,
-    "article_two_id": 12,
-    "article_three_id": 973,
-    "article_four_id": 1,
-    "article_five_id": 1876
+    ids: [  0x88da2,0xff92262,0x4532,0x2daff34,0x2a2451]
 }
 ###
 POST http://localhost:3000/api/get_article_homepage
@@ -64,7 +60,7 @@ content-type: application/json
 {
     "article_id": 1,
     "amount": 10,
-    "transaction_type": "pay_to_read",
+    "transaction_type": 2,//type1:  ....  type2:/...
     "user_balance": 765
 }
 ###
