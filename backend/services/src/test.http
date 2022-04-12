@@ -12,13 +12,17 @@ content-type: application/json
 
 {
     "user_id": 1,
-    "start_index": 1,
+    "start_index": 1,       
     "number_of_articles": 5
 }
 ###
 return
 {
+<<<<<<< HEAD
 	"ids": [882, 92262, 4532, 234, 22451]
+=======
+    ids: [  0x88da2,0xff92262,0x4532,0x2daff34,0x2a2451]
+>>>>>>> 06a51a6146e5cf450465f379087dc02ef519a14b
 }
 ###
 POST http://localhost:3000/api/get_article_homepage
@@ -60,8 +64,7 @@ content-type: application/json
 {
     "article_id": 1,
     "amount": 10,
-    "transaction_type": 1, //1 = pay to read 2 = upvote 3 = cash out
-    "user_balance": 765
+    "transaction_type": 1 //1 = pay to read 2 = upvote 3 = cash out
 }
 ###
 return
@@ -100,7 +103,7 @@ return
 {
     "article_liquidation_time": 4,
     "article_total_invested": 439,
-    "article_user_stake": 0.0387243735,
+    "article_user_stake": 0.038724373,
     "article_user_investment": 17
 }
 ###
