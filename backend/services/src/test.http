@@ -41,7 +41,7 @@ return
     "article_total_invested": 432
 }
 ###
-POST http://localhost:3000/api/check_transaction_status
+POST http://localhost:3000/api/paid_or_not
 content-type: application/json
 
 {
@@ -51,7 +51,7 @@ content-type: application/json
 ###
 return
 {
-    "transaction_status": true //true = paid, false = haven't paid
+    "paid_or_not": true //true = paid, false = haven't paid
 }
 ###
 POST http://localhost:3000/api/pay_command
@@ -65,7 +65,7 @@ content-type: application/json
 ###
 return
 {
-    "pay_command": true
+    "err": //empty = success, not empty = error msg
 }
 ###
 POST http://localhost:3000/api/get_read_page
@@ -74,7 +74,6 @@ content-type: application/json
 {
     "article_id": 1,
     "user_id": 2,
-    "transaction_status": true
 }
 ###
 return
@@ -91,7 +90,6 @@ content-type: application/json
 
 {
     "article_id": 1,
-    "time": "2021-12-28 15:19:00",
     "user_id": 2
 }
 ###
@@ -108,8 +106,7 @@ content-type: application/json
 
 {
     "article_id": 1,
-    "amount": 5,
-    "balance": 755
+    "amount": 5
 }
 ###
 return
@@ -122,8 +119,7 @@ content-type: application/json
 
 {
     "amount": 5,
-    "user_id": 2,
-    "balance": 755
+    "user_id": 2
 }
 ###
 return
