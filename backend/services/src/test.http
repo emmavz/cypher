@@ -18,11 +18,7 @@ content-type: application/json
 ###
 return
 {
-    "article_one_id": 34567,
-    "article_two_id": 12,
-    "article_three_id": 973,
-    "article_four_id": 1,
-    "article_five_id": 1876
+	"ids": [882, 92262, 4532, 234, 22451]
 }
 ###
 POST http://localhost:3000/api/get_article_homepage
@@ -35,7 +31,7 @@ content-type: application/json
 ###
 return
 {
-    "StringURL": "http://backgroundImage",
+    "image_url": "http://backgroundImage",
     "article_title": "A History of Fashion",
     "article_author": "Violet Lee",
     "article_pfp": "www.violetleepfp.com",
@@ -55,7 +51,7 @@ content-type: application/json
 ###
 return
 {
-    "transaction_status": true
+    "transaction_status": true //true = paid, false = haven't paid
 }
 ###
 POST http://localhost:3000/api/pay_command
@@ -64,7 +60,7 @@ content-type: application/json
 {
     "article_id": 1,
     "amount": 10,
-    "transaction_type": "pay_to_read",
+    "transaction_type": 1, //1 = pay to read 2 = upvote 3 = cash out
     "user_balance": 765
 }
 ###
@@ -84,7 +80,7 @@ content-type: application/json
 ###
 return
 {
-    "article_imageURL": "http://backgroundImage",
+    "article_image_url": "http://backgroundImage",
     "article_title": "The History of Fashion",
     "article_author_name": "Violet Lee",
     "author_pfp": "http://authorpfp",
@@ -119,20 +115,21 @@ content-type: application/json
 ###
 return
 {
-    "upvote_command": true
+    "err": //empty = success, not empty = error msg
 }
 ###
-POST http://localhost:3000/api/check_transaction_boolean
+POST http://localhost:3000/api/is_balance_enough
 content-type: application/json
 
 {
     "amount": 5,
-    "user_id": 2
+    "user_id": 2,
+    "balance": 755
 }
 ###
 return
 {
-    "user_wallet_balance": 755
+    "is_balance_enough": true
 }
 ###
 POST http://localhost:3000/api/user_profile_page
@@ -178,12 +175,13 @@ content-type: application/json
 
 {
     "user_id": 2,
+    "article_id": 1,
     "amount": 5
 }
 ###
 return
 {
-    "cash_out_command": true
+    "err": //empty = success, not empty = error msg
 }
 ###
 POST http://localhost:3000/api/article_prep_page
@@ -195,7 +193,7 @@ content-type: application/json
 ###
 return
 {
-    "instruction_strings": "enter title, enter description, enter body, set liquidation time, set price"
+    "err": //empty = success, not empty = error msg
 }
 ###
 POST http://localhost:3000/api/article_confirmation_page
