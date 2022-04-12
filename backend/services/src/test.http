@@ -18,11 +18,7 @@ content-type: application/json
 ###
 return
 {
-<<<<<<< HEAD
 	"ids": [882, 92262, 4532, 234, 22451]
-=======
-    ids: [  0x88da2,0xff92262,0x4532,0x2daff34,0x2a2451]
->>>>>>> 06a51a6146e5cf450465f379087dc02ef519a14b
 }
 ###
 POST http://localhost:3000/api/get_article_homepage
