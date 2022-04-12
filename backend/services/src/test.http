@@ -21,6 +21,25 @@ return
 	"ids": [882, 92262, 4532, 234, 22451]
 }
 ###
+POST http://localhost:3000/api/query_article_list_properties
+content-type: application/json
+
+{
+    "ids": [882, 92262, 4532, 234, 22451]
+}
+###
+return
+//for each article
+{
+	"article_title": [882, 92262, 4532, 234, 22451],
+    "author_name": "Violet Lee",
+    "author_pfp": "www.violetleepfp.com",
+    "date_posted": "12/25/2021 15:19:00",
+    "total_invested": 432,
+    "image_url": "http://backgroundImage"
+
+}
+###
 POST http://localhost:3000/api/get_article_homepage
 content-type: application/json
 
@@ -34,7 +53,7 @@ return
     "image_url": "http://backgroundImage",
     "article_title": "A History of Fashion",
     "article_author": "Violet Lee",
-    "article_pfp": "www.violetleepfp.com",
+    "author_pfp": "www.violetleepfp.com",
     "article_description": "fashion has always been my passion!",
     "article_price": 10,
     "article_liquidation_time": 4,
@@ -106,7 +125,8 @@ content-type: application/json
 
 {
     "article_id": 1,
-    "amount": 5
+    "amount": 5,
+    "user_id": 2
 }
 ###
 return
