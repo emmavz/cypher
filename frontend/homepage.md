@@ -29,9 +29,7 @@ If clicked, trigger paid_or_not API.
 
 Request: 'user_id', 'article_id'
 
-Return: boolean //true = paid, false = haven't paid
-
-If paid_or_not API = false, go to article_homepage //if true, go to article_readPage
+Return: boolean //true = paid, go to article_homepage, false = haven't paid, go to article_read_page
 
 The URL to the article_read_page page is /article/[article_id]?uid=[userid]
 
@@ -66,7 +64,9 @@ If API failed with an error message, go to article_list_view
 
 
 If 'statistics' clicked, trigger API: get_statistics
+
 If 'upvote' clicked, trigger API: upvote_command
+
 If 'downvote' clicked, trigger API: cash_out_command
 
 
