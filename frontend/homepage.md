@@ -7,9 +7,17 @@ Input url is /home?uid=[userid]
 
 Assume user has logged in. User will see a list of articles here.
 
-API call is query_article_list_properties
+API call is 
+query_article_list
 
-Request value 'id_x' //list of article ids
+Request value 'user_id', 'start_index', 'number_of_articles' //start_index = window size of device, number_of_articles = start_index/3
+
+Response value 'article_ids' 
+
+API call is 
+query_article_list_properties
+
+Request value 'article_ids' //from previous API
 
 Respones value 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url'
 
@@ -70,6 +78,9 @@ pay_to_read button
 ### Clickable area 1.
 If clicked, trigger API: pay_to_read command, 
 //'are you sure?' button
+
+text is "are you sure?"
+
 <img width="472" alt="are you sure" src="https://user-images.githubusercontent.com/17632589/163291813-0111bf74-5b2d-4a7b-b678-10e393be5a26.png">
 
 When response received, and if response = empty, trigger get_read_page API query, and render get_read_page
