@@ -15,7 +15,7 @@ Request value 'user_id', 'start_index', 'number_of_articles' //if window size/ca
 Response value: 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url' 'tags' //for each article_id
 
 The UI element mapping to the response value:
-![article_list UI elements](https://user-images.githubusercontent.com/17632589/163289703-5ac353a4-500d-46f1-8f96-edb3b9fd318b.jpeg)
+![article_list UI elements](https://user-images.githubusercontent.com/17632589/163302454-950cb39d-931d-4596-9558-190145325b16.jpeg)
 
 
 In case of error response. show the error message. then an empty article list page
