@@ -7,27 +7,6 @@ content-type: application/json
     "number_of_article": "5"
 }
 ###
-POST http://localhost:3000/api/query_article_list
-content-type: application/json
-
-{
-    "user_id": 1,
-    "start_index": 1,       
-    "number_of_articles": 5
-}
-###
-return
-{
-	"ids": [882, 92262, 4532, 234, 22451]
-}
-###
-POST http://localhost:3000/api/query_article_list_properties
-content-type: application/json
-
-{
-    "ids": [882, 92262, 4532, 234, 22451]
-}
-###
 return
 //for each article
 {
@@ -36,7 +15,8 @@ return
     "author_pfp": "www.violetleepfp.com",
     "date_posted": "12/25/2021 15:19:00",
     "total_invested": 432,
-    "image_url": "http://backgroundImage"
+    "image_url": "http://backgroundImage",
+    "tags": "for you, fashion"
 
 }
 ###
