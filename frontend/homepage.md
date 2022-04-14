@@ -2,11 +2,11 @@
 
 # List of articles
 Input url is /home?uid=[userid]
-Screenshot.... Add your screenshot here.
+<img width="413" alt="get_article_list_view" src="https://user-images.githubusercontent.com/17632589/163287942-eb1ba918-756d-40c2-9fe5-b5de84098d96.png">
 Assume user has logged in. User will see a list of articles here.
-API call is ....
-Request value ...
-Respones value...
+API call is query_article_list_properties
+Request value 'id_x' //list of article ids
+Respones value 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url'
 
 The UI element mapping to the response value:
 TODO.... one UI element --> one response value
