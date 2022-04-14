@@ -23,7 +23,6 @@ In case of error response. show the error message. then an empty article list pa
 ![article_list clickable area](https://user-images.githubusercontent.com/17632589/163292189-bd1755cd-507e-416e-82f9-39ab6716466b.jpeg)
 
 ### Image area
-Show in the screenshot...
 
 If clicked, trigger paid_or_not API. 
 
@@ -34,9 +33,9 @@ The URL to the article_homepage page is /article/[article_id]?uid=[userid]
 
 # Empty article list page
 If there is anything wrong that we cannot show the list, show this page.
-The text on this page is "error"
+The text on this page is "error. Sorry! This request couldn't be processed right now. Please try again later!"
 
-TODO Screenshot here...
+<img width="275" alt="Screen Shot 2022-04-13 at 5 51 49 PM" src="https://user-images.githubusercontent.com/17632589/163292806-a1798f1e-9a38-4741-809a-b0535c8c3a1c.png">
 
 # Article_homepage page
 
