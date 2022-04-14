@@ -19,7 +19,7 @@ query_article_list_properties
 
 Request value 'article_ids' //from previous API
 
-Respones value 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url'
+Respones value 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url' //for each article_id
 
 The UI element mapping to the response value:
 ![article_list UI elements](https://user-images.githubusercontent.com/17632589/163289703-5ac353a4-500d-46f1-8f96-edb3b9fd318b.jpeg)
@@ -38,7 +38,7 @@ Request: 'user_id', 'article_id'
 
 Return: boolean //true = paid, false = haven't paid
 
-If paid_or_not API = false, go to article_homepage
+If paid_or_not API = false, go to article_homepage //if ture, go to article_readPage
 
 The URL to the article_homepage page is /article/[article_id]?uid=[userid]
 
@@ -80,19 +80,20 @@ pay_to_read button
 
 
 ### Clickable area 1.
-If clicked, trigger API: pay_to_read command, 
-
-Request: 'article_id', 'amount', 'transaction_type'
-
-Return: //empty = success, not empty = error msg
-
-//'are you sure?' button
+If clicked, popup 'are you sure?' button
 
 text is "are you sure?"
 
 <img width="472" alt="are you sure" src="https://user-images.githubusercontent.com/17632589/163291813-0111bf74-5b2d-4a7b-b678-10e393be5a26.png">
 
-When response received, and if response = empty, trigger get_read_page API query, and render get_read_page
+If 'yes' clicked, trigger API: pay_to_read command, 
+
+Request: 'article_id', 'amount', 'transaction_type' //transaction_type = 1, (1 = pay to read 2 = upvote 3 = cash out)
+
+Return: //empty = success, not empty = error msg
+
+
+When response received, and if response = empty, trigger get_read_page API query, and render get_read_page. If response = not empty, display empty article list page
 
 read_page screenshot:
 <img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
