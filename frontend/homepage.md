@@ -15,7 +15,7 @@ The UI element mapping to the response value:
 In case of error response. show the error message. then an empty article list page
 
 ## Clickable area 
-### Button TODO...
+![article_list clickable area](https://user-images.githubusercontent.com/17632589/163292189-bd1755cd-507e-416e-82f9-39ab6716466b.jpeg)
 
 ### Image area
 Show in the screenshot...
@@ -33,25 +33,28 @@ TODO Screenshot here...
 URL /article/[article_id]/uid=[userid]
 Input value: article_id is the article_id
 uid is the user_id
-
-Screenshot here ... TODO...
+<img width="420" alt="article_homepage" src="https://user-images.githubusercontent.com/17632589/163291830-904ef29a-4128-4152-8253-59ae128daf44.png">
 API: get_article_homepage
 Request: 'article_id'
 Response: 'image_url', 'article_title', 'article_author', 'author_pfp', 'article_description', 'article_price', 'article_liquidation_time', 'article_total_invested'
 
-UI element mapping to response data property... TODO...
+UI elements:
+![article_homepage_UI elements](https://user-images.githubusercontent.com/17632589/163291846-afc8f054-d6a8-4df5-a4af-35cab5fea582.jpeg)
 
 If API failed with an error message, go to article_list_view
 
 ## Clickable area
-//pay to read button
-Screenshot of clickable area
+pay_to_read button
+![article_homepage clickable area](https://user-images.githubusercontent.com/17632589/163291842-b3e7c0a0-3e47-478c-bee2-d3bfd2d5ba58.jpeg)
 
 
 ### Clickable area 1.
 If clicked, trigger API: pay_to_read command, 
 //'are you sure?' button
-When response received, and if response = empty, trigger get_read_page API query, and render get_read_page
-If UI has change, take screenshot here. 
+<img width="472" alt="are you sure" src="https://user-images.githubusercontent.com/17632589/163291813-0111bf74-5b2d-4a7b-b678-10e393be5a26.png">
 
+When response received, and if response = empty, trigger get_read_page API query, and render get_read_page
+
+read_page screenshot:
+<img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
 
