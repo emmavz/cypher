@@ -10,7 +10,7 @@ content-type: application/json
 return
 //for each article
 {
-	"article_title": [882, 92262, 4532, 234, 22451],
+	"article_title": "A history of fashion",
     "author_name": "Violet Lee",
     "author_pfp": "www.violetleepfp.com",
     "date_posted": "12/25/2021 15:19:00",
