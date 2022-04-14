@@ -34,6 +34,10 @@ In case of error response. show the error message. then an empty article list pa
 
 If clicked, trigger paid_or_not API. 
 
+Request: 'user_id', 'article_id'
+
+Return: boolean //true = paid, false = haven't paid
+
 If paid_or_not API = false, go to article_homepage
 
 The URL to the article_homepage page is /article/[article_id]?uid=[userid]
@@ -77,6 +81,11 @@ pay_to_read button
 
 ### Clickable area 1.
 If clicked, trigger API: pay_to_read command, 
+
+Request: 'article_id', 'amount', 'transaction_type'
+
+Return: //empty = success, not empty = error msg
+
 //'are you sure?' button
 
 text is "are you sure?"
