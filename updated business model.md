@@ -40,3 +40,7 @@ In this way, the platform is structured in a way to encourage curator marketing.
 Notes:
 - Each user can only share the link to eight others. This prevents spam and encourages users to choose people who are likely to contribute to the platform
 - Each sharing chain can only be eight people long. This prevents grouping (gathering a large gruop of people to only pay once) and keeps the timeframe reasonable
+
+![share-to-read diagram](https://user-images.githubusercontent.com/17632589/163700074-605a6e4a-cb4e-4d19-8c5e-ca7e324b93b6.jpeg)
+
+
