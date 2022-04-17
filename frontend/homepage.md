@@ -23,15 +23,22 @@ In case of error response. show the error message. then an empty article list pa
 ## Clickable area 
 ![article_list clickable area](https://user-images.githubusercontent.com/17632589/163292189-bd1755cd-507e-416e-82f9-39ab6716466b.jpeg)
 
-### Image area
+# already_paid //article_readpage
 
-If clicked, trigger paid_or_not API. 
+If clicked, trigger API: already_paid. 
+The URL to the already_paid page is /article/[article_id]?uid=[userid]
 
-Request: 'user_id', 'article_id'
+Request: 'article_id', 'user_id'
 
-Return: boolean //true = paid, go to article_read_page, false = haven't paid, go to article_homepage //assume user has paid. go to article_readpage
+Response: 'article_image_url', 'article_title', 'article_author_name', 'author_pfp', 'article_body' //article_readpage
 
-The URL to the article_read_page page is /article/[article_id]?uid=[userid]
+<img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
+
+
+UI elements:
+![read_page UI](https://user-images.githubusercontent.com/17632589/163301836-677bec4e-3220-4fb0-9cbc-32f8a2b6af83.jpeg)
+
+If API failed with an error message, go to article_list_view
 
 
 # Empty article list page
@@ -39,22 +46,6 @@ If there is anything wrong that we cannot show the list, show this page.
 The text on this page is "error. Sorry! This request couldn't be processed right now. Please try again later!"
 
 <img width="275" alt="Screen Shot 2022-04-13 at 5 51 49 PM" src="https://user-images.githubusercontent.com/17632589/163292806-a1798f1e-9a38-4741-809a-b0535c8c3a1c.png">
-
-# Article_read_page 
-
-<img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
-
-API: get_read_page
-
-Request: 'article_id', 'user_id'
-
-Response: 'article_image_url', 'article_title', 'article_author_name', 'author_pfp', 'article_body'
-
-UI elements:
-![read_page UI](https://user-images.githubusercontent.com/17632589/163301836-677bec4e-3220-4fb0-9cbc-32f8a2b6af83.jpeg)
-
-
-If API failed with an error message, go to article_list_view
 
 
 
