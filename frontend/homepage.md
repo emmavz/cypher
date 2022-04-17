@@ -29,7 +29,7 @@ If clicked, trigger paid_or_not API.
 
 Request: 'user_id', 'article_id'
 
-Return: boolean //true = paid, go to article_homepage, false = haven't paid, go to article_read_page
+Return: boolean //true = paid, go to article_read_page, false = haven't paid, go to article_homepage //assume user has paid. go to article_readpage
 
 The URL to the article_read_page page is /article/[article_id]?uid=[userid]
 
