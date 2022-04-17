@@ -26,6 +26,7 @@ In case of error response. show the error message. then an empty article list pa
 # already_paid //article_readpage
 
 If clicked, trigger API: already_paid. 
+
 The URL to the already_paid page is /article/[article_id]?uid=[userid]
 
 Request: 'article_id', 'user_id'
