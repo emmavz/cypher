@@ -37,6 +37,7 @@ Response:
     has_paid: boolean //true = has paid, false = unpaid
     paid:{
     //article_readpage properties
+        'article_id',
         'article_image_url', 
         'article_title', 
         'article_author_name', 
