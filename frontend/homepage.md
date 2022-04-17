@@ -25,13 +25,29 @@ In case of error response. show the error message. then an empty article list pa
 
 # already_paid //article_readpage
 
-If clicked, trigger API: already_paid. 
+If clicked, trigger API: check_already_paid. 
 
 The URL to the already_paid page is /article/[article_id]?uid=[userid]
 
 Request: 'article_id', 'user_id'
 
 Response: 'article_image_url', 'article_title', 'article_author_name', 'author_pfp', 'article_body' //article_readpage
+
+{
+    has_paid: bool,
+    paid:{
+        article_image_url:...
+        ...
+    },
+    unpaid:{
+        asdfasdf,
+    }
+}
+
+If has_paid is true, only check paid property... and render ...
+if has_paid is false, only check unpaid property... and .render ...
+
+
 
 <img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
 
