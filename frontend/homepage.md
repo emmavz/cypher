@@ -34,7 +34,7 @@ Request: 'article_id', 'user_id'
 Response:
 
 {
-    has_paid: boolean //true = has paid, false = unpaid
+    paid_or_not: boolean //true = has paid, false = unpaid
     paid:{
     //article_readpage properties
         'article_id',
