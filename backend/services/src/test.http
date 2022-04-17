@@ -92,6 +92,7 @@ content-type: application/json
 return
 {
     "paid_or_not": true, //true = paid, false = haven't paid
+    "article_id": 1,
     "article_image_url": "http://backgroundImage",
     "article_title": "The History of Fashion",
     "article_author_name": "Violet Lee",
@@ -123,6 +124,7 @@ content-type: application/json
 ###
 return
 {
+    "article_id": 1,
     "article_image_url": "http://backgroundImage",
     "article_title": "The History of Fashion",
     "article_author_name": "Violet Lee",
