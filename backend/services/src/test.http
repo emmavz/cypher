@@ -81,7 +81,7 @@ return
     "article_total_invested": 432
 }
 ###
-POST http://localhost:3000/api/paid_or_not
+POST http://localhost:3000/api/check_already_paid
 content-type: application/json
 
 {
@@ -91,7 +91,12 @@ content-type: application/json
 ###
 return
 {
-    "paid_or_not": true //true = paid, false = haven't paid
+    "paid_or_not": true, //true = paid, false = haven't paid
+    "article_image_url": "http://backgroundImage",
+    "article_title": "The History of Fashion",
+    "article_author_name": "Violet Lee",
+    "author_pfp": "http://authorpfp",
+    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
 }
 ###
 POST http://localhost:3000/api/pay_command
