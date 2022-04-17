@@ -6,7 +6,8 @@ content-type: application/json
     "start_index": "1",
     "number_of_article": "5"
 }
-###
+####
+
 return
 [
     {
@@ -61,26 +62,6 @@ return
     }
 ]
 ###
-POST http://localhost:3000/api/get_article_homepage
-content-type: application/json
-
-{
-    "article_id": 1
-
-}
-###
-return
-{
-    "image_url": "http://backgroundImage",
-    "article_title": "A History of Fashion",
-    "article_author": "Violet Lee",
-    "author_pfp": "www.violetleepfp.com",
-    "article_description": "fashion has always been my passion!",
-    "article_price": 10,
-    "article_liquidation_time": 4,
-    "article_total_invested": 432
-}
-###
 POST http://localhost:3000/api/check_already_paid
 content-type: application/json
 
@@ -100,6 +81,26 @@ return
         "author_pfp": "http://authorpfp",
         "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
     }
+}
+###
+POST http://localhost:3000/api/get_article_homepage
+content-type: application/json
+
+{
+    "article_id": 1
+
+}
+###
+return
+{
+    "image_url": "http://backgroundImage",
+    "article_title": "A History of Fashion",
+    "article_author": "Violet Lee",
+    "author_pfp": "www.violetleepfp.com",
+    "article_description": "fashion has always been my passion!",
+    "article_price": 10,
+    "article_liquidation_time": 4,
+    "article_total_invested": 432
 }
 ###
 POST http://localhost:3000/api/pay_command
