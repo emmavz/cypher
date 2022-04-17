@@ -11,6 +11,9 @@ async fn main() {
         .route("/api/get_article_list_and_view",
             // get(get_books)
             post(article_list_and_view)
+        )
+        .route("/api/check_already_paid",
+            post(check_already_paid)
         );
 
     println!("Run our application as a hyper server on http://localhost:3000.");
@@ -114,6 +117,28 @@ pub async fn article_list_and_view(
         "tags": "for you, fashion"
     }
 ]
+    )
+    }).join().unwrap().into()
+}
+
+
+pub async fn check_already_paid(
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        // let name = input.get("name");
+        json!( 
+            {
+                "paid_or_not": true, //true = paid, false = haven't paid
+                "paid": {
+                    "article_id": 1,
+                    "article_image_url": "http://backgroundImage",
+                    "article_title": "The History of Fashion",
+                    "article_author_name": "Violet Lee",
+                    "author_pfp": "http://authorpfp",
+                    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+                }
+            }
     )
     }).join().unwrap().into()
 }
