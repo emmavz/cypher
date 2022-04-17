@@ -6,18 +6,81 @@ content-type: application/json
     "start_index": "1",
     "number_of_article": "5"
 }
+####
+
+return
+[
+    {
+        "article_id": 1,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 2,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 3,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 4,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 5,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    }
+]
+###
+POST http://localhost:3000/api/check_already_paid
+content-type: application/json
+
+{
+    "user_id": 2,
+    "article_id": 1
+}
 ###
 return
-//for each article
 {
-	"article_title": "A history of fashion",
-    "author_name": "Violet Lee",
-    "author_pfp": "www.violetleepfp.com",
-    "date_posted": "12/25/2021 15:19:00",
-    "total_invested": 432,
-    "image_url": "http://backgroundImage",
-    "tags": "for you, fashion"
-
+    "paid_or_not": true, //true = paid, false = haven't paid
+    "paid": {
+        "article_id": 1,
+        "article_image_url": "http://backgroundImage",
+        "article_title": "The History of Fashion",
+        "article_author_name": "Violet Lee",
+        "author_pfp": "http://authorpfp",
+        "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+    }
 }
 ###
 POST http://localhost:3000/api/get_article_homepage
@@ -38,19 +101,6 @@ return
     "article_price": 10,
     "article_liquidation_time": 4,
     "article_total_invested": 432
-}
-###
-POST http://localhost:3000/api/paid_or_not
-content-type: application/json
-
-{
-    "user_id": 2,
-    "article_id": 1
-}
-###
-return
-{
-    "paid_or_not": true //true = paid, false = haven't paid
 }
 ###
 POST http://localhost:3000/api/pay_command
@@ -77,6 +127,7 @@ content-type: application/json
 ###
 return
 {
+    "article_id": 1,
     "article_image_url": "http://backgroundImage",
     "article_title": "The History of Fashion",
     "article_author_name": "Violet Lee",

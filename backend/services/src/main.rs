@@ -11,9 +11,12 @@ async fn main() {
         .route("/api/get_article_list_and_view",
             // get(get_books)
             post(article_list_and_view)
+        )
+        .route("/api/check_already_paid",
+            post(check_already_paid)
         );
 
-    // Run our application as a hyper server on http://localhost:3000.
+    println!("Run our application as a hyper server on http://localhost:3000.");
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())
         .await
@@ -61,27 +64,82 @@ pub async fn article_list_and_view(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         // let name = input.get("name");
-        json!([
-            {
-                "article_id":1,
-                "title": "first title",
-                "author":"emma",
-                "author_avator":"someurl",
-                "image_url":"some_img",
-                "total_tea_invested":"12345",
-                "data_posted":"2021"
-            },
-            {
-                "article_id":2,
-                "title": "second title",
-                "author":"jana",
-                "author_avator":"someurl",
-                "image_url":"some_img",
-                "total_tea_invested":"4321",
-                "data_posted":"2021"
-            }
+        json!(
+[
+    {
+        "article_id": 1,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 2,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 3,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 4,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 5,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    }
+]
+    )
+    }).join().unwrap().into()
+}
 
-        ])
+
+pub async fn check_already_paid(
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        // let name = input.get("name");
+        json!( 
+            {
+                "paid_or_not": true, //true = paid, false = haven't paid
+                "paid": {
+                    "article_id": 1,
+                    "article_image_url": "http://backgroundImage",
+                    "article_title": "The History of Fashion",
+                    "article_author_name": "Violet Lee",
+                    "author_pfp": "http://authorpfp",
+                    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+                }
+            }
+    )
     }).join().unwrap().into()
 }
 
