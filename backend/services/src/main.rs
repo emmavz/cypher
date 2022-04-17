@@ -13,7 +13,7 @@ async fn main() {
             post(article_list_and_view)
         );
 
-    // Run our application as a hyper server on http://localhost:3000.
+    println!("Run our application as a hyper server on http://localhost:3000.");
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())
         .await
@@ -61,27 +61,60 @@ pub async fn article_list_and_view(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         // let name = input.get("name");
-        json!([
-            {
-                "article_id":1,
-                "title": "first title",
-                "author":"emma",
-                "author_avator":"someurl",
-                "image_url":"some_img",
-                "total_tea_invested":"12345",
-                "data_posted":"2021"
-            },
-            {
-                "article_id":2,
-                "title": "second title",
-                "author":"jana",
-                "author_avator":"someurl",
-                "image_url":"some_img",
-                "total_tea_invested":"4321",
-                "data_posted":"2021"
-            }
-
-        ])
+        json!(
+[
+    {
+        "article_id": 1,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 2,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 3,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 4,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 5,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    }
+]
+    )
     }).join().unwrap().into()
 }
 

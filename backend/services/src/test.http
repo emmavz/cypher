@@ -8,17 +8,58 @@ content-type: application/json
 }
 ###
 return
-//for each article
-{
-	"article_title": "A history of fashion",
-    "author_name": "Violet Lee",
-    "author_pfp": "www.violetleepfp.com",
-    "date_posted": "12/25/2021 15:19:00",
-    "total_invested": 432,
-    "image_url": "http://backgroundImage",
-    "tags": "for you, fashion"
-
-}
+[
+    {
+        "article_id": 1,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 2,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 3,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 4,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    },
+    {
+        "article_id": 5,
+        "article_title": "A history of fashion",
+        "author_name": "Violet Lee",
+        "author_pfp": "www.violetleepfp.com",
+        "date_posted": "12/25/2021 15:19:00",
+        "total_invested": 432,
+        "image_url": "http://backgroundImage",
+        "tags": "for you, fashion"
+    }
+]
 ###
 POST http://localhost:3000/api/get_article_homepage
 content-type: application/json
