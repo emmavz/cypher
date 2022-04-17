@@ -23,7 +23,7 @@ In case of error response. show the error message. then an empty article list pa
 ## Clickable area 
 ![article_list clickable area](https://user-images.githubusercontent.com/17632589/163292189-bd1755cd-507e-416e-82f9-39ab6716466b.jpeg)
 
-# already_paid //article_readpage
+# check_already_paid //article_readpage
 
 If clicked, trigger API: check_already_paid. 
 
@@ -31,21 +31,25 @@ The URL to the already_paid page is /article/[article_id]?uid=[userid]
 
 Request: 'article_id', 'user_id'
 
-Response: 'article_image_url', 'article_title', 'article_author_name', 'author_pfp', 'article_body' //article_readpage
+Response:
 
 {
-    has_paid: bool,
+    has_paid: boolean //true = has paid, false = unpaid
     paid:{
-        article_image_url:...
-        ...
+    //article_readpage properties
+        'article_image_url', 
+        'article_title', 
+        'article_author_name', 
+        'author_pfp', 
+        'article_body' 
     },
-    unpaid:{
-        asdfasdf,
+    unpaid:{ 
+    //article_homepage properties
     }
 }
 
-If has_paid is true, only check paid property... and render ...
-if has_paid is false, only check unpaid property... and .render ...
+If has_paid is true, only render paid properties
+if has_paid is false, only render unpaid properties
 
 
 
