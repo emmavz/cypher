@@ -6,7 +6,8 @@ content-type: application/json
     "start_index": "1",
     "number_of_article": "5"
 }
-###
+####
+
 return
 [
     {
@@ -61,43 +62,45 @@ return
     }
 ]
 ###
-POST http://localhost:3000/api/get_article_homepage
-content-type: application/json
-
-{
-    "article_id": 2
-
-}
-###
-return
-{
-    "image_url": "http://backgroundImage",
-    "article_title": "Super Chewy Cookies Recipe",
-    "article_author": "Eliza Mae",
-    "author_pfp": "www.empfp.com",
-    "article_description": "This recipe will teach you the most awesome way to make amazingly chewy cookie that will make your grandma proud.",
-    "article_price": 20,
-    "article_liquidation_time": 2,
-    "article_total_invested": 100
-}
-###
 POST http://localhost:3000/api/check_already_paid
 content-type: application/json
 
 {
     "user_id": 2,
+    "article_id": 2
+}
+###
+return
+{
+    "paid_or_not": true, //true = paid, false = haven't paid
+    "paid": {
+        "article_id": 2,
+        "article_image_url": "http://backgroundImage",
+        "article_title": "Super Chewy Cookie Recipe",
+        "article_author_name": "Eliza Mae",
+        "author_pfp": "http://authorpfp",
+        "article_body": "Hiya there! If you asked me how many recipes I’ve tried to get super chewy, PERFECT cookies, I couldn’t even tell you. But what I can tell you, is the recipe that FINALLY worked for me. IT'S ALL ABOUT THE BROWN SUGAR! Brown sugar is where a lot of people get it wrong. Before you buy brown sugar from the store, make sure to look at the consistency. It’s suuuuper important that you get the right kind or else your cookies are going to be suuuuper NOT chewy. Trust me. Been there, done that. Below, you’ll find a list of things to look out for when buying brown sugar during your next trip to the grocery."
+    }
+}
+###
+POST http://localhost:3000/api/get_article_homepage
+content-type: application/json
+
+{
     "article_id": 1
+
 }
 ###:
 return
 {
-    "paid_or_not": true, //true = paid, false = haven't paid
-    "article_id": 1,
-    "article_image_url": "http://backgroundImage",
-    "article_title": "The History of Fashion",
-    "article_author_name": "Violet Lee",
-    "author_pfp": "http://authorpfp",
-    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+    "image_url": "http://backgroundImage",
+    "article_title": "A History of Fashion",
+    "article_author": "Violet Lee",
+    "author_pfp": "www.violetleepfp.com",
+    "article_description": "fashion has always been my passion!",
+    "article_price": 10,
+    "article_liquidation_time": 4,
+    "article_total_invested": 432
 }
 ###
 POST http://localhost:3000/api/pay_command
