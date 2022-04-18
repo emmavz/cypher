@@ -1,0 +1,63 @@
+$primary-color: #068550;
+$secondary-color: #2C2C2C;
+$white: #ffffff;
+$black: #000000;
+
+$container-width: 18px;
+
+html,
+body {
+    line-height: 1.4 !important;
+    height: 100%;
+}
+
+body {
+    font-size: 16px;
+    font-family: 'Open Sans',
+        sans-serif;
+    color: $secondary-color;
+    font-weight: 400;
+    min-height: 100%;
+    background-color: $primary-color;
+    letter-spacing: -0.3px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700 !important;
+}
+
+.container,
+.container-fluid {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container,
+.container-fluid,
+.row>div {
+    padding-left: #{$container-width};
+    padding-right: #{$container-width};
+}
+
+.row,
+.row {
+    margin-left: -#{$container-width};
+    margin-right: - #{$container-width};
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.app {
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
