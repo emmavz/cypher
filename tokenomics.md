@@ -19,4 +19,4 @@ When users aquire CPHR, it is stored in their Metamask wallet.
 
 **CPHR --> TEA**
 
-Cypher (the platform) will cover all gas fees from topping up/withdrawing from all users by paying a [monthly] fee to TEA. The user does not have to interact with TEA.
+Cypher (the platform) will cover all gas fees from topping up/withdrawing from all users by paying a [monthly] fee to TEA. 
