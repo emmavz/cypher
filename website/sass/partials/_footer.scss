@@ -1,0 +1,33 @@
+.footer {
+    padding: 11px 0px 14px 0px;
+    z-index: 100;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    &__controls {
+
+        a {
+            margin: 0 22.5px;
+            display: inline-block;
+            position: relative;
+
+            &:after {
+                content: "";
+                width: 134px;
+                height: 5px;
+                position: absolute;
+                bottom: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: $white;
+                border-radius: 100px;
+                display: none;
+            }
+
+            &.active:after {
+                display: block;
+            }
+        }
+    }
+}
