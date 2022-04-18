@@ -15,7 +15,7 @@ return
         "article_title": "Why Python is The Future",
         "author_name": "Ephraim Jones",
         "author_pfp": "www.ejpfp.com",
-        "date_posted": "1/03/2022 15:19:00",
+        "date_posted": "1/03/2021 15:19:00",
         "total_invested": 10025,
         "image_url": "http://backgroundImage",
         "tags": "for you, coding"
@@ -25,7 +25,7 @@ return
         "article_title": "Super Chewy Cookies Recipe",
         "author_name": "Eliza Mae",
         "author_pfp": "www.empfp.com",
-        "date_posted": "1/21/2022 15:19:00",
+        "date_posted": "1/21/2021 15:19:00",
         "total_invested": 7342,
         "image_url": "http://backgroundImage",
         "tags": "for you, baking"
@@ -34,8 +34,8 @@ return
         "article_id": 3,
         "article_title": "The Go-To-Market Guide",
         "author_name": "Cecelia Hong",
-        "author_pfp": "www.ch.com",
-        "date_posted": "1/07/2022 15:19:00",
+        "author_pfp": "www.chpfp.com",
+        "date_posted": "1/07/2021 15:19:00",
         "total_invested": 8961,
         "image_url": "http://backgroundImage",
         "tags": "for you, business"
@@ -45,7 +45,7 @@ return
         "article_title": "The Rules of Digital Marketing",
         "author_name": "Melissa Shen",
         "author_pfp": "www.mspfp.com",
-        "date_posted": "12/25/2021 15:19:00",
+        "date_posted": "1/19/2021 15:19:00",
         "total_invested": 9456,
         "image_url": "http://backgroundImage",
         "tags": "for you, marketing"
@@ -55,10 +55,10 @@ return
         "article_title": "Building muscle the right way",
         "author_name": "Darren Jones",
         "author_pfp": "www.djpfp.com",
-        "date_posted": "1/24/2022 15:19:00",
+        "date_posted": "1/24/2021 15:19:00",
         "total_invested": 11275,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, fitness"
     }
 ]
 ###
