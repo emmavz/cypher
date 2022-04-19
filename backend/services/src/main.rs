@@ -68,52 +68,52 @@ pub async fn article_list_and_view(
 [
     {
         "article_id": 1,
-        "article_title": "A history of fashion",
+        "article_title": "A history of fashion 1",
         "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
+        "author_pfp": "./img/dynamic/profile-1.png",
         "date_posted": "12/25/2021 15:19:00",
         "total_invested": 432,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-1.jpg",
         "tags": "for you, fashion"
     },
     {
         "article_id": 2,
-        "article_title": "A history of fashion",
+        "article_title": "A history of fashion 2",
         "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
+        "author_pfp": "./img/dynamic/profile-2.png",
         "date_posted": "12/25/2021 15:19:00",
         "total_invested": 432,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-2.jpg",
         "tags": "for you, fashion"
     },
     {
         "article_id": 3,
-        "article_title": "A history of fashion",
+        "article_title": "A history of fashion 3",
         "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
+        "author_pfp": "./img/dynamic/profile-3.png",
         "date_posted": "12/25/2021 15:19:00",
         "total_invested": 432,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-3.jpg",
         "tags": "for you, fashion"
     },
     {
         "article_id": 4,
-        "article_title": "A history of fashion",
+        "article_title": "A history of fashion 4",
         "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
+        "author_pfp": "./img/dynamic/profile-4.png",
         "date_posted": "12/25/2021 15:19:00",
         "total_invested": 432,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-4.jpg",
         "tags": "for you, fashion"
     },
     {
         "article_id": 5,
-        "article_title": "A history of fashion",
+        "article_title": "A history of fashion 5",
         "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
+        "author_pfp": "./img/dynamic/profile-5.png",
         "date_posted": "12/25/2021 15:19:00",
         "total_invested": 432,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-5.jpg",
         "tags": "for you, fashion"
     }
 ]
@@ -127,7 +127,7 @@ pub async fn check_already_paid(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         // let name = input.get("name");
-        json!( 
+        json!(
             {
                 "paid_or_not": true, //true = paid, false = haven't paid
                 "paid": {
@@ -142,4 +142,3 @@ pub async fn check_already_paid(
     )
     }).join().unwrap().into()
 }
-
