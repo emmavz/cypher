@@ -40,50 +40,50 @@ pub async fn article_list_and_view(
         "article_id": 1,
         "article_title": "Why Python is The Future",
         "author_name": "Ephraim Jones",
-        "author_pfp": "www.ejpfp.com",
+        "author_pfp": "./img/dynamic/profile-1.png",
         "date_posted": "1/03/2021 15:19:00",
         "total_invested": 10025,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-1.jpg",
         "tags": "for you, coding"
     },
     {
         "article_id": 2,
         "article_title": "Super Chewy Cookies Recipe",
         "author_name": "Eliza Mae",
-        "author_pfp": "www.empfp.com",
+        "author_pfp": "./img/dynamic/profile-2.png",
         "date_posted": "1/21/2021 15:19:00",
         "total_invested": 7342,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-2.jpg",
         "tags": "for you, baking"
     },
     {
         "article_id": 3,
         "article_title": "The Go-To-Market Guide",
         "author_name": "Cecelia Hong",
-        "author_pfp": "www.chpfp.com",
+        "author_pfp": "./img/dynamic/profile-3.png",
         "date_posted": "1/07/2021 15:19:00",
         "total_invested": 8961,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-3.jpg",
         "tags": "for you, business"
     },
     {
         "article_id": 4,
         "article_title": "The Rules of Digital Marketing",
         "author_name": "Melissa Shen",
-        "author_pfp": "www.mspfp.com",
+        "author_pfp": "./img/dynamic/profile-4.png",
         "date_posted": "1/19/2021 15:19:00",
         "total_invested": 9456,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-4.jpg",
         "tags": "for you, marketing"
     },
     {
         "article_id": 5,
         "article_title": "Building muscle the right way",
         "author_name": "Darren Jones",
-        "author_pfp": "www.djpfp.com",
+        "author_pfp": "./img/dynamic/profile-5.png",
         "date_posted": "1/24/2021 15:19:00",
         "total_invested": 11275,
-        "image_url": "http://backgroundImage",
+        "image_url": "./img/dynamic/post-5.jpg",
         "tags": "for you, fitness"
     }
 ]
@@ -97,7 +97,7 @@ pub async fn check_already_paid(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         // let name = input.get("name");
-        json!( 
+        json!(
             {
                 "paid_or_not": true, //true = paid, false = haven't paid
                 "paid": {
@@ -112,4 +112,3 @@ pub async fn check_already_paid(
     )
     }).join().unwrap().into()
 }
-
