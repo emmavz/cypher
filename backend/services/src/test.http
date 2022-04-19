@@ -87,7 +87,7 @@ POST http://localhost:3000/api/get_article_homepage
 content-type: application/json
 
 {
-    "article_id": 1
+    "article_id": 2
 
 }
 ###:
@@ -100,15 +100,16 @@ return
     "article_description": "fashion has always been my passion!",
     "article_price": 10,
     "article_liquidation_time": 4,
-    "article_total_invested": 432
+    "article_total_reads": 432,
+    "article_total_shares": 76
 }
 ###
 POST http://localhost:3000/api/pay_command
 content-type: application/json
 
 {
-    "article_id": 1,
-    "amount": 10,
+    "article_id": 2,
+    "amount": 20,
     "transaction_type": 1 //1 = pay to read 2 = upvote 3 = cash out
 }
 ###
@@ -146,8 +147,10 @@ content-type: application/json
 return
 {
     "article_liquidation_time": 2,
-    "article_total_invested": 120,
-    "article_user_stake": 0.1667,
+    "article_total_reads": 836,
+    "article_total_shares": 76,
+    "author_total_invested": 120,
+    "user_stake": 0.1667,
     "article_user_investment": 20
 }
 ###
@@ -186,14 +189,19 @@ content-type: application/json
 }
 ###
 return
-{
+    {
     "username": "Jessica Covington",
-    "#_followers": 0,
-    "#_following": 0,
-    "User_bio": "Your bio is empty",
+    "#_followers": 456,
+    "#_following": 23,
+    "User_bio": "She turned her can't into can and her dreams into plans.",
     "user_pfp": "http://pfpImage",
-    "wallet_balance": 1326
-}
+    "wallet_balance": 1326,
+    "articles_authored":{ 
+        //return properties for every article, haven't done JSON for this yet
+    }
+    
+    }
+
 ###
 
 POST http://localhost:3000/api/investments_page
@@ -205,15 +213,16 @@ content-type: application/json
 ###
 return
 {
-    "article_id": 1,
-    "article_title": "A History of Fashion",
-    "author": "Violet Lee",
+    "author_id": 9,
+    "author_name": "Desiree King",
     "author_pic": "http://pfpImage",
     "image_url": "http://ImageURL",
-    "total_TEA_invested": 444,
-    "user_stake": 22,
-    "liquidation_time": 4,
-    "date_posted": "12/25/2021 15:19:00"
+    "author_tags": "luxury, cats",
+    "total_invested": 740,
+    "user_stake": 0.25,
+    "user_invested": 185,
+    "number_followers": 9236,
+    "number_following": 648
 }
 ###
 POST http://localhost:3000/api/cash_out_command
