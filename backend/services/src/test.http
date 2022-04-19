@@ -12,53 +12,53 @@ return
 [
     {
         "article_id": 1,
-        "article_title": "A history of fashion",
-        "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
-        "date_posted": "12/25/2021 15:19:00",
-        "total_invested": 432,
+        "article_title": "Why Python is The Future",
+        "author_name": "Ephraim Jones",
+        "author_pfp": "www.ejpfp.com",
+        "date_posted": "1/03/2021 15:19:00",
+        "total_invested": 10025,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, coding"
     },
     {
         "article_id": 2,
-        "article_title": "A history of fashion",
-        "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
-        "date_posted": "12/25/2021 15:19:00",
-        "total_invested": 432,
+        "article_title": "Super Chewy Cookies Recipe",
+        "author_name": "Eliza Mae",
+        "author_pfp": "www.empfp.com",
+        "date_posted": "1/21/2021 15:19:00",
+        "total_invested": 7342,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, baking"
     },
     {
         "article_id": 3,
-        "article_title": "A history of fashion",
-        "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
-        "date_posted": "12/25/2021 15:19:00",
-        "total_invested": 432,
+        "article_title": "The Go-To-Market Guide",
+        "author_name": "Cecelia Hong",
+        "author_pfp": "www.chpfp.com",
+        "date_posted": "1/07/2021 15:19:00",
+        "total_invested": 8961,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, business"
     },
     {
         "article_id": 4,
-        "article_title": "A history of fashion",
-        "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
-        "date_posted": "12/25/2021 15:19:00",
-        "total_invested": 432,
+        "article_title": "The Rules of Digital Marketing",
+        "author_name": "Melissa Shen",
+        "author_pfp": "www.mspfp.com",
+        "date_posted": "1/19/2021 15:19:00",
+        "total_invested": 9456,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, marketing"
     },
     {
         "article_id": 5,
-        "article_title": "A history of fashion",
-        "author_name": "Violet Lee",
-        "author_pfp": "www.violetleepfp.com",
-        "date_posted": "12/25/2021 15:19:00",
-        "total_invested": 432,
+        "article_title": "Building muscle the right way",
+        "author_name": "Darren Jones",
+        "author_pfp": "www.djpfp.com",
+        "date_posted": "1/24/2021 15:19:00",
+        "total_invested": 11275,
         "image_url": "http://backgroundImage",
-        "tags": "for you, fashion"
+        "tags": "for you, fitness"
     }
 ]
 ###
@@ -67,19 +67,19 @@ content-type: application/json
 
 {
     "user_id": 2,
-    "article_id": 1
+    "article_id": 2
 }
 ###
 return
 {
     "paid_or_not": true, //true = paid, false = haven't paid
     "paid": {
-        "article_id": 1,
+        "article_id": 2,
         "article_image_url": "http://backgroundImage",
-        "article_title": "The History of Fashion",
-        "article_author_name": "Violet Lee",
+        "article_title": "Super Chewy Cookie Recipe",
+        "article_author_name": "Eliza Mae",
         "author_pfp": "http://authorpfp",
-        "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+        "article_body": "Hiya there! If you asked me how many recipes I’ve tried to get super chewy, PERFECT cookies, I couldn’t even tell you. But what I can tell you, is the recipe that FINALLY worked for me. IT'S ALL ABOUT THE BROWN SUGAR! Brown sugar is where a lot of people get it wrong. Before you buy brown sugar from the store, make sure to look at the consistency. It’s suuuuper important that you get the right kind or else your cookies are going to be suuuuper NOT chewy. Trust me. Been there, done that. Below, you’ll find a list of things to look out for when buying brown sugar during your next trip to the grocery."
     }
 }
 ###
@@ -90,7 +90,7 @@ content-type: application/json
     "article_id": 1
 
 }
-###
+###:
 return
 {
     "image_url": "http://backgroundImage",
@@ -121,42 +121,42 @@ POST http://localhost:3000/api/get_read_page
 content-type: application/json
 
 {
-    "article_id": 1,
+    "article_id": 2,
     "user_id": 2,
 }
 ###
 return
 {
-    "article_id": 1,
+    "article_id": 2,
     "article_image_url": "http://backgroundImage",
-    "article_title": "The History of Fashion",
-    "article_author_name": "Violet Lee",
-    "author_pfp": "http://authorpfp",
-    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
+    "article_title": "Super Chewy Cookies Recipe",
+    "article_author_name": "Eliza Mae",
+    "author_pfp": "http://empfp",
+    "article_body": "Hiya there! If you asked me how many recipes I’ve tried to get super chewy, PERFECT cookies, I couldn’t even tell you. But what I can tell you, is the recipe that FINALLY worked for me."
 }
 ###
 POST http://localhost:3000/api/get_statistics
 content-type: application/json
 
 {
-    "article_id": 1,
+    "article_id": 2,
     "user_id": 2
 }
 ###
 return
 {
-    "article_liquidation_time": 4,
-    "article_total_invested": 439,
-    "article_user_stake": 0.038724373,
-    "article_user_investment": 17
+    "article_liquidation_time": 2,
+    "article_total_invested": 120,
+    "article_user_stake": 0.1667,
+    "article_user_investment": 20
 }
 ###
 POST http://localhost:3000/api/upvote_command
 content-type: application/json
 
 {
-    "article_id": 1,
-    "amount": 5,
+    "article_id": 2,
+    "amount": 10,
     "user_id": 2
 }
 ###
@@ -169,7 +169,7 @@ POST http://localhost:3000/api/is_balance_enough
 content-type: application/json
 
 {
-    "amount": 5,
+    "amount": 10,
     "user_id": 2
 }
 ###
@@ -182,17 +182,17 @@ POST http://localhost:3000/api/user_profile_page
 content-type: application/json
 
 {
-    "user_id": 1
+    "user_id": 2
 }
 ###
 return
 {
-    "username": "Violet Lee",
-    "#_followers": 354,
-    "#_following": 345,
-    "User_bio": "This is Violet",
+    "username": "Jessica Covington",
+    "#_followers": 0,
+    "#_following": 0,
+    "User_bio": "Your bio is empty",
     "user_pfp": "http://pfpImage",
-    "wallet_balance": 3456
+    "wallet_balance": 1326
 }
 ###
 
