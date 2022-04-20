@@ -3,7 +3,7 @@
 # List of articles
 Input url is /home?uid=[userid]
 
-<img width="413" alt="get_article_list_view" src="https://user-images.githubusercontent.com/17632589/163287942-eb1ba918-756d-40c2-9fe5-b5de84098d96.png">
+<img width="451" alt="Screen Shot 2022-04-20 at 9 16 32 AM" src="https://user-images.githubusercontent.com/17632589/164276399-763af5bb-1370-4ae9-98cb-bc98133aada0.png">
 
 Assume user has logged in. User will see a list of articles here.
 
@@ -15,13 +15,13 @@ Request value 'user_id', 'start_index', 'number_of_articles' //if window size/ca
 Response value: 'article_title' 'author_name' 'author_pfp' 'date_posted' 'total_invested' 'image_url' 'tags' //for each article_id
 
 The UI element mapping to the response value:
-![article_list UI elements](https://user-images.githubusercontent.com/17632589/163302454-950cb39d-931d-4596-9558-190145325b16.jpeg)
+![article_list_view_UI elements](https://user-images.githubusercontent.com/17632589/164275991-4e42b97e-9f6e-47d1-87f9-0b7da5d94c79.jpeg)
 
 
 In case of error response. show the error message. then an empty article list page
 
 ## Clickable area 
-![article_list clickable area](https://user-images.githubusercontent.com/17632589/163292189-bd1755cd-507e-416e-82f9-39ab6716466b.jpeg)
+![article_list_view_clickablearea](https://user-images.githubusercontent.com/17632589/164275987-ac3b92e1-49ba-47bd-8b7e-2e392eea8258.jpg)
 
 # check_already_paid //article_readpage
 
