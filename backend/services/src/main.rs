@@ -23,10 +23,25 @@ async fn main(){     // create our static file handler
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
-    let frontend = async {
+    // let frontend = async {
+    //     let app = Router::new()
+    //         .nest(
+    //             "/",
+    //             get_service(ServeDir::new("../../frontend/website/"))
+    //             .handle_error(|error: std::io::Error| async move {
+    //                 (
+    //                     StatusCode::INTERNAL_SERVER_ERROR,
+    //                     format!("Unhandled internal error: {}", error),
+    //                 )
+    //             }),
+    //         )
+    //         .layer(TraceLayer::new_for_http());
+    //     serve(app, 8080).await;
+    // };
+    let backend = async {
         let app = Router::new()
             .nest(
-                "/",
+                "/home",
                 get_service(ServeDir::new("../../frontend/website/"))
                 .handle_error(|error: std::io::Error| async move {
                     (
@@ -35,11 +50,7 @@ async fn main(){     // create our static file handler
                     )
                 }),
             )
-            .layer(TraceLayer::new_for_http());
-        serve(app, 8080).await;
-    };
-    let backend = async {
-        let app = Router::new()
+            .layer(TraceLayer::new_for_http())
             .route("/api/get_article_list_and_view", post(article_list_and_view))
             .route("/api/check_already_paid", post(check_already_paid))
             .layer(
@@ -65,7 +76,7 @@ async fn main(){     // create our static file handler
         serve(app, 3000).await;
     };
 
-    tokio::join!(frontend, backend);
+    tokio::join!( backend);
 
 }
 async fn serve(app: Router, port: u16) {
