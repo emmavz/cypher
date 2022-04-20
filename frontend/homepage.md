@@ -54,11 +54,14 @@ if has_paid is false, only render unpaid properties
 
 
 
-<img width="473" alt="article read page" src="https://user-images.githubusercontent.com/17632589/163291858-bb93fc56-3a41-4abf-b9c3-b0dbb3ac6594.png">
+<img width="423" alt="Screen Shot 2022-04-19 at 8 10 55 AM" src="https://user-images.githubusercontent.com/17632589/164036348-3353b27e-6b4c-42c4-b0c7-162b382fd5ce.png">
+
+
+
 
 
 UI elements:
-![read_page UI](https://user-images.githubusercontent.com/17632589/163301836-677bec4e-3220-4fb0-9cbc-32f8a2b6af83.jpeg)
+![read_page UI elements](https://user-images.githubusercontent.com/17632589/164042410-42f8efab-0ea9-4fb3-9edb-eeae9230548f.jpg)
 
 If API failed with an error message, go to article_list_view
 
@@ -73,14 +76,26 @@ The text on this page is "error. Sorry! This request couldn't be processed right
 
 ### Clickable area
 
-![read_page clickable](https://user-images.githubusercontent.com/17632589/163301826-d8641e23-d9dd-47ee-877e-213f48c0d5c2.jpeg)
+![read_page clickable area](https://user-images.githubusercontent.com/17632589/164042420-18210448-99fe-4b89-a784-5df14572da0b.jpg)
 
 
-If 'statistics' clicked, trigger API: get_statistics
+If 'x' clicked, trigger API: get_statistics
 
 If 'upvote' clicked, trigger API: upvote_command
 
-If 'downvote' clicked, trigger API: cash_out_command
+If 'share' clicked, trigger API: share_to_read
 
+If 'author_pfp' clicked, trigger API: user_profile
 
+If 'statistics' clicked, trigger API: get_statistics
+
+If 'home button' clicked, trigger API: get_article_list_and_view
+
+If 'search button' clicked, trigger API: search_page
+
+If 'add article button' clicked, trigger API: article_prep_page
+
+If 'activity wall button' clicked, trigger API: activity_wall
+
+If 'user profile page button' clicked, trigger API: user_profile_page
 

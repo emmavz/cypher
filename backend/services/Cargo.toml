@@ -6,7 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.4.8" # Web framework that focuses on ergonomics and modularity.
+axum = "0.5.3" # Web framework that focuses on ergonomics and modularity.
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+axum_static_macro = "1"
+tower-http = { version = "0.2.0", features = ["cors", "fs", "trace"] }
 tokio = { version = "1.17.0", features = ["full"] } # Event-driven, non-blocking I/O platform.
 serde = { version = "1.0.136", features = ["derive"] } # A serialization/deserialization framework.
 serde_json = "1.0.79" # Serde serializion/deserialization of JSON data.
