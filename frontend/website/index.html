@@ -122,14 +122,14 @@
 		$(function () {
 			$.ajax({
 				type: 'POST',
-				dataType: 'json',
+				// dataType: 'json',
 				contentType: "application/json",
-				data: {
+				data: JSON.stringify({
 					"user_id": 1,
 					"start_index": "1",
 					"number_of_article": "5"
-				},
-				url: 'http://localhost:3000/api/get_article_list_and_view'
+				}),
+				url: '/api/get_article_list_and_view'
 			}).done(function (res) {
 				console.log(res);
 			});
