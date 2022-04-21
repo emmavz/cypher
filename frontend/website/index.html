@@ -38,59 +38,186 @@
 		<div class="content i-wrap">
 			<div class="blog-post-wrap container flex flex-wrap">
 
-				<?php foreach ($articles as $k => $article) : ?>
-
-				<?php
-						$bgColor = '#'.getAverageColor($article->image_url);
-					?>
-
 				<div class="w-full flex justify-center">
-					<a href="#<?= $article->article_id ?>" class="blog-post inline-flex flex-wrap justify-between">
-						<span
-							style="background: linear-gradient(206.14deg, <?= $bgColor; ?>  0%, #4F4D55 145.34%);"></span>
+					<a href="#" class="blog-post inline-flex flex-wrap justify-between">
+						<span style="background: linear-gradient(206.14deg, #CEB9C0 0%, #4F4D55 145.34%);"></span>
 						<div class="blog-post__left">
 							<div class="blog-post__left__header flex items-center mb-4">
 								<div class="blog-post__left__header__img">
-									<img src="<?= $article->author_pfp ?>" alt="">
+									<img src="./img/dynamic/profile-1.png" alt="">
 								</div>
 								<div class="pl-3">
-									<h2 class="mb-1">
-										<?= $article->article_title ?>
-									</h2>
+									<h2 class="mb-1">Why Python is The Future</h2>
 									<div class="flex blog-post__left__header__author">
-										<span>
-											<?= $article->author_name ?>
-										</span> <img src="./img/lock-icon.svg" alt="" class="ml-2.5">
+										<span>Ephraim Jones</span>
 									</div>
 								</div>
 							</div>
 
 							<ul class="categories mb-4">
-								<?php foreach (explode(', ', $article->tags) as $tag) : ?>
-								<li><span>
-										<?= $tag ?>
-									</span></li>
-								<?php endforeach; ?>
+								<li><span>For You</span></li>
+								<li><span>Coding</span></li>
 							</ul>
 
 							<div class="blog-post__left__meta flex mb-2.5">
-								<div class="mr-3">
-									<?= date('F d, Y', strtotime($article->date_posted)) ?>
-								</div>
-								<!-- <div>5 min read</div> -->
+								<div class="mr-3">January 3, 2021</div>
 							</div>
 
 							<div class="blog-post__left__stock">
-								<?= $article->total_invested ?>T Invested
+								10025 CPHR Invested
 							</div>
 						</div>
 
-						<div class="blog-post__right" style="background-image: url('<?= $article->image_url ?>')">&nbsp;
-							<span
-								style="background: linear-gradient(206.14deg, <?= $bgColor; ?> 0%, #4F4D55 145.34%);"></span>
+						<div class="blog-post__right" style="background-image: url('./img/dynamic/post-1.png')">&nbsp;
+							<span style="background: linear-gradient(206.14deg, #CEB9C0 0%, #4F4D55 145.34%);"></span>
 						</div>
 					</a>
 				</div>
+
+				<div class="w-full flex justify-center">
+					<a href="#" class="blog-post inline-flex flex-wrap justify-between">
+						<span style="background: linear-gradient(206.14deg, #B6D0E9 0%, #4B4857 145.34%);"></span>
+						<div class="blog-post__left">
+							<div class="blog-post__left__header flex items-center mb-4">
+								<div class="blog-post__left__header__img">
+									<img src="./img/dynamic/profile-2.png" alt="">
+								</div>
+								<div class="pl-3">
+									<h2 class="mb-1">Super Chewy Cookies Recipe</h2>
+									<div class="flex blog-post__left__header__author">
+										<span>Eliza Mae</span>
+									</div>
+								</div>
+							</div>
+
+							<ul class="categories mb-4">
+								<li><span>For You</span></li>
+								<li><span>Baking</span></li>
+							</ul>
+
+							<div class="blog-post__left__meta flex mb-2.5">
+								<div class="mr-3">January 21, 2021</div>
+							</div>
+
+							<div class="blog-post__left__stock">
+								7342 CPHR Invested
+							</div>
+						</div>
+
+						<div class="blog-post__right" style="background-image: url('./img/dynamic/post-2.png')">&nbsp;
+							<span style="background: linear-gradient(206.14deg, #B6D0E9 0%, #4B4857 145.34%);"></span>
+						</div>
+					</a>
+				</div>
+
+				<div class="w-full flex justify-center">
+					<a href="#" class="blog-post inline-flex flex-wrap justify-between">
+						<span style="background: linear-gradient(206.14deg, #C7CEB9 0%, #4F4D55 145.34%);"></span>
+						<div class="blog-post__left">
+							<div class="blog-post__left__header flex items-center mb-4">
+								<div class="blog-post__left__header__img">
+									<img src="./img/dynamic/profile-3.png" alt="">
+								</div>
+								<div class="pl-3">
+									<h2 class="mb-1">The Go-To-Market Guide</h2>
+									<div class="flex blog-post__left__header__author">
+										<span>Cecilia Hong</span>
+									</div>
+								</div>
+							</div>
+
+							<ul class="categories mb-4">
+								<li><span>For You</span></li>
+								<li><span>Business</span></li>
+							</ul>
+
+							<div class="blog-post__left__meta flex mb-2.5">
+								<div class="mr-3">January 7, 2021</div>
+							</div>
+
+							<div class="blog-post__left__stock">
+								8961 CPHR Invested
+							</div>
+						</div>
+
+						<div class="blog-post__right" style="background-image: url('./img/dynamic/post-3.png')">&nbsp;
+							<span style="background: linear-gradient(206.14deg, #C7CEB9 0%, #4F4D55 145.34%);"></span>
+						</div>
+					</a>
+				</div>
+
+				<div class="w-full flex justify-center">
+					<a href="#" class="blog-post inline-flex flex-wrap justify-between">
+						<span style="background: linear-gradient(206.14deg, #F4C7DF 0%, #894F80 145.34%);"></span>
+						<div class="blog-post__left">
+							<div class="blog-post__left__header flex items-center mb-4">
+								<div class="blog-post__left__header__img">
+									<img src="./img/dynamic/profile-4.png" alt="">
+								</div>
+								<div class="pl-3">
+									<h2 class="mb-1">The Rules of Digital Marketing</h2>
+									<div class="flex blog-post__left__header__author">
+										<span>Melissa Shen</span>
+									</div>
+								</div>
+							</div>
+
+							<ul class="categories mb-4">
+								<li><span>For You</span></li>
+								<li><span class="mx-w-80">Marketing</span></li>
+							</ul>
+
+							<div class="blog-post__left__meta flex mb-2.5">
+								<div class="mr-3">January 19, 2021</div>
+							</div>
+
+							<div class="blog-post__left__stock">
+								9456 CPHR Invested
+							</div>
+						</div>
+
+						<div class="blog-post__right" style="background-image: url('./img/dynamic/post-4.png')">&nbsp;
+							<span style="background: linear-gradient(206.14deg, #F4C7DF 0%, #894F80 145.34%);"></span>
+						</div>
+					</a>
+				</div>
+
+				<div class="w-full flex justify-center">
+					<a href="#" class="blog-post inline-flex flex-wrap justify-between">
+						<span style="background: linear-gradient(206.14deg, #CDCFFF 0%, #052054 145.34%);"></span>
+						<div class="blog-post__left">
+							<div class="blog-post__left__header flex items-center mb-4">
+								<div class="blog-post__left__header__img">
+									<img src="./img/dynamic/profile-5.png" alt="">
+								</div>
+								<div class="pl-3">
+									<h2 class="mb-1">Building Muscle The Right Way</h2>
+									<div class="flex blog-post__left__header__author">
+										<span>Darren Jones</span>
+									</div>
+								</div>
+							</div>
+
+							<ul class="categories mb-4">
+								<li><span>For You</span></li>
+								<li><span>Fitness</span></li>
+							</ul>
+
+							<div class="blog-post__left__meta flex mb-2.5">
+								<div class="mr-3">January 24, 2021</div>
+							</div>
+
+							<div class="blog-post__left__stock">
+								11275 CPHR Invested
+							</div>
+						</div>
+
+						<div class="blog-post__right" style="background-image: url('./img/dynamic/post-5.png')">&nbsp;
+							<span style="background: linear-gradient(206.14deg, #CDCFFF 0%, #052054 145.34%);"></span>
+						</div>
+					</a>
+				</div>
+
 			</div>
 		</div>
 
