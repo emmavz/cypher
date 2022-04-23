@@ -24,8 +24,8 @@ Default port is 88 for both development and testing. If you want to change them 
 npm install
 ```
 
-(Skip this. This is only for development)
 ### Compile and Hot-Reload for Development
+(Skip this. This is only for development)
 
 ```sh
 npm run dev
