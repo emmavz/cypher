@@ -40,17 +40,6 @@ async fn main(){     // create our static file handler
     // };
     let backend = async {
         let app = Router::new()
-            .nest(
-                "/home",
-                get_service(ServeDir::new("../../frontend/website/"))
-                .handle_error(|error: std::io::Error| async move {
-                    (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled internal error: {}", error),
-                    )
-                }),
-            )
-            .layer(TraceLayer::new_for_http())
             .route("/api/get_article_list_and_view", post(article_list_and_view))
             .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/get_article_homepage", post(article_homepage))
@@ -71,9 +60,31 @@ async fn main(){     // create our static file handler
                     header::ACCEPT_LANGUAGE,
                     header::AUTHORIZATION,
                 ])
-                .allow_origin(Origin::exact("http://localhost:88".parse().unwrap()))
+                .allow_origin(Origin::exact("http://localhost:3000".parse().unwrap()))
                 .allow_methods(vec![Method::GET, Method::POST]),
-        );
+            )
+            .route(
+                "/",
+                get_service(ServeDir::new("../../frontend/website/index.html"))
+                .handle_error(|error: std::io::Error| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled internal error: {}", error),
+                    )
+                }),
+            )
+            .nest(
+                "/src",
+                get_service(ServeDir::new("../../frontend/website/src/"))
+                .handle_error(|error: std::io::Error| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled internal error: {}", error),
+                    )
+                }),
+            )
+            .layer(TraceLayer::new_for_http())
+            ;
         serve(app, 3000).await;
     };
 
