@@ -13,7 +13,6 @@ Default port is 88 for both development and testing. If you want to change them 
 npm install
 ```
 
-(SKIP THIS COMMAND IF dist FOLDER ALREADY EXISTS)
 ```sh
 npm run build
 ```
