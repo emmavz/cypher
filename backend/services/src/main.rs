@@ -65,7 +65,7 @@ async fn main(){     // create our static file handler
             )
             .route(
                 "/",
-                get_service(ServeDir::new("../../frontend/website/index.html"))
+                get_service(ServeDir::new("../../frontend/website/dist/index.html"))
                 .handle_error(|error: std::io::Error| async move {
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
@@ -74,8 +74,18 @@ async fn main(){     // create our static file handler
                 }),
             )
             .nest(
-                "/src",
-                get_service(ServeDir::new("../../frontend/website/src/"))
+                "/dist",
+                get_service(ServeDir::new("../../frontend/website/dist/"))
+                .handle_error(|error: std::io::Error| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled internal error: {}", error),
+                    )
+                }),
+            )
+            .nest(
+                "/assets",
+                get_service(ServeDir::new("../../frontend/website/dist/assets/"))
                 .handle_error(|error: std::io::Error| async move {
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
@@ -85,7 +95,7 @@ async fn main(){     // create our static file handler
             )
             .layer(TraceLayer::new_for_http())
             ;
-        serve(app, 8888).await;
+        serve(app, 3000).await;
     };
 
     tokio::join!( backend);
