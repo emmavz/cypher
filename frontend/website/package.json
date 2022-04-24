@@ -1,0 +1,24 @@
+{
+  "name": "cypher",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --port 8888",
+    "build": "vite build",
+    "preview": "vite preview --port 8888",
+    "__build__": "vite build --base=/cypher/frontend/website/dist/"
+  },
+  "dependencies": {
+    "moment": "^2.29.3",
+    "node-vibrant": "^3.2.1-alpha.1",
+    "vue": "^3.2.33",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "autoprefixer": "^10.4.4",
+    "postcss": "^8.4.12",
+    "sass": "^1.50.1",
+    "tailwindcss": "^3.0.24",
+    "vite": "^2.9.5"
+  }
+}
