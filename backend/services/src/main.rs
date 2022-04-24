@@ -11,7 +11,7 @@ use axum::{
 };
 use std::net::SocketAddr;
 use serde_json::{json, Value};
-use tower_http::{services::ServeDir, trace::TraceLayer};
+use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -70,6 +70,16 @@ async fn main(){     // create our static file handler
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         format!("Unhandled internal error: {}", error),
+                    )
+                }),
+            )
+            .route(
+                "/article/:id",
+                get_service(ServeFile::new("../../frontend/website/dist/index.html"))
+                .handle_error(|error: std::io::Error| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled article internal error: {}", error),
                     )
                 }),
             )
