@@ -224,16 +224,16 @@ pub async fn article_homepage(
         // let name = input.get("name");
         json!(
             {
-                "article_total_invested": "10025",
-                "image_url": "http://localhost:3000/dynamic/post-1-single.png",
-                "article_title": "Why Python is The Future",
-                "article_author": "Ephraim Jones",
-                "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
-                "article_description": "Python can be used on a server to create web applications. Python can be used alongside software to create workflows. Python can connect to database systems!",
-                "article_price": 10,
-                "article_liquidation_time": 4,
-                "article_total_reads": 432,
-                "article_total_shares": 76
+                "image_url": "http://localhost:3000/dynamic/post-2-single.jpg",
+                "article_title": "Super Chewy Cookies Recipe",
+                "article_author": "Eliza Mae",
+                "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
+                "article_description": "This recipe will teach you the most awesome way to make amazingly chewy cookies that will make your grandma proud.",
+                "article_price": 20,
+                "article_liquidation_time": 2,
+                "article_total_reads": 835,
+                "article_total_shares": 76,
+                "user_wallet_balance": 1256
             }
     )
     }).join().unwrap().into()

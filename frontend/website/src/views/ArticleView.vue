@@ -39,7 +39,7 @@ export default ({
             <template v-if="article">
                 <div class="relative flex justify-center banner_img">
                     <img :src="article.image_url" alt="" class="w-full">
-                    <span>{{ article.article_total_invested+'T' }}</span>
+                    <span>{{ article.user_wallet_balance }} CPHR</span>
                     <button class="close-icon"><img src="/src/assets/img/close-icon.svg" alt="" width="34"></button>
                 </div>
 
