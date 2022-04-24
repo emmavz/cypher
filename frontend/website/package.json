@@ -2,9 +2,9 @@
   "name": "cypher",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 88",
+    "dev": "vite --port 8888",
     "build": "vite build",
-    "preview": "vite preview --port 88",
+    "preview": "vite preview --port 8888",
     "__build__": "vite build --base=/cypher/frontend/website/dist/"
   },
   "dependencies": {
