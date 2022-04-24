@@ -96,14 +96,15 @@ content-type: application/json
 return
 {
     "image_url": "http://backgroundImage",
-    "article_title": "A History of Fashion",
-    "article_author": "Violet Lee",
-    "author_pfp": "www.violetleepfp.com",
-    "article_description": "fashion has always been my passion!",
-    "article_price": 10,
-    "article_liquidation_time": 4,
-    "article_total_reads": 432,
-    "article_total_shares": 76
+    "article_title": "Super Chewy Cookies Recipe",
+    "article_author": "Eliza Mae",
+    "author_pfp": "www.elizamaepfp.com",
+    "article_description": "This recipe will teach you the most awesome way to make amazingly chewy cookies that will make your grandma proud.",
+    "article_price": 20,
+    "article_liquidation_time": 2,
+    "article_total_reads": 835,
+    "article_total_shares": 76,
+    "user_wallet_balance": 1256
 }
 ###
 POST http://localhost:3000/api/pay_command
