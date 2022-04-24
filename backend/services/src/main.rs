@@ -93,6 +93,16 @@ async fn main(){     // create our static file handler
                     )
                 }),
             )
+            .nest(
+                "/dynamic",
+                get_service(ServeDir::new("../../frontend/website/dist/dynamic/"))
+                .handle_error(|error: std::io::Error| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled internal error: {}", error),
+                    )
+                }),
+            )
             .layer(TraceLayer::new_for_http())
             ;
         serve(app, 3000).await;
@@ -124,50 +134,50 @@ pub async fn article_list_and_view(
         "article_id": 1,
         "article_title": "Why Python is The Future",
         "author_name": "Ephraim Jones",
-        "author_pfp": "http://localhost:88/dynamic/profile-1.png",
+        "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
         "date_posted": "1/03/2021 15:19:00",
         "total_invested": 10025,
-        "image_url": "http://localhost:88/dynamic/post-1.png",
+        "image_url": "http://localhost:3000/dynamic/post-1.png",
         "tags": "for you, coding"
     },
     {
         "article_id": 2,
         "article_title": "Super Chewy Cookies Recipe",
         "author_name": "Eliza Mae",
-        "author_pfp": "http://localhost:88/dynamic/profile-2.png",
+        "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
         "date_posted": "1/21/2021 15:19:00",
         "total_invested": 7342,
-        "image_url": "http://localhost:88/dynamic/post-2.jpg",
+        "image_url": "http://localhost:3000/dynamic/post-2.jpg",
         "tags": "for you, baking"
     },
     {
         "article_id": 3,
         "article_title": "The Go-To-Market Guide",
         "author_name": "Cecelia Hong",
-        "author_pfp": "http://localhost:88/dynamic/profile-3.png",
+        "author_pfp": "http://localhost:3000/dynamic/profile-3.png",
         "date_posted": "1/07/2021 15:19:00",
         "total_invested": 8961,
-        "image_url": "http://localhost:88/dynamic/post-3.jpg",
+        "image_url": "http://localhost:3000/dynamic/post-3.jpg",
         "tags": "for you, business"
     },
     {
         "article_id": 4,
         "article_title": "The Rules of Digital Marketing",
         "author_name": "Melissa Shen",
-        "author_pfp": "http://localhost:88/dynamic/profile-4.png",
+        "author_pfp": "http://localhost:3000/dynamic/profile-4.png",
         "date_posted": "1/19/2021 15:19:00",
         "total_invested": 9456,
-        "image_url": "http://localhost:88/dynamic/post-4.jpg",
+        "image_url": "http://localhost:3000/dynamic/post-4.jpg",
         "tags": "for you, marketing"
     },
     {
         "article_id": 5,
         "article_title": "Building muscle the right way",
         "author_name": "Darren Jones",
-        "author_pfp": "http://localhost:88/dynamic/profile-5.png",
+        "author_pfp": "http://localhost:3000/dynamic/profile-5.png",
         "date_posted": "1/24/2021 15:19:00",
         "total_invested": 11275,
-        "image_url": "http://localhost:88/dynamic/post-5.jpg",
+        "image_url": "http://localhost:3000/dynamic/post-5.jpg",
         "tags": "for you, fitness"
     }
 ]
@@ -205,10 +215,10 @@ pub async fn article_homepage(
         json!(
             {
                 "article_total_invested": "10025",
-                "image_url": "http://localhost:88/dynamic/post-1-single.png",
+                "image_url": "http://localhost:3000/dynamic/post-1-single.png",
                 "article_title": "Why Python is The Future",
                 "article_author": "Ephraim Jones",
-                "author_pfp": "http://localhost:88/dynamic/profile-1.png",
+                "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
                 "article_description": "Python can be used on a server to create web applications. Python can be used alongside software to create workflows. Python can connect to database systems!",
                 "article_price": 10,
                 "article_liquidation_time": 4,
