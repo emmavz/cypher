@@ -8,6 +8,8 @@
     "__build__": "vite build --base=/cypher/frontend/website/dist/"
   },
   "dependencies": {
+    "axios": "^0.26.1",
+    "mitt": "^3.0.0",
     "moment": "^2.29.3",
     "node-vibrant": "^3.2.1-alpha.1",
     "vue": "^3.2.33",
