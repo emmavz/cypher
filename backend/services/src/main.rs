@@ -23,46 +23,8 @@ async fn main(){     // create our static file handler
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
-    // let frontend = async {
-    //     let app = Router::new()
-    //         .nest(
-    //             "/",
-    //             get_service(ServeDir::new("../../frontend/website/"))
-    //             .handle_error(|error: std::io::Error| async move {
-    //                 (
-    //                     StatusCode::INTERNAL_SERVER_ERROR,
-    //                     format!("Unhandled internal error: {}", error),
-    //                 )
-    //             }),
-    //         )
-    //         .layer(TraceLayer::new_for_http());
-    //     serve(app, 8080).await;
-    // };
-    let backend = async {
+    let frontend = async {
         let app = Router::new()
-            .route("/api/get_article_list_and_view", post(article_list_and_view))
-            .route("/api/check_already_paid", post(check_already_paid))
-            .route("/api/get_article_homepage", post(article_homepage))
-            .layer(
-            // see https://docs.rs/tower-http/latest/tower_http/cors/index.html
-            // for more details
-            //
-            // pay attention that for some request types like posting content-type: application/json
-            // it is required to add ".allow_headers(vec![http::header::CONTENT_TYPE])"
-            // or see this issue https://github.com/tokio-rs/axum/issues/849
-            CorsLayer::new()
-                // .allow_origins(AllowedOrigins::Any { allow_null: false })
-                .allow_headers([
-                    header::ACCEPT,
-                    header::CONTENT_TYPE,
-                    header::CONTENT_LENGTH,
-                    header::ACCEPT_ENCODING,
-                    header::ACCEPT_LANGUAGE,
-                    header::AUTHORIZATION,
-                ])
-                .allow_origin(Origin::exact("http://localhost:3000".parse().unwrap()))
-                .allow_methods(vec![Method::GET, Method::POST]),
-            )
             .route(
                 "/",
                 get_service(ServeDir::new("../../frontend/website/dist/index.html"))
@@ -113,17 +75,41 @@ async fn main(){     // create our static file handler
                     )
                 }),
             )
-            .layer(TraceLayer::new_for_http())
-            ;
-        serve(app, 3000).await;
+            .layer(TraceLayer::new_for_http());
+        serve(app, "static file",  8080).await;
     };
-
-    tokio::join!( backend);
-
+    let backend = async {
+        let app = Router::new()
+            .route("/api/get_article_list_and_view", post(article_list_and_view))
+            .route("/api/check_already_paid", post(check_already_paid))
+            .route("/api/get_article_homepage", post(article_homepage))
+            .layer(
+            // see https://docs.rs/tower-http/latest/tower_http/cors/index.html
+            // for more details
+            //
+            // pay attention that for some request types like posting content-type: application/json
+            // it is required to add ".allow_headers(vec![http::header::CONTENT_TYPE])"
+            // or see this issue https://github.com/tokio-rs/axum/issues/849
+            CorsLayer::new()
+                // .allow_origins(AllowedOrigins::Any { allow_null: false })
+                .allow_headers([
+                    header::ACCEPT,
+                    header::CONTENT_TYPE,
+                    header::CONTENT_LENGTH,
+                    header::ACCEPT_ENCODING,
+                    header::ACCEPT_LANGUAGE,
+                    header::AUTHORIZATION,
+                ])
+                .allow_origin(Origin::exact("http://localhost:8080".parse().unwrap()))
+                .allow_methods(vec![Method::GET, Method::POST]),
+            );
+        serve(app, "ajax api", 3000).await;
+    };
+    tokio::join!( frontend, backend);
 }
-async fn serve(app: Router, port: u16) {
+async fn serve(app: Router, server_name:&str, port: u16) {
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    println!("Run our application as a hyper server on http://localhost:{}.", port);
+    println!("Run our application as a {} server on http://localhost:{}.", server_name, port);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
