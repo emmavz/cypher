@@ -7,12 +7,23 @@ use axum::{
     http::{header, Method, StatusCode},
     response::{Html, IntoResponse},
     routing::{get,post, get_service},
+    extract::{Extension},
     Json, Router,
 };
+use std::sync::Arc;
 use std::net::SocketAddr;
 use serde_json::{json, Value};
 use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use tokendb::{
+    SledGlue, exec_cmd, begin_transaction, rollback_transaction, 
+    dump_single_table, commit_transaction, 
+};
+
+pub struct AppState {
+    pub glue_path: String,
+}
 
 #[tokio::main]
 async fn main(){     // create our static file handler
@@ -23,6 +34,8 @@ async fn main(){     // create our static file handler
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
+
+    let glue_path: String = std::env::current_dir().unwrap().to_str().unwrap().into();
     let frontend = async {
         let app = Router::new()
             .route(
@@ -83,6 +96,7 @@ async fn main(){     // create our static file handler
             .route("/api/get_article_list_and_view", post(article_list_and_view))
             .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/get_article_homepage", post(article_homepage))
+            .route("/api/sql_test", post(sql_test))
             .layer(
             // see https://docs.rs/tower-http/latest/tower_http/cors/index.html
             // for more details
@@ -102,14 +116,15 @@ async fn main(){     // create our static file handler
                 ])
                 .allow_origin(Origin::exact("http://localhost:8080".parse().unwrap()))
                 .allow_methods(vec![Method::GET, Method::POST]),
-            );
+            )
+            .layer(Extension(Arc::new(AppState {glue_path})));
         serve(app, "ajax api", 3000).await;
     };
     tokio::join!( frontend, backend);
 }
 async fn serve(app: Router, server_name:&str, port: u16) {
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    println!("Run our application as a {} server on http://localhost:{}.", server_name, port);
+    info!("Run our application as a {} server on http://localhost:{}.", server_name, port);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
@@ -120,6 +135,7 @@ async fn serve(app: Router, server_name:&str, port: u16) {
 use std::thread;
 
 pub async fn article_list_and_view(
+    Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
@@ -183,6 +199,7 @@ pub async fn article_list_and_view(
 
 
 pub async fn check_already_paid(
+    Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
@@ -204,6 +221,7 @@ pub async fn check_already_paid(
 }
 
 pub async fn article_homepage(
+    Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
@@ -222,5 +240,67 @@ pub async fn article_homepage(
                 "user_wallet_balance": 1256
             }
     )
+    }).join().unwrap().into()
+}
+pub async fn sql_test(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        let sqls = input.get("sql").unwrap().as_array().unwrap();
+
+        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+        let mut results = Vec::new();
+        for sql in sqls{
+            println!("sql is {}", &sql);
+            println!("sql.as_str() is {:?}", &sql.as_str());
+            let result = match exec_cmd(
+                &mut glue,
+                sql.as_str().unwrap(),
+            ){
+                Ok(r)=> json!(
+                    {
+                        "result": true,
+                    }
+                ),
+                Err(e)=> json!(
+                    {
+                        "error": e.to_string(),
+                    }
+                )
+            };
+            results.push(result.clone());
+            if result.get("error").is_some(){
+                break;
+            }
+        };
+        json!(results)
+        // if json!([
+        //         {
+        //             "id": 1,
+        //             "name": "Friday"
+        //         },
+        //         {
+        //             "id": 2,
+        //             "name": "Phone"
+        //         }
+        //     ])
+        //     ==
+        //     dump_single_table("TxTest", None, &mut glue).unwrap() 
+        // {
+
+        //     json!(
+        //         {
+        //         "result": true
+        //         }
+        //     )
+        // }else{
+        //     json!(
+        //         {
+        //         "result": false
+        //         }
+        //     )
+            
+        // }
     }).join().unwrap().into()
 }

@@ -20,7 +20,7 @@ pub type SledGlue = Glue<IVec, SledStorage>;
 	// }
 
 pub fn init_glue(parent_dir: &str) -> TokenStateResult<SledGlue> {
-	info!("init_glue to dir {}", parent_dir);
+	println!("init_glue to dir {}", parent_dir);
 	Ok(SledGlue::new(SledStorage::new(
 		Path::new(parent_dir).join("cypher_db")
 		.to_str()
@@ -32,7 +32,7 @@ pub fn init_glue(parent_dir: &str) -> TokenStateResult<SledGlue> {
 
 pub fn begin_transaction(glue: &mut SledGlue) -> TokenStateResult<Vec<u8>> {
 	let payload = glue.execute(BEGIN_TRANSACTION_EXPR)?;
-	info!("begin transaction result: {:?}", payload);
+	println!("begin transaction result: {:?}", payload);
 	Ok(bincode::serialize(&payload)?)
 }
 
@@ -47,13 +47,13 @@ pub fn check_transaction_context(buf: &[u8]) -> TokenStateResult<()> {
 
 pub fn commit_transaction(glue: &mut SledGlue) -> TokenStateResult<()> {
 	let payload = glue.execute(COMMIT_TRANSACTION_EXPR)?;
-	info!("commit transaction result: {:?}", payload);
+	println!("commit transaction result: {:?}", payload);
 	Ok(())
 }
 
 pub fn rollback_transaction(glue: &mut SledGlue) -> TokenStateResult<()> {
 	let payload = glue.execute(ROLLBACK_TRANSACTION_EXPR)?;
-	info!("rollback transaction result: {:?}", payload);
+	println!("rollback transaction result: {:?}", payload);
 	Ok(())
 }
 
@@ -74,7 +74,7 @@ pub fn exec_cmd(
 }
 
 pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Vec<u8>> {
-	info!("enter exec_query, sql: {}", sql);
+	println!("enter exec_query, sql: {}", sql);
 	let statement: Statement = block_on(glue.plan(sql))?;
 	match statement {
 		Statement::Query(_) => (),
@@ -88,7 +88,7 @@ pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Vec<u8>> {
 	let result: Payload = glue.execute_stmt(statement)?;
 	Ok(bincode::serialize(&result)?)
 }
-fn dump_single_table(
+pub fn dump_single_table(
 	table: &str,
 	max_rows: Option<&u64>,
 	glue: &mut SledGlue,

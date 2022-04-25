@@ -1,3 +1,23 @@
+POST http://localhost:3000/api/sql_test
+content-type: application/json
+
+{
+    "sql":[
+        "CREATE TABLE TxTest ( id INTEGER, name TEXT);",
+        "INSERT INTO TxTest VALUES (1, 'Friday'), (2, 'Phone');"
+    ]
+}
+###
+POST http://localhost:3000/api/sql_test
+content-type: application/json
+
+{
+    "sql":[
+        "DROP TABLE TxTest "
+    ]
+}
+###
+
 GET http://localhost:8080/index.html
 ### 
 POST http://localhost:3000/api/get_article_list_and_view
