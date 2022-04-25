@@ -1,9 +1,12 @@
 .footer {
+    background-color: $primary-color;
     padding: 11px 0px 14px 0px;
     z-index: 100;
     bottom: 0;
     left: 0;
     width: 100%;
+    position: fixed;
+    height: $footer-height;
 
     &__controls {
 

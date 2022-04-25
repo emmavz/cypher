@@ -2,36 +2,27 @@
 export default ({
   data() {
     return {
-      isLoading: true,
       article: null,
     }
   },
   created() {
 
-    const response = fetch('http://localhost:3000/api/get_article_homepage', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-          "article_id": this.$route.params.articleId,
-      })
+    this.sendApiRequest('get_article_homepage', {
+        "article_id": this.$route.params.articleId
     })
-    .then(response => response.json())
     .then(article => {
       this.article = article;
-    })
-    .finally(() => this.isLoading = false);
+    });
+
   },
 })
 </script>
 
 <template>
-    <!-- App -->
-    <div class="app">
-        <!-- Header -->
-        <header class="header"></header>
+
+    <div class="app-wp">
+
+        <Header/>
 
         <!-- Content -->
         <div class="content">
@@ -39,7 +30,7 @@ export default ({
             <template v-if="article">
                 <div class="relative flex justify-center banner_img">
                     <img :src="article.image_url" alt="" class="w-full">
-                    <span>{{ article.user_wallet_balance }} CPHR</span>
+                    <span>{{ article.user_wallet_balance }} {{ this.currency }}</span>
                     <button class="close-icon"><img src="/src/assets/img/close-icon.svg" alt="" width="34"></button>
                 </div>
 
@@ -56,7 +47,7 @@ export default ({
                         <p class="mb-6">
                             {{ article.article_description }}
                         </p>
-                        <div class="mb-6"><a href="#" class="btn">Pay to Read (20T)</a></div>
+                        <div class="mb-6"><a href="#" class="btn f-16">Pay to Read (20 {{ this.currency }})</a></div>
                         <div><a href="#" class="btn">Share to Read</a></div>
                     </div>
                 </div>
@@ -75,24 +66,10 @@ export default ({
                     </div>
                 </div>
             </template>
-        </div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="footer__controls">
-                    <ul class="flex justify-center items-center">
-                        <li><RouterLink :to="{name: 'home'}"><img src="@/assets/img/home-icon.svg" alt=""></RouterLink></li>
-                        <li><a href="#"><img src="/src/assets/img/search-icon.svg" alt=""></a></li>
-                        <li><a href="#" class="active"><img src="/src/assets/img/plus-white-icon.svg" alt=""></a></li>
-                        <li><a href="#"><img src="/src/assets/img/notification-icon.svg" alt=""></a></li>
-                        <li><a href="#"><img src="/src/assets/img/profile-icon.svg" alt=""></a></li>
-                    </ul>
-                </div>
-            </div>
-        </footer>
+            <Error/>
+        </div>
 
     </div>
 
-    <div class="f-spinner" v-if="isLoading"><div></div></div>
 </template>

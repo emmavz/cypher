@@ -1,5 +1,5 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import Footer from '@/components/Footer.vue'
 export default {
   name: "App",
@@ -11,10 +11,16 @@ export default {
 
 <template>
 
-  <router-view></router-view>
+  <main class="app">
+
+    <router-view></router-view>
+
+    <Footer/>
+
+  </main>
 
 </template>
 
 <style lang="scss">
-@import '@/assets/styles.scss';
+  @import '@/assets/styles.scss';
 </style>

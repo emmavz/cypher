@@ -9,6 +9,7 @@ $white: #ffffff;
 $black: #000000;
 
 $container-width: 18px;
+$footer-height: 90px;
 
 html,
 body {
@@ -23,7 +24,7 @@ body {
     color: $secondary-color;
     font-weight: 400;
     min-height: 100%;
-    background-color: $primary-color;
+    background-color: $secondary-color;
     letter-spacing: -0.3px;
 }
 
@@ -60,8 +61,30 @@ h6 {
     flex-wrap: wrap;
 }
 
-.app {
+.app,
+#app,
+.app-wp {
     height: 100%;
+}
+
+.app,
+.app-wp {
     display: flex;
     flex-direction: column;
+}
+
+.app-wp {
+    height: calc(100% - $footer-height);
+}
+
+.header--mr+.content {
+    margin-top: -17px;
+}
+
+.hide {
+    display: none !important;
+}
+
+.f-16 {
+    font-size: 16px !important;
 }
