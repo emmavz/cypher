@@ -11,7 +11,7 @@ use std::path::Path;
 const BEGIN_TRANSACTION_EXPR: &str = "BEGIN;";
 const COMMIT_TRANSACTION_EXPR: &str = "COMMIT;";
 const ROLLBACK_TRANSACTION_EXPR: &str = "ROLLBACK;";
-
+pub const ROW_KEY_OF_EMPTY_TABLE: &str = "<headers>";
 pub type SledGlue = Glue<IVec, SledStorage>;
 
 
@@ -88,6 +88,51 @@ pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Vec<u8>> {
 	let result: Payload = glue.execute_stmt(statement)?;
 	Ok(bincode::serialize(&result)?)
 }
+fn dump_single_table(
+	table: &str,
+	max_rows: Option<&u64>,
+	glue: &mut SledGlue,
+) -> TokenStateResult<serde_json::Value> {
+	let mut values = Vec::new();
+
+	let payload = glue.execute(&format!("SELECT * FROM {};", table))?;
+	match payload {
+		Payload::Select { labels, rows } => {
+			if rows.is_empty() {
+				// if there is no rows just print headers
+				values.push(serde_json::json!({
+					ROW_KEY_OF_EMPTY_TABLE: labels,
+				}));
+			} else {
+				for row in rows.iter().take(*max_rows.unwrap_or(&u64::MAX) as usize) {
+					let mut record = serde_json::Map::new();
+
+					for (i, field) in row.iter().enumerate() {
+						record.insert(
+							labels
+								.get(i)
+								.ok_or(TokenStateError::Other(format!(
+									"failed to get label at index {}",
+									i
+								)))?
+								.clone(),
+							sql_to_json_value(field),
+						);
+					}
+					values.push(serde_json::Value::Object(record));
+				}
+			}
+		}
+		_ => {
+			return Err(TokenStateError::Other(format!(
+				"Get not select result: {:?}",
+				payload
+			)))
+		}
+	}
+
+	Ok(serde_json::json!(values))
+}
 
 // pub fn dump_gluedb_data(
 // 	glue: &Glue,
@@ -121,20 +166,18 @@ fn sql_to_json_value(v: &Value) -> serde_json::Value {
 
 #[cfg(test)]
 mod tests {
-	use crate::tokendb::dump_single_table;
-	use crate::TokenDb;
-	use interface::{Followup, Ts, Tsid};
 	use serde_json::json;
+	use crate::tokendb::{init_glue, begin_transaction, rollback_transaction, 
+		dump_single_table, exec_cmd, commit_transaction, 
 
+	};
 	#[test]
 	fn transaction_works() -> Result<(), Box<dyn std::error::Error>> {
 		let temp = tempfile::tempdir().unwrap();
-		let token_id = 1;
-		let mut db = TokenDb::new(temp.path().to_str().unwrap().to_string());
-		db.init_glue(token_id)?;
+		let mut db = init_glue(temp.path().to_str().unwrap())?;
 
-		db.exec_cmd(
-			token_id,
+		exec_cmd(
+			&mut db,
 			r#"
 				CREATE TABLE TxTest (
             id INTEGER,
@@ -144,7 +187,6 @@ mod tests {
             (1, "Friday"),
             (2, "Phone");
 		"#,
-			new_tsid(1),
 		)?;
 		assert_eq!(
 			json!([
@@ -157,14 +199,13 @@ mod tests {
 					"name": "Phone"
 				}
 			]),
-			dump_single_table("TxTest", None, db.db_map.get_mut(&token_id).unwrap())?
+			dump_single_table("TxTest", None, &mut db)?
 		);
 
-		db.begin_transaction(token_id)?;
-		db.exec_cmd(
-			token_id,
+		begin_transaction(&mut db)?;
+		exec_cmd(
+			&mut db,
 			r#"INSERT INTO TxTest VALUES (3, "Vienna");"#,
-			new_tsid(2),
 		)?;
 		assert_eq!(
 			json!([
@@ -181,9 +222,9 @@ mod tests {
 					"name": "Vienna"
 				}
 			]),
-			dump_single_table("TxTest", None, db.db_map.get_mut(&token_id).unwrap())?
+			dump_single_table("TxTest", None, &mut db)?
 		);
-		db.rollback_transaction(token_id)?;
+		rollback_transaction(&mut db)?;
 		assert_eq!(
 			json!([
 				{
@@ -195,14 +236,13 @@ mod tests {
 					"name": "Phone"
 				}
 			]),
-			dump_single_table("TxTest", None, db.db_map.get_mut(&token_id).unwrap())?
+			dump_single_table("TxTest", None, &mut db)?
 		);
 
-		db.begin_transaction(token_id)?;
-		db.exec_cmd(
-			token_id,
+		begin_transaction(&mut db)?;
+		exec_cmd(
+			&mut db,
 			r#"INSERT INTO TxTest VALUES (3, "Vienna");"#,
-			new_tsid(3),
 		)?;
 		assert_eq!(
 			json!([
@@ -219,9 +259,9 @@ mod tests {
 					"name": "Vienna"
 				}
 			]),
-			dump_single_table("TxTest", None, db.db_map.get_mut(&token_id).unwrap())?
+			dump_single_table("TxTest", None, &mut db)? 
 		);
-		db.commit_transaction(token_id)?;
+		commit_transaction(&mut db)?;
 		assert_eq!(
 			json!([
 				{
@@ -237,20 +277,10 @@ mod tests {
 					"name": "Vienna"
 				}
 			]),
-			dump_single_table("TxTest", None, db.db_map.get_mut(&token_id).unwrap())?
+			dump_single_table("TxTest", None, &mut db)?
 		);
 
 		temp.close()?;
 		Ok(())
-	}
-
-	fn new_tsid(ts: Ts) -> Tsid {
-		Tsid::from_followup(
-			Default::default(),
-			&Followup {
-				ts,
-				..Default::default()
-			},
-		)
 	}
 }
