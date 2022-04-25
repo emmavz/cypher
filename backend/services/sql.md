@@ -92,3 +92,7 @@ from articles
 insert into articles (title,description,content,liquidation_days,price,category,
 hashtag,mintues) values('abc','blueblueblue','i like swiming','7','10','hobby',
 'swim','1')
+
+### create table
+
+CREATE TABLE articles ( id INTEGER, description TEXT null, content TEXT null, liquidation_days INTEGER, price decimal, category INTEGER, hashtag TEXT, minutues INTEGER);

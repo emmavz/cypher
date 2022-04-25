@@ -3,8 +3,14 @@ content-type: application/json
 
 {
     "sql":[
-        "CREATE TABLE TxTest ( id INTEGER, name TEXT);",
-        "INSERT INTO TxTest VALUES (1, 'Friday'), (2, 'Phone');"
+        "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price decimal, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER);",
+        "CREATE TABLE top_ids (article_id INTEGER, author_id INTEGER)",
+        "CREATE TABLE authors (author_id INTEGER, author_name TEXT, author_pfp TEXT, total_invested INTEGER)"
+        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
+        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
+        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
+        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
+        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
     ]
 }
 ###
@@ -13,12 +19,39 @@ content-type: application/json
 
 {
     "sql":[
-        "DROP TABLE TxTest "
+        "DROP TABLE articles ",
+        "DROP TABLE top_ids",
+        "DROP TABLE authors"
     ]
 }
 ###
 
-GET http://localhost:8080/index.html
+POST http://localhost:3000/api/sql_test
+content-type: application/json
+
+{
+    "sql":[
+        "INSERT INTO articles VALUES (0, 'Why Python is The Future', 0, 'description', 'content', 7, 15, 3, 'for you, coding', 'http://localhost:3000/dynamic/post-1.png',  0 );",
+        "INSERT INTO articles VALUES (1, 'Super Chewy Cookies Recipe', 1, 'description', 'content', 7, 15, 3, 'for you, baking', 'http://localhost:3000/dynamic/post-2.jpg', 0);",
+        "INSERT INTO articles VALUES (2, 'The Go-To-Market Guide', 2, 'description', 'content', 7, 15, 3, 'for you, business', 'http://localhost:3000/dynamic/post-3.jpg', 0);",
+        "INSERT INTO articles VALUES (3, 'The Rules of Digital Marketing', 3, 'description', 'content', 7, 15, 3, 'for you, marketing', 'http://localhost:3000/dynamic/post-4.jpg', 0);",
+        "INSERT INTO articles VALUES (4, 'Building muscle the right way', 4, 'description', 'content', 7, 15, 3, 'for you, fitness', 'http://localhost:3000/dynamic/post-5.jpg', 0);"
+    ]
+}
+###
+
+POST http://localhost:3000/api/sql_test
+content-type: application/json
+
+{
+    "sql":[
+        "INSERT INTO authors VALUES (0, 'Ephraim Jones', 'http://localhost:3000/dynamic/profile-1.png', 10025)",
+        "INSERT INTO authors VALUES (1, 'Eliza Mae', 'http://localhost:3000/dynamic/profile-2.png', 7342)",
+        "INSERT INTO authors VALUES (2, 'Cecelia Hong', 'http://localhost:3000/dynamic/profile-3.png', 8961)", 
+        "INSERT INTO authors VALUES (3, 'Melissa Shen', 'http://localhost:3000/dynamic/profile-4.png', 9456)",
+        "INSERT INTO authors VALUES (4, 'Darren Jones', 'http://localhost:3000/dynamic/profile-5.png', 11275)" 
+    ]
+}
 ### 
 POST http://localhost:3000/api/get_article_list_and_view
 content-type: application/json
