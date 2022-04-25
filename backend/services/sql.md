@@ -87,3 +87,8 @@ select distinct
 title,liquidation_days,invested
 from articles 
 
+### add article
+
+insert into articles (title,description,content,liquidation_days,price,category,
+hashtag,mintues) values('abc','blueblueblue','i like swiming','7','10','hobby',
+'swim','1')
