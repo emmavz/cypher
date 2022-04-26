@@ -143,61 +143,78 @@ pub async fn article_list_and_view(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         // let name = input.get("name");
-        json!(
-[
-    {
-        "article_id": 1,
-        "article_title": "Why Python is The Future",
-        "author_name": "Ephraim Jones",
-        "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
-        "date_posted": "1/03/2021 15:19:00",
-        "total_invested": 10025,
-        "image_url": "http://localhost:3000/dynamic/post-1.png",
-        "tags": "for you, coding"
-    },
-    {
-        "article_id": 2,
-        "article_title": "Super Chewy Cookies Recipe",
-        "author_name": "Eliza Mae",
-        "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
-        "date_posted": "1/21/2021 15:19:00",
-        "total_invested": 7342,
-        "image_url": "http://localhost:3000/dynamic/post-2.jpg",
-        "tags": "for you, baking"
-    },
-    {
-        "article_id": 3,
-        "article_title": "The Go-To-Market Guide",
-        "author_name": "Cecelia Hong",
-        "author_pfp": "http://localhost:3000/dynamic/profile-3.png",
-        "date_posted": "1/07/2021 15:19:00",
-        "total_invested": 8961,
-        "image_url": "http://localhost:3000/dynamic/post-3.jpg",
-        "tags": "for you, business"
-    },
-    {
-        "article_id": 4,
-        "article_title": "The Rules of Digital Marketing",
-        "author_name": "Melissa Shen",
-        "author_pfp": "http://localhost:3000/dynamic/profile-4.png",
-        "date_posted": "1/19/2021 15:19:00",
-        "total_invested": 9456,
-        "image_url": "http://localhost:3000/dynamic/post-4.jpg",
-        "tags": "for you, marketing"
-    },
-    {
-        "article_id": 5,
-        "article_title": "Building muscle the right way",
-        "author_name": "Darren Jones",
-        "author_pfp": "http://localhost:3000/dynamic/profile-5.png",
-        "date_posted": "1/24/2021 15:19:00",
-        "total_invested": 11275,
-        "image_url": "http://localhost:3000/dynamic/post-5.jpg",
-        "tags": "for you, fitness"
-    }
-]
-    )
+        let sql =  "SELECT a.article_id, a.article_title, b.author_name, b.author_pfp, b.total_invested, a.image_url, a.hashtag  FROM articles a LEFT JOIN authors b ON b.author_id = a.author_id";
+        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+        println!("sql is {}", &sql);
+        match exec_query(
+            &mut glue,
+            sql
+        ){
+            Ok(payload) => {
+                payload_to_json(&payload)
+            },
+            Err(e)=> json!(
+                {
+                    "error": e.to_string(),
+                }
+            )
+        }
     }).join().unwrap().into()
+//         json!(
+// [
+//     {
+//         "article_id": 1,
+//         "article_title": "Why Python is The Future",
+//         "author_name": "Ephraim Jones",
+//         "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
+//         "date_posted": "1/03/2021 15:19:00",
+//         "total_invested": 10025,
+//         "image_url": "http://localhost:3000/dynamic/post-1.png",
+//         "tags": "for you, coding"
+//     },
+//     {
+//         "article_id": 2,
+//         "article_title": "Super Chewy Cookies Recipe",
+//         "author_name": "Eliza Mae",
+//         "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
+//         "date_posted": "1/21/2021 15:19:00",
+//         "total_invested": 7342,
+//         "image_url": "http://localhost:3000/dynamic/post-2.jpg",
+//         "tags": "for you, baking"
+//     },
+//     {
+//         "article_id": 3,
+//         "article_title": "The Go-To-Market Guide",
+//         "author_name": "Cecelia Hong",
+//         "author_pfp": "http://localhost:3000/dynamic/profile-3.png",
+//         "date_posted": "1/07/2021 15:19:00",
+//         "total_invested": 8961,
+//         "image_url": "http://localhost:3000/dynamic/post-3.jpg",
+//         "tags": "for you, business"
+//     },
+//     {
+//         "article_id": 4,
+//         "article_title": "The Rules of Digital Marketing",
+//         "author_name": "Melissa Shen",
+//         "author_pfp": "http://localhost:3000/dynamic/profile-4.png",
+//         "date_posted": "1/19/2021 15:19:00",
+//         "total_invested": 9456,
+//         "image_url": "http://localhost:3000/dynamic/post-4.jpg",
+//         "tags": "for you, marketing"
+//     },
+//     {
+//         "article_id": 5,
+//         "article_title": "Building muscle the right way",
+//         "author_name": "Darren Jones",
+//         "author_pfp": "http://localhost:3000/dynamic/profile-5.png",
+//         "date_posted": "1/24/2021 15:19:00",
+//         "total_invested": 11275,
+//         "image_url": "http://localhost:3000/dynamic/post-5.jpg",
+//         "tags": "for you, fitness"
+//     }
+// ]
+    // )
+    // }).join().unwrap().into()
 }
 
 
@@ -307,7 +324,45 @@ pub async fn sql_test(
         // }
     }).join().unwrap().into()
 }
-
+pub fn payload_to_json(payload: &Payload)->serde_json::Value{
+    println!("payload is {:?}", &payload);
+    match payload{
+        Payload::Select{ labels, rows} =>{
+            let mut obj_array = Vec::new();
+            for row in rows{
+                let mut map = serde_json::Map::new();
+                for i in 0..row.len() {
+                    println!("____");
+                    // println!("key:{:?} : {:?}", &labels[i], &row[i]);
+                    match &row[i]{
+                        GlueValue::I64(num)=>{
+                            let num_i64: i64 = *num;
+                            map.insert(labels[i].to_owned(), Value::Number(num_i64.into()));
+                        },
+                        GlueValue::Str(s)=>{
+                            map.insert(labels[i].to_owned(), Value::String(s.to_string()));
+                        },
+                        GlueValue::F64(f)=>{
+                            let num_float: f64 = *f;
+                            map.insert(labels[i].to_owned(), Value::Number(Number::from_f64(num_float).unwrap()));
+                        }
+                        _ =>{
+                            println!("Not supported GlueValue {:?}", &row[i]);
+                        }
+                    }
+                }
+                println!("map {:?}", &map);
+                obj_array.push(map);
+            }
+            json!(obj_array)
+        },
+        _ => {
+            json!({
+                "error": "not payload::select result"
+            })
+        }
+    }
+}
 pub async fn sql_query(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
@@ -325,43 +380,7 @@ pub async fn sql_query(
                 sql.as_str().unwrap(),
             ){
                 Ok(payload) => {
-                    println!("payload is {:?}", &payload);
-                    match payload{
-                        Payload::Select{ labels, rows} =>{
-                            let mut obj_array = Vec::new();
-                            for row in rows{
-                                let mut map = serde_json::Map::new();
-                                for i in 0..row.len() {
-                                    println!("____");
-                                    // println!("key:{:?} : {:?}", &labels[i], &row[i]);
-                                    match &row[i]{
-                                        GlueValue::I64(num)=>{
-                                            let num_i64: i64 = *num;
-                                            map.insert(labels[i].to_owned(), Value::Number(num_i64.into()));
-                                        },
-                                        GlueValue::Str(s)=>{
-                                            map.insert(labels[i].to_owned(), Value::String(s.to_string()));
-                                        },
-                                        GlueValue::F64(f)=>{
-                                            let num_float: f64 = *f;
-                                            map.insert(labels[i].to_owned(), Value::Number(Number::from_f64(num_float).unwrap()));
-                                        }
-                                        _ =>{
-                                            println!("Not supported GlueValue {:?}", &row[i]);
-                                        }
-                                    }
-                                }
-                                println!("map {:?}", &map);
-                                obj_array.push(map);
-                            }
-                            json!(obj_array)
-                        },
-                        _ => {
-                            json!({
-                                "error": "not payload::select result"
-                            })
-                        }
-                    }
+                    payload_to_json(&payload)
                 },
                 Err(e)=> json!(
                     {
@@ -375,32 +394,5 @@ pub async fn sql_query(
             }
         };
         json!(results)
-        // if json!([
-        //         {
-        //             "id": 1,
-        //             "name": "friday"
-        //         },
-        //         {
-        //             "id": 2,
-        //             "name": "phone"
-        //         }
-        //     ])
-        //     ==
-        //     dump_single_table("txtest", none, &mut glue).unwrap() 
-        // {
-
-        //     json!(
-        //         {
-        //         "result": true
-        //         }
-        //     )
-        // }else{
-        //     json!(
-        //         {
-        //         "result": false
-        //         }
-        //     )
-            
-        // }
     }).join().unwrap().into()
 }

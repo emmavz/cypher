@@ -6,11 +6,6 @@ content-type: application/json
         "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER);",
         "CREATE TABLE top_ids (article_id INTEGER, author_id INTEGER)",
         "CREATE TABLE authors (author_id INTEGER, author_name TEXT, author_pfp TEXT, total_invested INTEGER)"
-        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
-        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
-        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
-        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
-        # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
     ]
 }
 ###
@@ -59,7 +54,7 @@ content-type: application/json
 
 {
     "sql":[
-        "SELECT * FROM articles"
+        "SELECT a.article_id, a.article_title, b.author_name, b.author_pfp, b.total_invested, a.image_url, a.hashtag  FROM articles a LEFT JOIN authors b ON b.author_id = a.author_id"
     ]
 }
 ### 
