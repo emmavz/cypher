@@ -30,10 +30,11 @@ pub fn init_glue(parent_dir: &str) -> TokenStateResult<SledGlue> {
 	)?))
 }
 
-pub fn begin_transaction(glue: &mut SledGlue) -> TokenStateResult<Vec<u8>> {
+pub fn begin_transaction(glue: &mut SledGlue) -> TokenStateResult<Payload> {
 	let payload = glue.execute(BEGIN_TRANSACTION_EXPR)?;
 	println!("begin transaction result: {:?}", payload);
-	Ok(bincode::serialize(&payload)?)
+	Ok(payload)
+	// Ok(bincode::serialize(&payload)?)
 }
 
 pub fn check_transaction_context(buf: &[u8]) -> TokenStateResult<()> {
@@ -60,7 +61,7 @@ pub fn rollback_transaction(glue: &mut SledGlue) -> TokenStateResult<()> {
 pub fn exec_cmd(
 	glue: &mut SledGlue,
 	sql: &str,
-) -> TokenStateResult<Vec<u8>> {
+) -> TokenStateResult<Vec<Payload>> {
 	let mut payloads = Vec::new();
 	let statements = parse(sql)?;
 	for s in statements.iter() {
@@ -69,11 +70,11 @@ pub fn exec_cmd(
 		let payload = glue.execute_stmt(statement)?;
 		payloads.push(payload);
 	}
-
-	Ok(bincode::serialize(&payloads)?)
+	Ok(payloads)
+	// Ok(bincode::serialize(&payloads)?)
 }
 
-pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Vec<u8>> {
+pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Payload> {
 	println!("enter exec_query, sql: {}", sql);
 	let statement: Statement = block_on(glue.plan(sql))?;
 	match statement {
@@ -86,7 +87,8 @@ pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Vec<u8>> {
 	}
 
 	let result: Payload = glue.execute_stmt(statement)?;
-	Ok(bincode::serialize(&result)?)
+	Ok(result)
+	// Ok(bincode::serialize(&result)?)
 }
 pub fn dump_single_table(
 	table: &str,

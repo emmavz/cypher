@@ -12,13 +12,15 @@ use axum::{
 };
 use std::sync::Arc;
 use std::net::SocketAddr;
-use serde_json::{json, Value};
+use serde_json::{json, Value, Number};
 use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
+use gluesql::{
+    prelude::{Payload, Value as GlueValue}
+};
 use tokendb::{
     SledGlue, exec_cmd, begin_transaction, rollback_transaction, 
-    dump_single_table, commit_transaction, 
+    dump_single_table, commit_transaction, exec_query,
 };
 
 pub struct AppState {
@@ -97,6 +99,7 @@ async fn main(){     // create our static file handler
             .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/get_article_homepage", post(article_homepage))
             .route("/api/sql_test", post(sql_test))
+            .route("/api/sql_query", post(sql_query))
             .layer(
             // see https://docs.rs/tower-http/latest/tower_http/cors/index.html
             // for more details
@@ -287,6 +290,103 @@ pub async fn sql_test(
         //     ])
         //     ==
         //     dump_single_table("TxTest", None, &mut glue).unwrap() 
+        // {
+
+        //     json!(
+        //         {
+        //         "result": true
+        //         }
+        //     )
+        // }else{
+        //     json!(
+        //         {
+        //         "result": false
+        //         }
+        //     )
+            
+        // }
+    }).join().unwrap().into()
+}
+
+pub async fn sql_query(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        let sqls = input.get("sql").unwrap().as_array().unwrap();
+
+        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+        let mut results = Vec::new();
+        for sql in sqls{
+            println!("sql is {}", &sql);
+            println!("sql.as_str() is {:?}", &sql.as_str());
+            let result = match exec_query(
+                &mut glue,
+                sql.as_str().unwrap(),
+            ){
+                Ok(payload) => {
+                    println!("payload is {:?}", &payload);
+                    match payload{
+                        Payload::Select{ labels, rows} =>{
+                            let mut obj_array = Vec::new();
+                            for row in rows{
+                                let mut map = serde_json::Map::new();
+                                for i in 0..row.len() {
+                                    println!("____");
+                                    // println!("key:{:?} : {:?}", &labels[i], &row[i]);
+                                    match &row[i]{
+                                        GlueValue::I64(num)=>{
+                                            let num_i64: i64 = *num;
+                                            map.insert(labels[i].to_owned(), Value::Number(num_i64.into()));
+                                        },
+                                        GlueValue::Str(s)=>{
+                                            map.insert(labels[i].to_owned(), Value::String(s.to_string()));
+                                        },
+                                        GlueValue::F64(f)=>{
+                                            let num_float: f64 = *f;
+                                            map.insert(labels[i].to_owned(), Value::Number(Number::from_f64(num_float).unwrap()));
+                                        }
+                                        _ =>{
+                                            println!("Not supported GlueValue {:?}", &row[i]);
+                                        }
+                                    }
+                                }
+                                println!("map {:?}", &map);
+                                obj_array.push(map);
+                            }
+                            json!(obj_array)
+                        },
+                        _ => {
+                            json!({
+                                "error": "not payload::select result"
+                            })
+                        }
+                    }
+                },
+                Err(e)=> json!(
+                    {
+                        "error": e.to_string(),
+                    }
+                )
+            };
+            results.push(result.clone());
+            if result.get("error").is_some(){
+                break;
+            }
+        };
+        json!(results)
+        // if json!([
+        //         {
+        //             "id": 1,
+        //             "name": "friday"
+        //         },
+        //         {
+        //             "id": 2,
+        //             "name": "phone"
+        //         }
+        //     ])
+        //     ==
+        //     dump_single_table("txtest", none, &mut glue).unwrap() 
         // {
 
         //     json!(

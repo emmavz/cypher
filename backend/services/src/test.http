@@ -3,7 +3,7 @@ content-type: application/json
 
 {
     "sql":[
-        "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price decimal, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER);",
+        "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER);",
         "CREATE TABLE top_ids (article_id INTEGER, author_id INTEGER)",
         "CREATE TABLE authors (author_id INTEGER, author_name TEXT, author_pfp TEXT, total_invested INTEGER)"
         # "INSERT INTO articles VALUES (0, 'Why Python is The Future', 1, 'description', 'content', 3, 15, 3, 'tag1, tag2', 3);"
@@ -50,6 +50,16 @@ content-type: application/json
         "INSERT INTO authors VALUES (2, 'Cecelia Hong', 'http://localhost:3000/dynamic/profile-3.png', 8961)", 
         "INSERT INTO authors VALUES (3, 'Melissa Shen', 'http://localhost:3000/dynamic/profile-4.png', 9456)",
         "INSERT INTO authors VALUES (4, 'Darren Jones', 'http://localhost:3000/dynamic/profile-5.png', 11275)" 
+    ]
+}
+###
+
+POST http://localhost:3000/api/sql_query
+content-type: application/json
+
+{
+    "sql":[
+        "SELECT * FROM articles"
     ]
 }
 ### 
