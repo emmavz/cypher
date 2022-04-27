@@ -63,8 +63,8 @@ content-type: application/json
 
 {
     "user_id": 1,
-    "start_index": "1",
-    "number_of_article": "5"
+    "start_index": 0,
+    "number_of_article": 5
 }
 ####
 

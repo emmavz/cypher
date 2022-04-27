@@ -18,6 +18,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use gluesql::{
     prelude::{Payload, Value as GlueValue}
 };
+use anyhow::Result;
+use anyhow::anyhow;
 use tokendb::{
     SledGlue, exec_cmd, begin_transaction, rollback_transaction, 
     dump_single_table, commit_transaction, exec_query,
@@ -137,85 +139,52 @@ async fn serve(app: Router, server_name:&str, port: u16) {
 /// Use Thread for spawning a thread e.g. to acquire our crate::DATA mutex lock.
 use std::thread;
 
+fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let id_start = input.get("start_index")
+        .ok_or(anyhow!("input has no start_index"))?
+        .as_i64()
+        .ok_or(anyhow!("start_index is not a number"))?;
+    let id_end = input.get("number_of_article")
+        .ok_or(anyhow!("input has no number_of_article"))?
+        .as_i64()
+        .ok_or(anyhow!("number_of_article is not a number"))?
+        + id_start;
+    let _user_id = input.get("user_id")
+        .ok_or(anyhow!("input has no user_id"))?
+        .as_i64()
+        .ok_or(anyhow!("user_id is not a number"))?;//we have not used it yet
+
+    let sql=  format!(r#"SELECT a.article_id, a.article_title, 
+        b.author_name, b.author_pfp, b.total_invested, a.image_url, 
+        a.hashtag  FROM articles a LEFT JOIN authors b 
+        ON b.author_id = a.author_id WHERE a.article_id >= {} AND 
+        a.article_id < {}"#, id_start, id_end);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+
 pub async fn article_list_and_view(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
-        // let name = input.get("name");
-        let sql =  "SELECT a.article_id, a.article_title, b.author_name, b.author_pfp, b.total_invested, a.image_url, a.hashtag  FROM articles a LEFT JOIN authors b ON b.author_id = a.author_id";
-        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
-        println!("sql is {}", &sql);
-        match exec_query(
-            &mut glue,
-            sql
-        ){
-            Ok(payload) => {
-                payload_to_json(&payload)
+        match article_list_and_view_inner(&input, state){
+            Ok(result) =>{
+                payload_to_json(&result).unwrap_or_else(|e|
+                    json!({
+                        "error": e.to_string()
+                    })
+                )
             },
-            Err(e)=> json!(
-                {
-                    "error": e.to_string(),
-                }
-            )
+            Err(e) => json!({
+                "error": e.to_string(),
+            })
         }
     }).join().unwrap().into()
-//         json!(
-// [
-//     {
-//         "article_id": 1,
-//         "article_title": "Why Python is The Future",
-//         "author_name": "Ephraim Jones",
-//         "author_pfp": "http://localhost:3000/dynamic/profile-1.png",
-//         "date_posted": "1/03/2021 15:19:00",
-//         "total_invested": 10025,
-//         "image_url": "http://localhost:3000/dynamic/post-1.png",
-//         "tags": "for you, coding"
-//     },
-//     {
-//         "article_id": 2,
-//         "article_title": "Super Chewy Cookies Recipe",
-//         "author_name": "Eliza Mae",
-//         "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
-//         "date_posted": "1/21/2021 15:19:00",
-//         "total_invested": 7342,
-//         "image_url": "http://localhost:3000/dynamic/post-2.jpg",
-//         "tags": "for you, baking"
-//     },
-//     {
-//         "article_id": 3,
-//         "article_title": "The Go-To-Market Guide",
-//         "author_name": "Cecelia Hong",
-//         "author_pfp": "http://localhost:3000/dynamic/profile-3.png",
-//         "date_posted": "1/07/2021 15:19:00",
-//         "total_invested": 8961,
-//         "image_url": "http://localhost:3000/dynamic/post-3.jpg",
-//         "tags": "for you, business"
-//     },
-//     {
-//         "article_id": 4,
-//         "article_title": "The Rules of Digital Marketing",
-//         "author_name": "Melissa Shen",
-//         "author_pfp": "http://localhost:3000/dynamic/profile-4.png",
-//         "date_posted": "1/19/2021 15:19:00",
-//         "total_invested": 9456,
-//         "image_url": "http://localhost:3000/dynamic/post-4.jpg",
-//         "tags": "for you, marketing"
-//     },
-//     {
-//         "article_id": 5,
-//         "article_title": "Building muscle the right way",
-//         "author_name": "Darren Jones",
-//         "author_pfp": "http://localhost:3000/dynamic/profile-5.png",
-//         "date_posted": "1/24/2021 15:19:00",
-//         "total_invested": 11275,
-//         "image_url": "http://localhost:3000/dynamic/post-5.jpg",
-//         "tags": "for you, fitness"
-//     }
-// ]
-    // )
-    // }).join().unwrap().into()
 }
+
 
 
 pub async fn check_already_paid(
@@ -295,36 +264,9 @@ pub async fn sql_test(
             }
         };
         json!(results)
-        // if json!([
-        //         {
-        //             "id": 1,
-        //             "name": "Friday"
-        //         },
-        //         {
-        //             "id": 2,
-        //             "name": "Phone"
-        //         }
-        //     ])
-        //     ==
-        //     dump_single_table("TxTest", None, &mut glue).unwrap() 
-        // {
-
-        //     json!(
-        //         {
-        //         "result": true
-        //         }
-        //     )
-        // }else{
-        //     json!(
-        //         {
-        //         "result": false
-        //         }
-        //     )
-            
-        // }
     }).join().unwrap().into()
 }
-pub fn payload_to_json(payload: &Payload)->serde_json::Value{
+pub fn payload_to_json(payload: &Payload)->Result<serde_json::Value>{
     println!("payload is {:?}", &payload);
     match payload{
         Payload::Select{ labels, rows} =>{
@@ -354,12 +296,12 @@ pub fn payload_to_json(payload: &Payload)->serde_json::Value{
                 println!("map {:?}", &map);
                 obj_array.push(map);
             }
-            json!(obj_array)
+            Ok(json!(obj_array))
         },
         _ => {
-            json!({
+            Ok(json!({
                 "error": "not payload::select result"
-            })
+            }))
         }
     }
 }
@@ -380,7 +322,11 @@ pub async fn sql_query(
                 sql.as_str().unwrap(),
             ){
                 Ok(payload) => {
-                    payload_to_json(&payload)
+                    payload_to_json(&payload).unwrap_or_else(|e|
+                        json!({
+                            "error": e.to_string()
+                        })
+                    )
                 },
                 Err(e)=> json!(
                     {
