@@ -209,26 +209,38 @@ pub async fn check_already_paid(
     }).join().unwrap().into()
 }
 
+fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let article_id = input.get("article_id")
+        .ok_or(anyhow!("input has no start_index"))?
+        .as_i64()
+        .ok_or(anyhow!("start_index is not a number"))?;
+
+    let sql=  format!(r#"SELECT a.article_id, a.article_title, 
+        b.author_name, b.author_pfp, b.total_invested, a.image_url, 
+        a.hashtag  FROM articles a LEFT JOIN authors b 
+        ON b.author_id = a.author_id WHERE a.article_id = {}"#, article_id);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
 pub async fn article_homepage(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
-        // let name = input.get("name");
-        json!(
-            {
-                "image_url": "http://localhost:3000/dynamic/post-2-single.jpg",
-                "article_title": "Super Chewy Cookies Recipe",
-                "article_author": "Eliza Mae",
-                "author_pfp": "http://localhost:3000/dynamic/profile-2.png",
-                "article_description": "This recipe will teach you the most awesome way to make amazingly chewy cookies that will make your grandma proud.",
-                "article_price": 20,
-                "article_liquidation_time": 2,
-                "article_total_reads": 835,
-                "article_total_shares": 76,
-                "user_wallet_balance": 1256
-            }
-    )
+        match article_homepage_inner(&input, state){
+            Ok(result) =>{
+                payload_to_json(&result).unwrap_or_else(|e|
+                    json!({
+                        "error": e.to_string()
+                    })
+                )
+            },
+            Err(e) => json!({
+                "error": e.to_string(),
+            })
+        }
     }).join().unwrap().into()
 }
 pub async fn sql_test(
