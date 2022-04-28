@@ -21,21 +21,25 @@ export default {
 
             toggleLoader();
 
-            return this.$http.post(url, {
-                method: 'POST',
+            return this.$http.post(url, data, {
                 headers: {
-                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: (data)
-            }).then(response => response.data)
-                .catch(() => {
-                    this.isError = true;
-                    return Promise.reject('API ERROR');
-                })
-                .finally(() => {
-                    toggleLoader(false);
-                });
+            }).then(response => {
+                let data = response.data;
+                if (Array.isArray(data)) {
+                    return data;
+                }
+                else {
+                    console.log(data.error);
+                    return Promise.reject(data.error);
+                }
+            }).catch((error) => {
+                this.isError = true;
+                return Promise.reject(error);
+            }).finally(() => {
+                toggleLoader(false);
+            });
 
         }
     }

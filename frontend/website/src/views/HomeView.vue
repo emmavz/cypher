@@ -9,15 +9,15 @@ export default ({
   async created() {
 
     this.sendApiRequest('get_article_list_and_view', {
-            "user_id": 1,
-            "start_index": "1",
-            "number_of_article": "5"
-        }).then(articles => {
+          "user_id": 1,
+          "start_index": 0,
+          "number_of_article": 5
+      }).then(articles => {
       return (async () => {
 
         articles.map(article => {
           article.palette = '#000000';
-          article.tags = article.tags.split(', ');
+          article.hashtags = article.hashtag.split(', ');
           article.date_posted = this.moment(new Date(article.date_posted)).format('MMMM DD, YYYY');
         });
 
@@ -66,7 +66,7 @@ export default ({
               </div>
 
               <ul class="categories mb-4">
-                <li v-for="(tag, i) in article.tags" :key="i"><span>{{ tag }}</span></li>
+                <li v-for="(tag, i) in article.hashtags" :key="i"><span>{{ tag }}</span></li>
               </ul>
 
               <div class="blog-post__left__meta flex mb-2.5">

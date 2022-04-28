@@ -21,7 +21,7 @@ use gluesql::{
 use anyhow::Result;
 use anyhow::anyhow;
 use tokendb::{
-    SledGlue, exec_cmd, begin_transaction, rollback_transaction, 
+    SledGlue, exec_cmd, begin_transaction, rollback_transaction,
     dump_single_table, commit_transaction, exec_query,
 };
 
@@ -155,10 +155,10 @@ fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
         .as_i64()
         .ok_or(anyhow!("user_id is not a number"))?;//we have not used it yet
 
-    let sql=  format!(r#"SELECT a.article_id, a.article_title, 
+    let sql=  format!(r#"SELECT a.article_id, a.article_title,
         b.name, b.pfp, b.total_invested, a.image_url, a.hashtag
-        FROM articles a INNER JOIN users b 
-        ON b.id = a.author_id WHERE a.article_id >= {} AND 
+        FROM articles a INNER JOIN users b
+        ON b.id = a.author_id WHERE a.article_id >= {} AND
         a.article_id < {}"#, id_start, id_end);
 
     let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
@@ -193,10 +193,10 @@ fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
         .as_i64()
         .ok_or(anyhow!("article_id is not a number"))?;
 
-    let sql=  format!(r#"SELECT a.article_id, a.article_title, 
-        b.name, b.pfp, b.total_invested, a.image_url, 
-        a.hashtag, a.article_total_reads, a.article_total_shares 
-        FROM articles a INNER JOIN users b 
+    let sql=  format!(r#"SELECT a.article_id, a.article_title,
+        b.name, b.pfp, b.total_invested, a.image_url,
+        a.hashtag, a.article_total_reads, a.article_total_shares
+        FROM articles a INNER JOIN users b
         ON b.id = a.author_id WHERE a.article_id = {}"#, article_id);
 
     let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
@@ -344,11 +344,11 @@ fn check_already_paid_inner(input: &serde_json::Value, state: Arc<AppState>)
         .ok_or(anyhow!("user_id is not a number"))?;
 
     let sql=  format!(r#"
-        SELECT b.article_id, b.image_url AS article_image_url, b.article_title, 
+        SELECT b.article_id, b.image_url AS article_image_url, b.article_title,
         c.name AS article_auther_name, c.pfp AS author_pfp, b.content AS article_body
-        FROM pay_read_tx a 
-        INNER JOIN articles b  
-        ON a.article_id = b.article_id   
+        FROM pay_read_tx a
+        INNER JOIN articles b
+        ON a.article_id = b.article_id
         INNER JOIN users c
         ON a.payer_id = c.id
         WHERE a.article_id = {} AND a.payer_id={}"#, article_id, user_id);

@@ -5,7 +5,7 @@ content-type: application/json
     "sql":[
         "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER, article_total_reads INTEGER, article_total_shares INTEGER);",
         "CREATE TABLE top_ids (article_id INTEGER, user_id INTEGER)",
-        "CREATE TABLE users (id INTEGER, name TEXT, status INTEGER, pfp TEXT, total_invested INTEGER, wallet_address TEXT, balance INTEGER, profile_url TEXT null, bio TEXT null)"
+        "CREATE TABLE users (id INTEGER, name TEXT, status INTEGER, pfp TEXT, total_invested INTEGER, wallet_address TEXT, balance INTEGER, profile_url TEXT null, bio TEXT null)",
         "CREATE TABLE pay_read_tx (id INTEGER, payer_id INTEGER, article_id INTEGER, tx_time TEXT, tx_amount INTEGER"
     ]
 }
@@ -27,11 +27,11 @@ content-type: application/json
 
 {
     "sql":[
-        "INSERT INTO articles VALUES (0, 'Why Python is The Future', 0, 'description', 'content', 7, 15, 3, 'for you, coding', 'http://localhost:3000/dynamic/post-1.png',  0, 294,1245 );",
-        "INSERT INTO articles VALUES (1, 'Super Chewy Cookies Recipe', 1, 'description', 'content', 7, 15, 3, 'for you, baking', 'http://localhost:3000/dynamic/post-2.jpg', 0, 29,32);",
-        "INSERT INTO articles VALUES (2, 'The Go-To-Market Guide', 2, 'description', 'content', 7, 15, 3, 'for you, business', 'http://localhost:3000/dynamic/post-3.jpg', 0,299,2386);",
-        "INSERT INTO articles VALUES (3, 'The Rules of Digital Marketing', 3, 'description', 'content', 7, 15, 3, 'for you, marketing', 'http://localhost:3000/dynamic/post-4.jpg', 0, 89,298);",
-        "INSERT INTO articles VALUES (4, 'Building muscle the right way', 4, 'description', 'content', 7, 15, 3, 'for you, fitness', 'http://localhost:3000/dynamic/post-5.jpg', 0, 2, 29);"
+        "INSERT INTO articles VALUES (0, 'Why Python is The Future', 0, 'description', 'content', 7, 15, 3, 'for you, coding', 'http://localhost:8080/dynamic/post-1.png',  0, 294,1245 );",
+        "INSERT INTO articles VALUES (1, 'Super Chewy Cookies Recipe', 1, 'description', 'content', 7, 15, 3, 'for you, baking', 'http://localhost:8080/dynamic/post-2.jpg', 0, 29,32);",
+        "INSERT INTO articles VALUES (2, 'The Go-To-Market Guide', 2, 'description', 'content', 7, 15, 3, 'for you, business', 'http://localhost:8080/dynamic/post-3.jpg', 0,299,2386);",
+        "INSERT INTO articles VALUES (3, 'The Rules of Digital Marketing', 3, 'description', 'content', 7, 15, 3, 'for you, marketing', 'http://localhost:8080/dynamic/post-4.jpg', 0, 89,298);",
+        "INSERT INTO articles VALUES (4, 'Building muscle the right way', 4, 'description', 'content', 7, 15, 3, 'for you, fitness', 'http://localhost:8080/dynamic/post-5.jpg', 0, 2, 29);"
     ]
 }
 ###
@@ -41,11 +41,11 @@ content-type: application/json
 
 {
     "sql":[
-        "INSERT INTO users VALUES (0, 'Ephraim Jones', 0, 'http://localhost:3000/dynamic/profile-1.png', 10025, 'abcd1234', 123, null, null)",
-        "INSERT INTO users VALUES (1, 'Eliza Mae', 0, 'http://localhost:3000/dynamic/profile-2.png', 7342, 'abcd4321', 222, null, null)",
-        "INSERT INTO users VALUES (2, 'Cecelia Hong', 0, 'http://localhost:3000/dynamic/profile-3.png', 8961, 'abc123', 111, null, null)", 
-        "INSERT INTO users VALUES (3, 'Melissa Shen', 0, 'http://localhost:3000/dynamic/profile-4.png', 9456, 'abc321', 333, null, null)",
-        "INSERT INTO users VALUES (4, 'Darren Jones', 0, 'http://localhost:3000/dynamic/profile-5.png', 11275, 'a1b2c3', 444, null, null)" 
+        "INSERT INTO users VALUES (0, 'Ephraim Jones', 0, 'http://localhost:8080/dynamic/profile-1.png', 10025, 'abcd1234', 123, null, null)",
+        "INSERT INTO users VALUES (1, 'Eliza Mae', 0, 'http://localhost:8080/dynamic/profile-2.png', 7342, 'abcd4321', 222, null, null)",
+        "INSERT INTO users VALUES (2, 'Cecelia Hong', 0, 'http://localhost:8080/dynamic/profile-3.png', 8961, 'abc123', 111, null, null)",
+        "INSERT INTO users VALUES (3, 'Melissa Shen', 0, 'http://localhost:8080/dynamic/profile-4.png', 9456, 'abc321', 333, null, null)",
+        "INSERT INTO users VALUES (4, 'Darren Jones', 0, 'http://localhost:8080/dynamic/profile-5.png', 11275, 'a1b2c3', 444, null, null)"
     ]
 }
 ###
@@ -58,7 +58,7 @@ content-type: application/json
         "SELECT a.article_id, a.article_title, b.author_name, b.author_pfp, b.total_invested, a.image_url, a.hashtag  FROM articles a LEFT JOIN authors b ON b.author_id = a.author_id"
     ]
 }
-### 
+###
 POST http://localhost:3000/api/get_article_list_and_view
 content-type: application/json
 
@@ -258,10 +258,10 @@ return
     "User_bio": "She turned her can't into can and her dreams into plans.",
     "user_pfp": "http://pfpImage",
     "wallet_balance": 1326,
-    "articles_authored":{ 
+    "articles_authored":{
         //return properties for every article, haven't done JSON for this yet
     }
-    
+
     }
 
 ###
