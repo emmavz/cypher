@@ -59,17 +59,17 @@ user_article
 | article_id  | FK  |
 | invetsed | # |
 | timestamp | datetime |
+# articles
 
+"CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER, article_total_reads INTEGER, article_total_shares INTEGER);",
+# users
+
+"CREATE TABLE users (id INTEGER, name TEXT, status INTEGER, pfp TEXT, total_invested INTEGER, wallet_address TEXT, balance INTEGER, profile_url TEXT null, bio TEXT null)"
+# pay_read_tx
+
+"CREATE TABLE pay_read_tx (id INTEGER, payer_id INTEGER, article_id INTEGER, tx_time TEXT, tx_amount INTEGER"
 transactions
 
-| Property  | Type |
-| ------------- | ------------- |
-| tx_id | PK  |
-| article_id  | FK  |
-| user_id | FK |
-| tx_time | datetime |
-| tx_amount | # |
-| tx_type | string |
 
 bonding curve (NO USE)
 

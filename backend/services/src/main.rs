@@ -98,8 +98,8 @@ async fn main(){     // create our static file handler
     let backend = async {
         let app = Router::new()
             .route("/api/get_article_list_and_view", post(article_list_and_view))
-            .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/get_article_homepage", post(article_homepage))
+            .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/sql_test", post(sql_test))
             .route("/api/sql_query", post(sql_query))
             .layer(
@@ -157,7 +157,7 @@ fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
 
     let sql=  format!(r#"SELECT a.article_id, a.article_title, 
         b.name, b.pfp, b.total_invested, a.image_url, a.hashtag
-        FROM articles a LEFT JOIN users b 
+        FROM articles a INNER JOIN users b 
         ON b.id = a.author_id WHERE a.article_id >= {} AND 
         a.article_id < {}"#, id_start, id_end);
 
@@ -186,29 +186,6 @@ pub async fn article_list_and_view(
 }
 
 
-
-pub async fn check_already_paid(
-    Extension(state):Extension<Arc<AppState>>,
-    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
-) -> axum::extract::Json<Value> {
-    thread::spawn(move || {
-        // let name = input.get("name");
-        json!(
-            {
-                "paid_or_not": true, //true = paid, false = haven't paid
-                "paid": {
-                    "article_id": 1,
-                    "article_image_url": "http://backgroundImage",
-                    "article_title": "The History of Fashion",
-                    "article_author_name": "Violet Lee",
-                    "author_pfp": "http://authorpfp",
-                    "article_body": "Hi guys! I don’t know about you, but I am SO ready for spring! I’ve been posting some of my recent spring finds and what I’ve ordered and wanted to share last months most loved aka best-sellers!"
-                }
-            }
-    )
-    }).join().unwrap().into()
-}
-
 fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Payload>{
     let article_id = input.get("article_id")
@@ -219,7 +196,7 @@ fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
     let sql=  format!(r#"SELECT a.article_id, a.article_title, 
         b.name, b.pfp, b.total_invested, a.image_url, 
         a.hashtag, a.article_total_reads, a.article_total_shares 
-        FROM articles a LEFT JOIN users b 
+        FROM articles a INNER JOIN users b 
         ON b.id = a.author_id WHERE a.article_id = {}"#, article_id);
 
     let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
@@ -353,5 +330,48 @@ pub async fn sql_query(
             }
         };
         json!(results)
+    }).join().unwrap().into()
+}
+fn check_already_paid_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let article_id = input.get("article_id")
+        .ok_or(anyhow!("input has no article_id"))?
+        .as_i64()
+        .ok_or(anyhow!("article_id is not a number"))?;
+    let user_id = input.get("user_id")
+        .ok_or(anyhow!("input has no user_id"))?
+        .as_i64()
+        .ok_or(anyhow!("user_id is not a number"))?;
+
+    let sql=  format!(r#"
+        SELECT b.article_id, b.image_url AS article_image_url, b.article_title, 
+        c.name AS article_auther_name, c.pfp AS author_pfp, b.content AS article_body
+        FROM pay_read_tx a 
+        INNER JOIN articles b  
+        ON a.article_id = b.article_id   
+        INNER JOIN users c
+        ON a.payer_id = c.id
+        WHERE a.article_id = {} AND a.payer_id={}"#, article_id, user_id);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+pub async fn check_already_paid(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        match article_homepage_inner(&input, state){
+            Ok(result) =>{
+                payload_to_json(&result).unwrap_or_else(|e|
+                    json!({
+                        "error": e.to_string()
+                    })
+                )
+            },
+            Err(e) => json!({
+                "error": e.to_string(),
+            })
+        }
     }).join().unwrap().into()
 }
