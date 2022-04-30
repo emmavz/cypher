@@ -18,7 +18,7 @@ export default ({
         articles.map(article => {
           article.palette = '#000000';
           article.hashtags = article.hashtag.split(', ');
-          article.date_posted = this.moment(new Date(article.date_posted)).format('MMMM DD, YYYY');
+          article.date_posted = this.moment(article.date_posted).format('MMMM DD, YYYY');
         });
 
         await Promise.allSettled(articles.map(async (article) => {
@@ -70,7 +70,7 @@ export default ({
               </ul>
 
               <div class="blog-post__left__meta flex mb-2.5">
-                <div class="mr-3">{{ article.data_posted }}</div>
+                <div class="mr-3">{{ article.date_posted }}</div>
               </div>
 
               <div class="blog-post__left__stock">
