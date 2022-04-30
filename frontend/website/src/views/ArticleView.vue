@@ -2,13 +2,13 @@
 export default ({
   data() {
     return {
-      article: [],
+      article: null,
     }
   },
   created() {
 
     this.sendApiRequest('get_article_homepage', {
-        "article_id": Number(this.$route.params.articleId)
+        "article_id": this.$route.params.articleId
     })
     .then(article => {
       this.article = article;
@@ -27,7 +27,7 @@ export default ({
         <!-- Content -->
         <div class="content">
 
-            <div v-for="(article, i) in article" :key="i">
+            <template v-if="article">
                 <div class="relative flex justify-center banner_img">
                     <img :src="article.image_url" alt="" class="w-full">
                     <span>{{ article.user_wallet_balance }} {{ this.currency }}</span>
@@ -65,7 +65,7 @@ export default ({
                         </div>
                     </div>
                 </div>
-            </div>
+            </template>
 
             <Error/>
         </div>
