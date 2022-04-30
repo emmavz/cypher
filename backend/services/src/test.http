@@ -165,6 +165,21 @@ return
     "article_total_shares": 76,
     "user_wallet_balance": 1256
 }
+
+### 
+POST http://localhost:3000/api/get_user_profile
+content-type: application/json
+
+{
+    "user_id": 2
+}
+
+###
+return
+{
+    
+}
+
 ###
 POST http://localhost:3000/api/pay_command
 content-type: application/json
