@@ -156,7 +156,7 @@ fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
         .ok_or(anyhow!("user_id is not a number"))?;//we have not used it yet
 
     let sql=  format!(r#"SELECT a.article_id, a.article_title,
-        b.name, b.pfp, b.total_invested, a.image_url, a.hashtag
+        b.name, b.pfp, b.total_invested, a.image_url, a.hashtag, a.data_posted
         FROM articles a INNER JOIN users b
         ON b.id = a.author_id WHERE a.article_id >= {} AND
         a.article_id < {}"#, id_start, id_end);
@@ -193,11 +193,12 @@ fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
         .as_i64()
         .ok_or(anyhow!("article_id is not a number"))?;
 
-    let sql=  format!(r#"SELECT a.article_id, a.article_title,
-        b.name, b.pfp, b.total_invested, a.image_url,
-        a.hashtag, a.article_total_reads, a.article_total_shares
+    let sql=  format!(r#"SELECT a.article_title,
+        b.name as article_author, b.pfp as author_pfp, b.total_invested, a.image_url,
+        a.price as article_price, a.liquidation_days as article_liquidation_time,
+        a.article_total_reads, a.article_total_shares, a.article_description
         FROM articles a INNER JOIN users b
-        ON b.id = a.author_id WHERE a.article_id = {}"#, article_id);
+        ON b.id = a.author_id WHERE a.article_id = {} "#, article_id);
 
     let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))

@@ -3,10 +3,10 @@ content-type: application/json
 
 {
     "sql":[
-        "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER, article_total_reads INTEGER, article_total_shares INTEGER);",
+        "CREATE TABLE articles ( article_id INTEGER, article_title TEXT ,  author_id INTEGER, data_posted INTEGER, article_description TEXT null, content TEXT null,  liquidation_days INTEGER, price FLOAT, category INTEGER, hashtag TEXT null,image_url TEXT, data_posted INTEGER, article_total_reads INTEGER, article_total_shares INTEGER);",
         "CREATE TABLE top_ids (article_id INTEGER, user_id INTEGER)",
         "CREATE TABLE users (id INTEGER, name TEXT, status INTEGER, pfp TEXT, total_invested INTEGER, wallet_address TEXT, balance INTEGER, profile_url TEXT null, bio TEXT null)",
-        "CREATE TABLE pay_read_tx (id INTEGER, payer_id INTEGER, article_id INTEGER, tx_time TEXT, tx_amount INTEGER"
+        "CREATE TABLE pay_read_tx (id INTEGER, payer_id INTEGER, article_id INTEGER, tx_time TEXT, tx_amount INTEGER);"
     ]
 }
 ###
@@ -17,7 +17,8 @@ content-type: application/json
     "sql":[
         "DROP TABLE articles ",
         "DROP TABLE top_ids",
-        "DROP TABLE users"
+        "DROP TABLE users",
+        "DROP TABLE pay_read_tx"
     ]
 }
 ###
@@ -27,11 +28,11 @@ content-type: application/json
 
 {
     "sql":[
-        "INSERT INTO articles VALUES (0, 'Why Python is The Future', 0, 'description', 'content', 7, 15, 3, 'for you, coding', 'http://localhost:8080/dynamic/post-1.png',  0, 294,1245 );",
-        "INSERT INTO articles VALUES (1, 'Super Chewy Cookies Recipe', 1, 'description', 'content', 7, 15, 3, 'for you, baking', 'http://localhost:8080/dynamic/post-2.jpg', 0, 29,32);",
-        "INSERT INTO articles VALUES (2, 'The Go-To-Market Guide', 2, 'description', 'content', 7, 15, 3, 'for you, business', 'http://localhost:8080/dynamic/post-3.jpg', 0,299,2386);",
-        "INSERT INTO articles VALUES (3, 'The Rules of Digital Marketing', 3, 'description', 'content', 7, 15, 3, 'for you, marketing', 'http://localhost:8080/dynamic/post-4.jpg', 0, 89,298);",
-        "INSERT INTO articles VALUES (4, 'Building muscle the right way', 4, 'description', 'content', 7, 15, 3, 'for you, fitness', 'http://localhost:8080/dynamic/post-5.jpg', 0, 2, 29);"
+        "INSERT INTO articles VALUES (0, 'Why Python is The Future', 0, 1651335773, 'description', 'content', 7, 15, 3, 'for you, coding', 'http://localhost:8080/dynamic/post-1.png',  0, 294,1245 );",
+        "INSERT INTO articles VALUES (1, 'Super Chewy Cookies Recipe', 1, 1651335773, 'description', 'content', 7, 15, 3, 'for you, baking', 'http://localhost:8080/dynamic/post-2.jpg', 0, 29,32);",
+        "INSERT INTO articles VALUES (2, 'The Go-To-Market Guide', 2, 1651335773, 'description', 'content', 7, 15, 3, 'for you, business', 'http://localhost:8080/dynamic/post-3.jpg', 0,299,2386);",
+        "INSERT INTO articles VALUES (3, 'The Rules of Digital Marketing', 3, 1651335773, 'description', 'content', 7, 15, 3, 'for you, marketing', 'http://localhost:8080/dynamic/post-4.jpg', 0, 89,298);",
+        "INSERT INTO articles VALUES (4, 'Building muscle the right way', 4,  1651335773,'description', 'content', 7, 15, 3, 'for you, fitness', 'http://localhost:8080/dynamic/post-5.jpg', 0, 2, 29);"
     ]
 }
 ###
@@ -149,7 +150,6 @@ content-type: application/json
 
 {
     "article_id": 1
-
 }
 ###:
 return
