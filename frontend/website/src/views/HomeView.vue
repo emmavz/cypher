@@ -55,12 +55,12 @@ export default ({
             <div class="blog-post__left">
               <div class="blog-post__left__header flex items-center mb-4">
                 <div class="blog-post__left__header__img">
-                  <img :src="article.author_pfp" alt="">
+                  <img :src="article.pfp" alt="">
                 </div>
                 <div class="pl-3">
                   <h2 class="mb-1">{{ article.article_title }}</h2>
                   <div class="flex blog-post__left__header__author">
-                    <span>{{ article.author_name }}</span>
+                    <span>{{ article.name }}</span>
                   </div>
                 </div>
               </div>
