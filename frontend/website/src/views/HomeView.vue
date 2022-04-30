@@ -70,7 +70,7 @@ export default ({
               </ul>
 
               <div class="blog-post__left__meta flex mb-2.5">
-                <div class="mr-3">{{ article.date_posted }}</div>
+                <div class="mr-3">{{ article.data_posted }}</div>
               </div>
 
               <div class="blog-post__left__stock">
