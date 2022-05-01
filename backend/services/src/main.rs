@@ -140,89 +140,7 @@ async fn serve(app: Router, server_name:&str, port: u16) {
 /// Use Thread for spawning a thread e.g. to acquire our crate::DATA mutex lock.
 use std::thread;
 
-fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
-        ->Result<Payload>{
-    let id_start = input.get("start_index")
-        .ok_or(anyhow!("input has no start_index"))?
-        .as_i64()
-        .ok_or(anyhow!("start_index is not a number"))?;
-    let id_end = input.get("number_of_article")
-        .ok_or(anyhow!("input has no number_of_article"))?
-        .as_i64()
-        .ok_or(anyhow!("number_of_article is not a number"))?
-        + id_start;
-    let _user_id = input.get("user_id")
-        .ok_or(anyhow!("input has no user_id"))?
-        .as_i64()
-        .ok_or(anyhow!("user_id is not a number"))?;//we have not used it yet
 
-    let sql=  format!(r#"SELECT a.article_id, a.article_title,
-        b.name, b.pfp, b.total_invested, a.image_url, a.hashtag, a.date_posted
-        FROM articles a INNER JOIN users b
-        ON b.id = a.author_id WHERE a.article_id >= {} AND
-        a.article_id < {}"#, id_start, id_end);
-
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
-    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
-}
-
-pub async fn article_list_and_view(
-    Extension(state):Extension<Arc<AppState>>,
-    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
-) -> axum::extract::Json<Value> {
-    thread::spawn(move || {
-        match article_list_and_view_inner(&input, state){
-            Ok(result) =>{
-                payload_to_json(&result).unwrap_or_else(|e|
-                    json!({
-                        "error": e.to_string()
-                    })
-                )
-            },
-            Err(e) => json!({
-                "error": e.to_string(),
-            })
-        }
-    }).join().unwrap().into()
-}
-
-
-fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
-        ->Result<Payload>{
-    let article_id = input.get("article_id")
-        .ok_or(anyhow!("input has no article_id"))?
-        .as_i64()
-        .ok_or(anyhow!("article_id is not a number"))?;
-
-    let sql=  format!(r#"SELECT a.article_title,
-        b.name as article_author, b.pfp as author_pfp, b.total_invested, a.image_url,
-        a.price as article_price, a.liquidation_days as article_liquidation_time,
-        a.article_total_reads, a.article_total_shares, a.article_description
-        FROM articles a INNER JOIN users b
-        ON b.id = a.author_id WHERE a.article_id = {} "#, article_id);
-
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
-    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
-}
-pub async fn article_homepage(
-    Extension(state):Extension<Arc<AppState>>,
-    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
-) -> axum::extract::Json<Value> {
-    thread::spawn(move || {
-        match article_homepage_inner(&input, state){
-            Ok(result) =>{
-                payload_to_json(&result).unwrap_or_else(|e|
-                    json!({
-                        "error": e.to_string()
-                    })
-                )
-            },
-            Err(e) => json!({
-                "error": e.to_string(),
-            })
-        }
-    }).join().unwrap().into()
-}
 pub async fn sql_test(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
@@ -334,6 +252,63 @@ pub async fn sql_query(
         json!(results)
     }).join().unwrap().into()
 }
+
+fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let id_start = input.get("start_index")
+        .ok_or(anyhow!("input has no start_index"))?
+        .as_i64()
+        .ok_or(anyhow!("start_index is not a number"))?;
+    let id_end = input.get("number_of_article")
+        .ok_or(anyhow!("input has no number_of_article"))?
+        .as_i64()
+        .ok_or(anyhow!("number_of_article is not a number"))?
+        + id_start;
+    let _user_id = input.get("user_id")
+        .ok_or(anyhow!("input has no user_id"))?
+        .as_i64()
+        .ok_or(anyhow!("user_id is not a number"))?;//we have not used it yet
+
+    let sql=  format!(r#"SELECT a.article_id, a.article_title,
+        b.name, b.pfp, b.total_invested, a.image_url, a.hashtag, a.date_posted
+        FROM articles a INNER JOIN users b
+        ON b.id = a.author_id WHERE a.article_id >= {} AND
+        a.article_id < {}"#, id_start, id_end);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+
+pub async fn article_list_and_view(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    run_sql_json(state, input, article_list_and_view_inner).await
+}
+
+fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let article_id = input.get("article_id")
+        .ok_or(anyhow!("input has no article_id"))?
+        .as_i64()
+        .ok_or(anyhow!("article_id is not a number"))?;
+
+    let sql=  format!(r#"SELECT a.article_title,
+        b.name as article_author, b.pfp as author_pfp, b.total_invested, a.image_url,
+        a.price as article_price, a.liquidation_days as article_liquidation_time,
+        a.article_total_reads, a.article_total_shares, a.article_description
+        FROM articles a INNER JOIN users b
+        ON b.id = a.author_id WHERE a.article_id = {} "#, article_id);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+pub async fn article_homepage(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    run_sql_json(state, input, article_homepage_inner).await
+}
 fn check_already_paid_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Payload>{
     let article_id = input.get("article_id")
@@ -362,20 +337,7 @@ pub async fn check_already_paid(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
-    thread::spawn(move || {
-        match article_homepage_inner(&input, state){
-            Ok(result) =>{
-                payload_to_json(&result).unwrap_or_else(|e|
-                    json!({
-                        "error": e.to_string()
-                    })
-                )
-            },
-            Err(e) => json!({
-                "error": e.to_string(),
-            })
-        }
-    }).join().unwrap().into()
+    run_sql_json(state, input, check_already_paid_inner).await
 }
 fn get_user_profile_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Payload>{
@@ -396,8 +358,16 @@ pub async fn get_user_profile(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
+    run_sql_json(state, input, get_user_profile_inner).await
+}
+pub async fn run_sql_json<F>(
+    state: Arc<AppState>,
+    input: serde_json::Value,
+    sql_json: F
+) -> axum::extract::Json<Value> 
+where F: FnOnce(&serde_json::Value, Arc<AppState>)->Result<Payload> + Send + 'static{
     thread::spawn(move || {
-        match get_user_profile_inner(&input, state){
+        match sql_json(&input, state){
             Ok(result) =>{
                 payload_to_json(&result).unwrap_or_else(|e|
                     json!({
