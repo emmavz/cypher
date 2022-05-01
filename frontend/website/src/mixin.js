@@ -19,28 +19,67 @@ export default {
 
         async sendApiRequest(url, data) {
 
-            toggleLoader();
+            return this.afterApiCall(this.$http.post(url, data));
 
-            return this.$http.post(url, data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }).then(response => {
-                let data = response.data;
-                if (Array.isArray(data)) {
-                    return data;
+        },
+
+        async sendAllMultiApiRequests(array) {
+
+            return this.afterApiCall(Promise.all(this.prepareMultiApiRequest(array)));
+
+        },
+
+        beforeApiCall() {
+            toggleLoader();
+        },
+
+        afterApiCall(api) {
+
+            this.beforeApiCall();
+
+            return api.then((apiResponses) => {
+
+                apiResponses = Array.isArray(apiResponses) ? apiResponses : [apiResponses];
+
+                let responses = [],
+                    errors = [];
+                apiResponses.forEach(response => {
+                    let data = response.data;
+
+                    if (Array.isArray(data)) {
+                        responses.push(data);
+                    }
+                    else {
+                        errors.push(data.error);
+                    }
+                });
+
+                if (errors.length) {
+                    console.log(errors.join('\n'));
+                    return Promise.reject(errors.join('\n'));
                 }
                 else {
-                    console.log(data.error);
-                    return Promise.reject(data.error);
+                    return responses.length == 1 ? responses[0] : responses;
                 }
+
             }).catch((error) => {
                 this.isError = true;
                 return Promise.reject(error);
             }).finally(() => {
                 toggleLoader(false);
             });
+        },
 
+        prepareMultiApiRequest(array) {
+            let requestData = [];
+
+            array.forEach(element => {
+                requestData.push(
+                    this.$http.post(element.url, element.data)
+                );
+            });
+
+            return requestData;
         }
     }
 }

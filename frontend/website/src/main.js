@@ -3,7 +3,7 @@ import * as vars from './global-vars.js'
 import * as methods from './global-methods.js'
 import App from './App.vue'
 import router from './router'
-import Axios from './HTTP.js'
+import { axios, instance } from './HTTP.js'
 import mixin from './mixin.js'
 import moment from 'moment'
 
@@ -22,7 +22,8 @@ app.mixin(mixin)
 app.component('Header', Header)
 app.component('Error', Error)
 
-app.config.globalProperties.$http = Axios;
+app.config.globalProperties.$http = instance;
+app.config.globalProperties.$axios = axios;
 app.config.globalProperties.emitter = emitter;
 app.config.globalProperties.moment = moment;
 
