@@ -10,7 +10,7 @@ use axum::{
     extract::{Extension},
     Json, Router,
 };
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use std::net::SocketAddr;
 use serde_json::{json, Value, Number};
 use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
@@ -26,7 +26,14 @@ use tokendb::{
 };
 
 pub struct AppState {
-    pub glue_path: String,
+    pub glue: RwLock<SledGlue>,
+}
+impl AppState{
+    pub fn new(glue_path: &str)->Self{
+        AppState{
+            glue: RwLock::new(tokendb::init_glue(glue_path).unwrap()),
+        }
+    }
 }
 
 #[tokio::main]
@@ -123,7 +130,7 @@ async fn main(){     // create our static file handler
                 .allow_origin(Origin::exact("http://localhost:8080".parse().unwrap()))
                 .allow_methods(vec![Method::GET, Method::POST]),
             )
-            .layer(Extension(Arc::new(AppState {glue_path})));
+            .layer(Extension(Arc::new(AppState::new(&glue_path))));
         serve(app, "ajax api", 3000).await;
     };
     tokio::join!( frontend, backend);
@@ -148,7 +155,7 @@ pub async fn sql_test(
     thread::spawn(move || {
         let sqls = input.get("sql").unwrap().as_array().unwrap();
 
-        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+        let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
         let mut results = Vec::new();
         for sql in sqls{
             println!("sql is {}", &sql);
@@ -222,7 +229,7 @@ pub async fn sql_query(
     thread::spawn(move || {
         let sqls = input.get("sql").unwrap().as_array().unwrap();
 
-        let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+        let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
         let mut results = Vec::new();
         for sql in sqls{
             println!("sql is {}", &sql);
@@ -275,7 +282,7 @@ fn article_list_and_view_inner(input: &serde_json::Value, state: Arc<AppState>)
         ON b.id = a.author_id WHERE a.article_id >= {} AND
         a.article_id < {}"#, id_start, id_end);
 
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
 }
 
@@ -300,7 +307,7 @@ fn article_homepage_inner(input: &serde_json::Value, state: Arc<AppState>)
         FROM articles a INNER JOIN users b
         ON b.id = a.author_id WHERE a.article_id = {} "#, article_id);
 
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
 }
 pub async fn article_homepage(
@@ -330,7 +337,7 @@ fn check_already_paid_inner(input: &serde_json::Value, state: Arc<AppState>)
         ON a.payer_id = c.id
         WHERE a.article_id = {} AND a.payer_id={}"#, article_id, user_id);
 
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
 }
 pub async fn check_already_paid(
@@ -351,7 +358,7 @@ fn get_user_profile_inner(input: &serde_json::Value, state: Arc<AppState>)
         FROM users
         WHERE id = {} "#, user_id);
 
-    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
 }
 pub async fn get_user_profile(
