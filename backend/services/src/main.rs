@@ -100,6 +100,7 @@ async fn main(){     // create our static file handler
             .route("/api/get_article_list_and_view", post(article_list_and_view))
             .route("/api/get_article_homepage", post(article_homepage))
             .route("/api/check_already_paid", post(check_already_paid))
+            .route("/api/get_user_profile", post(get_user_profile))
             .route("/api/sql_test", post(sql_test))
             .route("/api/sql_query", post(sql_query))
             .layer(
@@ -363,6 +364,40 @@ pub async fn check_already_paid(
 ) -> axum::extract::Json<Value> {
     thread::spawn(move || {
         match article_homepage_inner(&input, state){
+            Ok(result) =>{
+                payload_to_json(&result).unwrap_or_else(|e|
+                    json!({
+                        "error": e.to_string()
+                    })
+                )
+            },
+            Err(e) => json!({
+                "error": e.to_string(),
+            })
+        }
+    }).join().unwrap().into()
+}
+fn get_user_profile_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let user_id = input.get("user_id")
+        .ok_or(anyhow!("input has no user_id"))?
+        .as_i64()
+        .ok_or(anyhow!("user_id is not a number"))?;
+
+    let sql=  format!(r#"
+        SELECT balance as user_wallet_balance
+        FROM users
+        WHERE id = {} "#, user_id);
+
+    let mut glue = tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+pub async fn get_user_profile(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    thread::spawn(move || {
+        match get_user_profile_inner(&input, state){
             Ok(result) =>{
                 payload_to_json(&result).unwrap_or_else(|e|
                     json!({
