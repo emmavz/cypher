@@ -2,16 +2,29 @@
 export default ({
   data() {
     return {
-      articles: [],
+      article: [],
+      userWalletBalance: [],
     }
   },
   created() {
 
-    this.sendApiRequest('get_article_homepage', {
-        "article_id": Number(this.$route.params.articleId)
-    })
-    .then(article => {
-      this.articles = article;
+    this.sendAllMultiApiRequests([
+        {
+            url: 'get_article_homepage',
+            data: {
+                "article_id": Number(this.$route.params.articleId)
+            }
+        },
+        {
+            url: 'get_user_profile',
+            data: {
+                "user_id": 2
+            }
+        },
+    ])
+    .then((reponses) => {
+        this.article = reponses[0];
+        this.userWalletBalance = reponses[1];
     });
 
   },
@@ -27,10 +40,10 @@ export default ({
         <!-- Content -->
         <div class="content">
 
-            <div v-for="(article, index) in articles" :key="index">
+            <div v-for="(article, index) in article" :key="index">
                 <div class="relative flex justify-center banner_img">
                     <img :src="article.image_url" alt="" class="w-full">
-                    <span>{{ article.user_wallet_balance }} {{ this.currency }}</span>
+                    <span>{{ userWalletBalance[0].user_wallet_balance }} {{ this.currency }}</span>
                     <button class="close-icon"><img src="/src/assets/img/close-icon.svg" alt="" width="34"></button>
                 </div>
 

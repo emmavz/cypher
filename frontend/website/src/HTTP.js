@@ -2,7 +2,8 @@ import axios from 'axios'
 
 // create a new axios instance
 const instance = axios.create({
-    baseURL: apiRoot
+    baseURL: apiRoot,
+    headers: { 'Content-Type': 'application/json' }
 });
 
 // const loader = document.getElementById('loader');
@@ -21,4 +22,4 @@ instance.interceptors.response.use(response => {
     return response
 })
 
-export default instance
+export { axios, instance }
