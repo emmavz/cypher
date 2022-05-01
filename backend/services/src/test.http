@@ -163,7 +163,7 @@ return
     "article_liquidation_time": 2,
     "article_total_reads": 835,
     "article_total_shares": 76,
-    "user_wallet_balance": 1256
+    "user_wallet_balancdde": 1256
 }
 
 ### 
@@ -177,7 +177,7 @@ content-type: application/json
 ###
 return
 {
-    
+    "user_wallet_balance": 1234
 }
 
 ###
