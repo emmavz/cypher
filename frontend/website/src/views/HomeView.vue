@@ -18,7 +18,7 @@ export default ({
         articles.map(article => {
           article.palette = '#000000';
           article.hashtags = article.hashtag.split(', ');
-          article.date_posted = this.moment(article.date_posted).format('MMMM DD, YYYY');
+          article.date_posted = this.moment(article.date_posted * 1000).format('MMMM DD, YYYY');
         });
 
         await Promise.allSettled(articles.map(async (article) => {
