@@ -4,7 +4,7 @@
 
 **General:**
 
-When a user wants to read a blogger's article, they will need to execute a transaction with their wallet and pay an amount in **T** to read the TApp's content.
+When a user wants to read a blogger's article, they will need to execute a transaction with their wallet and pay an amount in **CPHR** to read the TApp's content.
 
 - 20% of the money goes into the bonding curve to be split among the writer and the TApp hosts.
 - 10% of the money is split amongst all existing token holders (previous investors), proportionally.
@@ -20,7 +20,7 @@ When a user wants to read a blogger's article, they will need to execute a trans
 
 **Cash Out:**
 
-- Users can choose how many tokens to cash out (remove from the investing pool). The exact amount of T depends on the supply at the time of withdrawal. This amount goes into their local wallet.
+- Users can choose how many tokens to cash out (remove from the investing pool). The exact amount of CPHR depends on the supply at the time of withdrawal. This amount goes into their local wallet.
 
 **Curator Marketing**
 
