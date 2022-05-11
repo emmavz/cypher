@@ -7,8 +7,9 @@
 When a user wants to read a blogger's article, they will need to execute a transaction with their wallet and pay an amount in **CPHR** to read the TApp's content.
 
 - 20% of the money goes into the bonding curve to be split among the writer and the TApp hosts.
-- 10% of the money is split amongst all existing token holders (previous investors), proportionally.
 - 70% of the money is invested in the author (bonding curve) through token purchases
+- 10% of the money is split amongst all existing token holders (previous investors), proportionally.
+
 
 **Notes**
 - The price to read an article is fixed.
