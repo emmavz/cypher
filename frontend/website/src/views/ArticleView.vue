@@ -43,7 +43,7 @@ export default ({
             <div v-for="(article, index) in article" :key="index">
                 <div class="relative flex justify-center banner_img">
                     <img :src="article.image_url" alt="" class="w-full">
-                    <span>{{ userWalletBalance[0].user_wallet_balance }} {{ this.currency }}</span>
+                    <span class="currency-tag">{{ userWalletBalance[0].user_wallet_balance }} {{ this.currency }}</span>
                     <button class="close-icon"><img src="/src/assets/img/close-icon.svg" alt="" width="34"></button>
                 </div>
 
@@ -68,7 +68,7 @@ export default ({
                     <div class="container">
                         <div class="flex items-center justify-center">
                             <div class="mr-6">
-                                <img src="/src/assets/img/stats-icon.svg" alt="" class="ml-auto">
+                                <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto">
                             </div>
                             <div class="stats__right">
                                 <div><span>{{ article.article_liquidation_time }}</span>Days until liquidation</div>

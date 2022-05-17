@@ -1,9 +1,27 @@
 <script>
-import Vibrant from 'node-vibrant/dist/vibrant.min.js';
+import Category from '@/components/Category.vue';
+import Article from '@/components/Article.vue';
+
 export default ({
   data() {
     return {
       articles: [],
+      categories: [{
+          name: 'For You',
+          url: '#'
+        },{
+          name: 'Coding',
+          url: '#'
+        },
+        {
+          name: 'Business',
+          url: '#'
+        },
+        {
+          name: 'Other Categories',
+          url: '#'
+        }
+      ]
     }
   },
   async created() {
@@ -12,29 +30,15 @@ export default ({
           "user_id": 1,
           "start_index": 0,
           "number_of_article": 5
-      }).then(articles => {
-      return (async () => {
-
-        articles.map(article => {
-          article.palette = '#000000';
-          article.hashtags = article.hashtag.split(', ');
-          article.date_posted = this.moment(article.date_posted * 1000).format('MMMM DD, YYYY');
-        });
-
-        await Promise.allSettled(articles.map(async (article) => {
-          let palette = await Vibrant.from(article.image_url).quality(1).clearFilters().getPalette()
-          let rgb = palette.Muted._rgb;
-          rgb = 'rgb('+rgb[0]+', '+rgb[1]+', '+rgb[2]+')';
-          article.palette = rgb;
-        }));
-
-        return articles;
-      })();
-    })
+      })
     .then(articles => {
       this.articles = articles;
     }).catch(error => this.isError = true );
   },
+  components: {
+    Category,
+    Article
+  }
 })
 </script>
 
@@ -42,7 +46,7 @@ export default ({
 <template>
 
   <div class="app-wp">
-    <Header contentLoaded="true" />
+    <Header contentLoaded="true" :categories="categories" />
 
     <!-- Content -->
     <div class="content i-wrap">
@@ -50,38 +54,7 @@ export default ({
 
         <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
 
-          <RouterLink :to="{name: 'article_homepage', params: {articleId: article.article_id } }" class="blog-post inline-flex flex-wrap justify-between">
-            <span :style="{'background': 'linear-gradient(206.14deg, '+article.palette+' 0%, #4F4D55 145.34%)'}"></span>
-            <div class="blog-post__left">
-              <div class="blog-post__left__header flex items-center mb-4">
-                <div class="blog-post__left__header__img">
-                  <img :src="article.pfp" alt="">
-                </div>
-                <div class="pl-3">
-                  <h2 class="mb-1">{{ article.article_title }}</h2>
-                  <div class="flex blog-post__left__header__author">
-                    <span>{{ article.name }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <ul class="categories mb-4">
-                <li v-for="(tag, i) in article.hashtags" :key="i"><span>{{ tag }}</span></li>
-              </ul>
-
-              <div class="blog-post__left__meta flex mb-2.5">
-                <div class="mr-3">{{ article.date_posted }}</div>
-              </div>
-
-              <div class="blog-post__left__stock">
-                {{ article.total_invested }} {{ this.currency }} Invested
-              </div>
-            </div>
-
-            <div class="blog-post__right" :style="{'background-image': 'url('+article.image_url+')'}">&nbsp;
-              <span :style="{'background': 'linear-gradient(206.14deg, '+article.palette+' 0%, #4F4D55 145.34%)'}"></span>
-            </div>
-          </RouterLink>
+          <Article :article="article" />
 
         </div>
 
