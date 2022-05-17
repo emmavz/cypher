@@ -2,7 +2,8 @@ export default {
     data() {
         return {
             isError: false,
-            currency: currency
+            currency: currency,
+            profileTabs: ['Investments', 'Articles'],
         }
     },
     created() {

@@ -364,7 +364,7 @@ pub async fn run_sql_json<F>(
     state: Arc<AppState>,
     input: serde_json::Value,
     sql_json: F
-) -> axum::extract::Json<Value> 
+) -> axum::extract::Json<Value>
 where F: FnOnce(&serde_json::Value, Arc<AppState>)->Result<Payload> + Send + 'static{
     thread::spawn(move || {
         match sql_json(&input, state){
