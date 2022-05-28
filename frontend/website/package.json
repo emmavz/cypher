@@ -13,11 +13,13 @@
     "moment": "^2.29.3",
     "node-vibrant": "^3.2.1-alpha.1",
     "vue": "^3.2.33",
+    "vue-clipboard2": "^0.3.3",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
     "autoprefixer": "^10.4.4",
+    "click-outside-vue3": "^4.0.1",
     "postcss": "^8.4.12",
     "sass": "^1.50.1",
     "tailwindcss": "^3.0.24",

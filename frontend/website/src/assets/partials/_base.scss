@@ -8,6 +8,8 @@ $bright-gray: #EDEDED;
 $container-width: 18px;
 $footer-height: 90px;
 $border-radius: 14px;
+$border-radius--2: 24px;
+$border-radius--3: 35px;
 $box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
 html,
@@ -80,12 +82,20 @@ h6 {
     color: $primary-color;
 }
 
+.primary-bg {
+    background-color: $primary-color;
+}
+
 .aquamarine-color {
     color: $aquamarine-color;
 }
 
 .hide {
     display: none !important;
+}
+
+.border-radius {
+    border-radius: 14px;
 }
 
 .f-11 {
@@ -96,8 +106,24 @@ h6 {
     font-size: 13px;
 }
 
+.f-14 {
+    font-size: 14px;
+}
+
+.f-15 {
+    font-size: 15px;
+}
+
 .f-16 {
     font-size: 16px !important;
+}
+
+.f-18 {
+    font-size: 18px;
+}
+
+.f-20 {
+    font-size: 20px;
 }
 
 h2 {
@@ -133,4 +159,18 @@ textarea {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.m-w-76 {
+    min-width: 76px;
+}
+
+.h-27 {
+    height: 27px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

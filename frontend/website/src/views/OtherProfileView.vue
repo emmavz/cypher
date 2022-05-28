@@ -1,6 +1,7 @@
 <script>
 import Article from '@/components/Article.vue';
 import Author from '@/components/Author.vue';
+import UpVotePopup from '@/components/UpVotePopup.vue';
 import Tabs from '@/components/Tabs.vue';
 import StatsInvestment from '@/components/StatsInvestment.vue';
 import StatsStakes from '@/components/StatsStakes.vue';
@@ -52,7 +53,8 @@ export default ({
     Author,
     Tabs,
     StatsInvestment,
-    StatsStakes
+    StatsStakes,
+    UpVotePopup
   }
 })
 </script>
@@ -68,14 +70,21 @@ export default ({
 
             <Author :author="author" anotherProfile="true" />
 
-            <Tabs :tabList="profileTabs" tabRightButton="upvote">
+            <Tabs :tabList="profileTabs">
+                <template v-slot:btns>
+                    <UpVotePopup />
+                </template>
+
+
                 <template v-slot:tabPanel-1>
-                     <StatsInvestment :statsInvestment="statsInvestment" />
-                     <StatsStakes :statsStakes="statsStakes" class="mt-4" />
+                     <div class="container">
+                        <StatsInvestment :statsInvestment="statsInvestment" />
+                        <StatsStakes :statsStakes="statsStakes" class="mt-4" />
+                     </div>
                 </template>
 
                 <template v-slot:tabPanel-2>
-                     <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
+                     <div class="w-full flex justify-center container" v-for="(article,index) in articles" :key="index">
                         <Article :article="article" />
                     </div>
                 </template>

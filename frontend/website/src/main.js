@@ -6,6 +6,8 @@ import router from './router'
 import { axios, instance } from './HTTP.js'
 import mixin from './mixin.js'
 import moment from 'moment'
+import vClickOutside from 'click-outside-vue3'
+import VueClipboard from 'vue-clipboard2'
 
 import mitt from 'mitt';
 const emitter = mitt();
@@ -16,6 +18,8 @@ import Error from '@/components/Error.vue';
 const app = createApp(App)
 
 app.use(router)
+app.use(VueClipboard)
+app.use(vClickOutside)
 
 app.mixin(mixin)
 

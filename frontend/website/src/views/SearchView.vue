@@ -1,6 +1,7 @@
 <script>
 import Category from '@/components/Category.vue';
 import Article from '@/components/Article.vue';
+import Search from '@/components/Search.vue';
 export default ({
   data() {
     return {
@@ -74,7 +75,8 @@ export default ({
   },
   components: {
     Category,
-    Article
+    Article,
+    Search
   }
 })
 </script>
@@ -83,7 +85,11 @@ export default ({
 <template>
 
   <div class="app-wp">
-    <Header searchLoaded="true" categories="categories" />
+    <Header categories="categories">
+      <template v-slot:search>
+        <Search/>
+      </template>
+    </Header>
 
     <!-- Content -->
     <div class="content i-wrap">

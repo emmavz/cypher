@@ -4,6 +4,8 @@ export default {
             isError: false,
             currency: currency,
             profileTabs: ['Investments', 'Articles'],
+            articleTabs: ['Article', 'Statistics'],
+            searchTabs: ['Articles', 'Authors'],
         }
     },
     created() {
@@ -17,6 +19,22 @@ export default {
         });
     },
     methods: {
+
+        onlyNumeric(event) {
+            event = (event) ? event : window.event;
+            var charCode = (event.which) ? event.which : event.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                event.preventDefault();
+            } else {
+                return true;
+            }
+        },
+
+        setInputDynamicWidth(input) {
+            setTimeout(() => {
+                input.style.width = input.value.length + 'ch';
+            }, 0);
+        },
 
         async sendApiRequest(url, data) {
 

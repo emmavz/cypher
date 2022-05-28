@@ -127,7 +127,7 @@ async fn main(){     // create our static file handler
                     header::ACCEPT_LANGUAGE,
                     header::AUTHORIZATION,
                 ])
-                .allow_origin(Origin::exact("http://localhost:8080".parse().unwrap()))
+                .allow_origin(Origin::exact("http://localhost:8888".parse().unwrap()))
                 .allow_methods(vec![Method::GET, Method::POST]),
             )
             .layer(Extension(Arc::new(AppState::new(&glue_path))));
