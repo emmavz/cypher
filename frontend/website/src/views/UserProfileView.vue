@@ -68,13 +68,13 @@ export default ({
 
             <Tabs :tabList="profileTabs.slice().reverse()" tabRightButton="currency" >
                 <template v-slot:tabPanel-1>
-                    <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
+                    <div class="w-full flex justify-center container" v-for="(article,index) in articles" :key="index">
                         <Article :article="article" class="blog-post--user-article" />
                     </div>
                 </template>
 
                 <template v-slot:tabPanel-2>
-                    <div class="w-full flex justify-center" v-for="(investment,index) in investments" :key="index">
+                    <div class="w-full flex justify-center container" v-for="(investment,index) in investments" :key="index">
                         <Article :article="investment" class="blog-post--user-ivestment" />
                     </div>
                 </template>

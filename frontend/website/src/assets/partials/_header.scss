@@ -47,6 +47,10 @@
             background-color: $secondary-color;
             padding: 8px 15px;
         }
+
+        &.categories__plus--white a {
+            background-color: $white;
+        }
     }
 
     a,
@@ -84,24 +88,31 @@
  ************/
 
 .searchbar {
-  margin-bottom: 17px;
+    margin-bottom: 17px;
 
-  &__div {
-    width: 85%;
-    margin: auto;
-  }
+    &__div {
+        width: 94%;
+        margin: auto;
+    }
 
-   input {
-      background: $bright-gray;
-      box-shadow: $box-shadow;
-      border-radius: $border-radius;
-      padding: 4.9px 13px 4.9px 33px;
-      width: 100%;
-   }
+    input {
+        background: $bright-gray;
+        box-shadow: $box-shadow;
+        border-radius: $border-radius;
+        padding: 4.9px 13px 4.9px 33px;
+        width: 100%;
+    }
 
-   label {
-     position: absolute;
-     left: 10px;
-     cursor: pointer;
-   }
+    label {
+        position: absolute;
+        left: 10px;
+        cursor: pointer;
+    }
+}
+
+.searchbar--trigger {
+    .searchbar__div {
+        width: 100%;
+        margin: 0 15px;
+    }
 }

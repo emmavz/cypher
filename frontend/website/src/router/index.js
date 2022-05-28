@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
+import SearchFullView from '../views/SearchFullView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,14 +21,31 @@ const router = createRouter({
       component: () => import('../views/ArticleView.vue')
     },
     {
+      path: '/article_paid/:articleId',
+      name: 'full_article_homepage',
+      component: () => import('../views/FullArticleView.vue')
+    },
+    {
       path: '/search',
       name: 'search',
-      component: () => import('../views/SearchView.vue')
+      component: () => import('../views/SearchView.vue'),
+    },
+    {
+      path: '/search_full',
+      name: 'search_full',
+      components: {
+        default: SearchFullView
+      },
     },
     {
       path: '/notifications',
       name: 'notifications',
-      component: () => import('../views/NotificationView.vue')
+      component: () => import('../views/NotificationView.vue'),
+    },
+    {
+      path: '/notifications/article/:articleId',
+      name: 'notifications.article',
+      component: () => import('../views/NotificationArticleView.vue'),
     },
     {
       path: '/profile',
@@ -38,6 +56,21 @@ const router = createRouter({
       path: '/another-profile',
       name: 'another-profile',
       component: () => import('../views/OtherProfileView.vue')
+    },
+    {
+      path: '/drafts',
+      name: 'drafts',
+      component: () => import('../views/DraftArticleView.vue')
+    },
+    {
+      path: '/create_article',
+      name: 'create_article',
+      component: () => import('../views/CreateArticleView.vue')
+    },
+    {
+      path: '/create_article_published',
+      name: 'create_article_published',
+      component: () => import('../views/CreateArticlePublishedView.vue')
     }
   ]
 });
