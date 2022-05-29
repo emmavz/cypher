@@ -1,6 +1,5 @@
 <script>
 import ArticleBanner from '@/components/ArticleBanner.vue';
-import SharePopup from '@/components/SharePopup.vue';
 
 export default ({
     data() {
@@ -9,10 +8,6 @@ export default ({
             userWalletBalance: [],
             image_url: '',
             user_wallet_balance: '',
-            share_btn: 'Share to Read',
-            share_heading: 'Share to Read',
-            share_description: 'Each time you share this unique link, you start a <b>sharing chain</b>. Once somebody pays, everybody in that chain can read the article for free. You can share this link with up to <b>eight</b> friends.',
-            share_link: 'https://insert-link-here.com',
             showPaytoReadConfirmation: false
         }
     },
@@ -48,7 +43,6 @@ export default ({
     },
     components: {
         ArticleBanner,
-        SharePopup
     }
 })
 </script>
@@ -81,10 +75,7 @@ export default ({
                             <p class="mb-6">
                                 {{ article.article_description }}
                             </p>
-                            <div class="mb-6"><a href="#" class="btn i-wrap--v2__btn"
-                                    @click="showPaytoReadConfirmation = 1">Pay to Read (20 {{ this.currency }})</a>
-                            </div>
-                            <SharePopup :share_btn="share_btn" :share_heading="share_heading" :share_description="share_description"  :share_link="share_link" />
+                            <div><a href="#" class="btn i-wrap--v3__btn">Read</a></div>
                         </div>
                     </div>
 
@@ -108,9 +99,10 @@ export default ({
 
                 <div class="stats mb-12">
                     <div class="container">
+                        <div class="mb-8 mt-2"><b>Article Statistics</b></div>
                         <div class="flex items-center">
                             <div class="mr-6">
-                                <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto">
+                                <img src="@/assets/img/stats-icon--v4.svg" alt="" class="ml-auto">
                             </div>
                             <div class="stats__right">
                                 <div><span class="aquamarine-color mr-1.5">{{ article.article_liquidation_time

@@ -36,9 +36,9 @@ export default {
         <!-- Content -->
         <div class="content i-wrap flex flex-col pb-0">
 
-            <div class="max-h-full overflow-y-auto">
+            <div class="max-h-full overflow-y-auto -mt-4">
                 <div class="container">
-                    <h2 class="mb-6 ml-2">Drafts</h2>
+                    <h2 class="mb-4 ml-2">Drafts</h2>
                 </div>
 
                 <div class="blog-post-wrap">

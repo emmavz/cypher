@@ -64,10 +64,10 @@ export default ({
                     </div>
                 </div>
 
-                <div class="stats mb-16 border-b-0">
+                <div class="stats mb-8 border-b-0">
                     <div class="container">
                         <div class="mb-8 mt-2"><b>Article Statistics</b></div>
-                        <div class="flex items-center justify-center">
+                        <div class="flex items-center">
                             <div class="mr-6">
                                 <img src="@/assets/img/stats-icon--v4.svg" alt="" class="ml-auto">
                             </div>

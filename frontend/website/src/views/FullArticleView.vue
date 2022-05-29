@@ -8,9 +8,10 @@ export default ({
   data() {
     return {
       article: [],
-      userWalletBalance: [],
       image_url: '',
-      user_wallet_balance: '',
+      share_btn: 'Share',
+      share_heading: 'Share Article',
+      share_description: 'Thanks for helping an author out! Remember, the more people who invest in this author, the more CPHR you can earn! appy sharing!',
       share_link: 'https://insert-link-here.com',
       isModalVisible: false,
       showPaytoReadConfirmation: false,
@@ -35,8 +36,6 @@ export default ({
     .then((reponses) => {
         this.article = reponses[0];
         this.image_url = this.article[0].image_url;
-        this.userWalletBalance = reponses[1];
-        this.user_wallet_balance = this.userWalletBalance[0].user_wallet_balance;
     });
 
   },
@@ -70,11 +69,11 @@ export default ({
         <!-- Content -->
         <div class="content">
 
-            <ArticleBanner :image_url="image_url" :user_wallet_balance="user_wallet_balance" />
+            <ArticleBanner :image_url="image_url" />
 
             <div v-for="(article, index) in article" :key="index">
 
-                <div class="i-wrap--v2 border-b-0">
+                <div class="i-wrap--v2 border-b-0 -mb-4">
 
                     <div class="container">
 
@@ -96,7 +95,7 @@ export default ({
                     <template v-slot:btns>
                         <div class="flex">
                             <UpvotePopup class="sm-btns-container" />
-                            <SharePopup :share_link="share_link" name="Share" class="sm-btns-container ml-1.5" />
+                            <SharePopup :share_btn="share_btn" :share_heading="share_heading" :share_description="share_description"  :share_link="share_link" class="sm-btns-container ml-1.5"  />
                         </div>
                     </template>
 
@@ -118,7 +117,7 @@ export default ({
                     <template v-slot:tabPanel-2>
                         <div class="stats mb-8 border-b-0 -mt-10">
                             <div class="container">
-                                <div class="mb-4 mt-2 f-20"><b>Article Statistics</b></div>
+                                <div class="mb-6 mt-2 f-20"><b>Article Statistics</b></div>
                                 <div class="flex items-center ">
                                     <div class="mr-6">
                                         <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto">
@@ -130,14 +129,14 @@ export default ({
                                     </div>
                                 </div>
 
-                                <div class="mb-4 mt-10 f-20"><b>Your investment in <span class="aquamarine-color">Eliza Mae</span></b></div>
+                                <div class="mb-6 mt-10 f-20"><b>Your investment in <span class="aquamarine-color">Eliza Mae</span></b></div>
                                 <div class="flex items-center">
                                     <div class="mr-6">
                                         <img src="@/assets/img/stats-icon--v3.svg" alt="" class="ml-auto">
                                     </div>
                                     <div class="stats__right">
                                         <div>You Own<span class="aquamarine-color mr-1.5 ml-1.5 mb-1">16.67%</span>Stake</div>
-                                        <div><span class="aquamarine-color mr-1.5">20{{this.currency}}</span>Invested</div>
+                                        <div class="-mt-2"><span class="aquamarine-color mr-1.5">20</span><span class="mr-1.5">{{this.currency}}</span>Invested</div>
                                     </div>
                                 </div>
                             </div>

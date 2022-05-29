@@ -78,8 +78,8 @@ export default ({
 
                 <template v-slot:tabPanel-1>
                      <div class="container">
-                        <StatsInvestment :statsInvestment="statsInvestment" />
-                        <StatsStakes :statsStakes="statsStakes" class="mt-4" />
+                        <StatsInvestment :statsInvestment="statsInvestment" class="mt-4" />
+                        <StatsStakes :statsStakes="statsStakes" class="mt-8" />
                      </div>
                 </template>
 

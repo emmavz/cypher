@@ -8,12 +8,26 @@
     position: fixed;
     height: $footer-height;
 
+    img {
+        max-width: none;
+    }
+
     &__controls {
+
+        ul {
+            @media(max-width: 390px) {
+                justify-content: space-between;
+            }
+        }
 
         a {
             margin: 0 22.5px;
             display: inline-block;
             position: relative;
+
+            @media(max-width: 390px) {
+                margin: 0 5px;
+            }
 
             &:after {
                 content: "";

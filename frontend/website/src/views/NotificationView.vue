@@ -41,10 +41,10 @@ export default ({
         <Header/>
 
         <!-- Content -->
-        <div class="content i-wrap">
+        <div class="content i-wrap pt-8">
 
             <div class="container">
-                <h2 class="mb-6 ml-2">Notifications</h2>
+                <h2 class="mb-7 ml-2">Notifications</h2>
             </div>
 
             <ul class="notifications">

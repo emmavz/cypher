@@ -2,10 +2,21 @@
 import CreateArticleBanner from '@/components/CreateArticleBanner.vue';
 import Category from '@/components/Category.vue';
 
+import { QuillEditor, Quill } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
+import BlotFormatter from 'quill-blot-formatter';
+import MagicUrl from 'quill-magic-url';
+
+Quill.register("modules/blotFormatter", BlotFormatter);
+Quill.register("modules/magicUrl", MagicUrl);
+
 export default {
     data() {
         return {
             'image_url': new URL('../assets/img/img-icon.svg', import.meta.url).href,
+            title: '',
+            description: '',
             publish_description: '',
             publish_description_max: 200,
             publish_price: '0',
@@ -17,7 +28,30 @@ export default {
                     name: 'Fashion',
                     url: '#'
                 },
-            ]
+            ],
+            showQuillEditor: 0,
+            options: {
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+
+                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                        [{ 'align': [] }],
+                        ['link', 'image'],
+                        [{ 'direction': 'rtl' }],                         // text direction,
+                        ['clean'],
+                    ],
+                    blotFormatter: {},
+                    magicUrl: {}
+                },
+                placeholder: '',
+                theme: 'snow',
+            },
         }
     },
     created() {
@@ -36,10 +70,14 @@ export default {
         hidePublish() {
             this.showPublish = 0;
         },
+        editorReady(e) {
+            e.focus()
+        }
     },
     components: {
         CreateArticleBanner,
         Category,
+        QuillEditor
     },
 }
 </script>
@@ -58,10 +96,13 @@ export default {
                 <div class="container create_article__form">
                     <form action="javascript:void(0)">
                         <div class="br-b">
-                            <input type="text" placeholder="Insert Title" class="f-20 font-bold pb-1 text-center">
+                            <input type="text" placeholder="Insert Title" v-model="title" class="f-20 font-bold pb-1 text-center">
                         </div>
                         <div class="mt-6">
-                            <textarea rows="10" placeholder="Start writing" class="f-13 resize-none"></textarea>
+                            <div class="faker f-13 text-center opacity-80 editor_height" @click="showQuillEditor = 1" v-if="showQuillEditor == 0">Start Writing</div>
+                            <template v-if="showQuillEditor == 1">
+                                <QuillEditor :options="options" @ready="editorReady($event)" v-model:content="description" class="editor_height" />
+                            </template>
                         </div>
                     </form>
                 </div>

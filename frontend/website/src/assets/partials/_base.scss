@@ -5,12 +5,15 @@ $white: #ffffff;
 $black: #000000;
 $bright-gray: #EDEDED;
 
+$primary-font: 'Open Sans',
+    sans-serif;
 $container-width: 18px;
 $footer-height: 90px;
 $border-radius: 14px;
 $border-radius--2: 24px;
 $border-radius--3: 35px;
 $box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+$editor-color: rgb(255, 255, 255, 0.8);
 
 html,
 body {
@@ -20,8 +23,7 @@ body {
 
 body {
     font-size: 16px;
-    font-family: 'Open Sans',
-        sans-serif;
+    font-family: $primary-font;
     color: $secondary-color;
     font-weight: 400;
     min-height: 100%;
@@ -118,6 +120,10 @@ h6 {
     font-size: 16px !important;
 }
 
+.f-17 {
+    font-size: 17px;
+}
+
 .f-18 {
     font-size: 18px;
 }
@@ -173,4 +179,27 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.ql-container {
+
+    input {
+        color: $black  !important;
+    }
+}
+
+div.ql-editor.ql-blank::before {
+    color: $editor-color;
+    font-style: normal;
+    text-align: center;
+}
+
+div.ql-editor {
+    * {
+        color: $editor-color;
+    }
+}
+
+.ql-container {
+    font-family: $primary-font  !important;
 }

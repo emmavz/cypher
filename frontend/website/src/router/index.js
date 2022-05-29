@@ -26,6 +26,11 @@ const router = createRouter({
       component: () => import('../views/FullArticleView.vue')
     },
     {
+      path: '/article_afterpaid/:articleId',
+      name: 'article_afterpaid',
+      component: () => import('../views/ArticleAfterPaid.vue')
+    },
+    {
       path: '/search',
       name: 'search',
       component: () => import('../views/SearchView.vue'),
