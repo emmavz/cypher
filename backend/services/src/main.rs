@@ -574,6 +574,19 @@ pub async fn get_notifications(
     run_sql_json(state, input, get_notifications_inner).await
 }
 
+fn get_latest_article_id_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload> {
+
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+
+    // Find the latest article Id and store into variable
+    let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
+    match exec_query(&mut glue, &sql){
+        Ok(payload)=>Ok(payload),
+        Err(e) =>Err(anyhow!("Glue query error {}", e.to_string())),
+    }
+}
+
 fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Vec<Payload>> {
     let article_title = input.get("article_title")
@@ -585,17 +598,12 @@ fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
     let image_url = input.get("image_url")
         .ok_or(anyhow!("input has no image_url"))?;
 
-    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+    let article_result = run_sql_json(state, json!(input), get_latest_article_id_inner).await;
+    let ar = article_result.as_array().unwrap();
+    let article_result_first = &ar[0];
+    let id = article_result_first.get("article_id").unwrap().as_i64().unwrap();
 
-    // Find the latest article Id and store into variable
-    // let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
-    // let result = exec_query(&mut glue, &sql);
-    // match result{
-    //     Ok(r)=>  Ok(r),
-    //     Err(e)=> Err(anyhow!(e.to_string())),
-    // }
-
-    let new_article_id = "";
+    let new_article_id = id+1;
 
     let sql=  format!(r#"INSERT INTO articles (article_id, author_id, article_title, article_description, image_url, is_published) VALUES ({},{},{},{},{},{})
          "#, new_article_id, user_id, article_title, article_description, image_url, false);
@@ -611,6 +619,7 @@ fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
     // let sql=  format!(r#"INSERT INTO user_notification (notification_id, user_id, created_at) VALUES ({},{},{})
     //      "#, notification_id, user_id, local.timestamp());
 
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
 
     match exec_cmd(&mut glue, &sql){
         Ok(r)=> Ok(r),
@@ -634,7 +643,7 @@ fn get_id_inner(input: &serde_json::Value, state: Arc<AppState>)
     let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
     match exec_query(&mut glue, &sql){
         Ok(payload)=>Ok(payload),
-        Err(e) =>Err(anyhow!("Glue query error {}", e.to_string())), 
+        Err(e) =>Err(anyhow!("Glue query error {}", e.to_string())),
     }
 }
 
@@ -665,6 +674,7 @@ fn get_draft_articles_inner(input: &serde_json::Value, state: Arc<AppState>)
     let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
     exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
 }
+
 pub async fn get_draft_articles(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
