@@ -203,3 +203,8 @@ div.ql-editor {
 .ql-container {
     font-family: $primary-font  !important;
 }
+
+span[role="alert"] {
+    font-size: 12px;
+    color: #f27474;
+}

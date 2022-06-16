@@ -32,12 +32,12 @@ export default ({
                 }
             },
         ])
-            .then((reponses) => {
-                this.article = reponses[0];
-                this.image_url = this.article[0].image_url;
-                this.userWalletBalance = reponses[1];
-                this.user_wallet_balance = this.userWalletBalance[0].user_wallet_balance;
-            });
+        .then((reponses) => {
+            this.article = reponses[0];
+            this.image_url = this.article[0].image_url;
+            this.userWalletBalance = reponses[1];
+            this.user_wallet_balance = this.userWalletBalance[0].user_wallet_balance;
+        });
 
     },
     methods: {

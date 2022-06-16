@@ -1,35 +1,35 @@
 <script>
 export default {
-    props: ['image_url'],
-    data() {
-        return {
-            image: this.image_url,
-            image_selected: false
-        }
-    },
+    props: ['article_image'],
     methods: {
         onFileChange(e) {
             if(e.target.files.length) {
                 const file = e.target.files[0];
-                this.image = URL.createObjectURL(file);
-                this.image_selected = true;
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    this.$emit('article_image', reader.result);
+                };
+                // this.$emit('article_image', URL.createObjectURL(file));
             }
             else {
-                this.image = this.image_url;
-                this.image_selected = false;
+                this.$emit('article_image', null);
             }
+        },
+        getDefaultImage() {
+            return new URL('../assets/img/img-icon.svg', import.meta.url).href;
         }
-    }
+    },
 }
 </script>
 
 <template>
     <div class="relative flex justify-center banner_img">
         <input type="file" accept="image/*" id="banner_image" class="input-hide" @change="onFileChange">
-        <label for="banner_image" :class="['w-full relative overflow-hidden banner_img__label', {'banner_img__label--active': image_selected }]"><img :src="image" alt="" class="w-full cursor-pointer"></label>
+        <label for="banner_image" :class="['w-full relative overflow-hidden banner_img__label', {'banner_img__label--active': article_image }]"><img :src="article_image ? article_image : getDefaultImage()" alt="" class="w-full cursor-pointer"></label>
         <div>
             <div class="flex banner_img__btns">
-                <RouterLink :to="{name: 'drafts'}" class="ar-btn mr-2">Save</RouterLink>
+                <button  class="ar-btn mr-2" @click="$emit('saveArticle')">Save</button>
                 <button class="ar-btn" @click.stop="$emit('showPublish')">Publish</button>
             </div>
         </div>

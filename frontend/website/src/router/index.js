@@ -58,8 +58,8 @@ const router = createRouter({
       component: () => import('../views/UserProfileView.vue')
     },
     {
-      path: '/another-profile',
-      name: 'another-profile',
+      path: '/other-profile',
+      name: 'other-profile',
       component: () => import('../views/OtherProfileView.vue')
     },
     {

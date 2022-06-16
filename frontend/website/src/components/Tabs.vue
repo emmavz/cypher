@@ -4,9 +4,6 @@ export default {
     tabList: {
       type: Array,
       required: true,
-    },
-    tabRightButton: {
-      default: ''
     }
   },
   data() {
@@ -46,7 +43,7 @@ export default {
                     </li>
                 </ul>
                 <div>
-                    <span v-if="tabRightButton  == 'currency'" class="currency-tag currency-tag--opacity-70">1326  {{ this.currency }}</span>
+                    <slot name="currency" />
                     <slot name="btns" />
                 </div>
             </div>

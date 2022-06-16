@@ -6,31 +6,33 @@ import Tabs from '@/components/Tabs.vue';
 export default ({
   data() {
     return {
-        author: {
-            "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
-            "name": "Jessica Covington",
-            "followers": "456",
-            "following": "23",
-            "description": "She turned her can't into can and her dreams into plans.",
-        },
-        articles: [
-            {
-                "article_id": 0,
-                "article_title": "Tokenomics",
-                "date_posted": 1651335773,
-                "image_url": "http://localhost:8080/dynamic/post-6.png",
-                "name": "Jessica Covington",
-                "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
-            },
-            {
-                "article_id": 1,
-                "article_title": "School’s Out!",
-                "date_posted": 1651335773,
-                "image_url": "http://localhost:8080/dynamic/post-7.png",
-                "name": "Jessica Covington",
-                "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
-            }
-        ],
+        author: {},
+        articles: [],
+        // author: {
+        //     "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
+        //     "name": "Jessica Covington",
+        //     "followers": "456",
+        //     "following": "23",
+        //     "description": "She turned her can't into can and her dreams into plans.",
+        // },
+        // articles: [
+        //     {
+        //         "article_id": 0,
+        //         "article_title": "Tokenomics",
+        //         "date_posted": 1651335773,
+        //         "image_url": "http://localhost:8080/dynamic/post-6.png",
+        //         "name": "Jessica Covington",
+        //         "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
+        //     },
+        //     {
+        //         "article_id": 1,
+        //         "article_title": "School’s Out!",
+        //         "date_posted": 1651335773,
+        //         "image_url": "http://localhost:8080/dynamic/post-7.png",
+        //         "name": "Jessica Covington",
+        //         "pfp": "http://localhost:8080/dynamic/userprofile-1.png",
+        //     }
+        // ],
         investments: [
             {
                 "article_id": 0,
@@ -47,6 +49,30 @@ export default ({
         ],
     }
   },
+  async created() {
+
+    this.sendAllMultiApiRequests([
+        {
+            url: 'get_user_profile',
+            data: {
+                "user_id": 1,
+            }
+        },
+        {
+            url: 'get_user_profile_articles',
+            data: {
+                "user_id": 1
+            }
+        },
+    ])
+    .then((reponses) => {
+        this.author= reponses[0];
+        // this.authors = reponses[1];
+        // this.image_url = this.article[0].image_url;
+        // this.userWalletBalance = reponses[1];
+        // this.user_wallet_balance = this.userWalletBalance[0].user_wallet_balance;
+    });
+  },
   components: {
     Article,
     Author,
@@ -59,28 +85,36 @@ export default ({
 
     <div class="app-wp">
 
-        <Header/>
+        <Header />
 
         <!-- Content -->
         <div class="content i-wrap">
 
-            <Author :author="author" />
+            <div v-if="!isError">
+                <Author :author="author" />
 
-            <Tabs :tabList="profileTabs.slice().reverse()" tabRightButton="currency" >
-                <template v-slot:tabPanel-1>
-                    <div class="w-full flex justify-center container" v-for="(article,index) in articles" :key="index">
-                        <Article :article="article" class="blog-post--user-article" />
-                    </div>
-                </template>
+                <Tabs :tabList="profileTabs.slice().reverse()">
+                    <template v-slot:btns>
+                        <span class="currency-tag currency-tag--opacity-70">{{ author.user_wallet_balance }} {{
+                        this.currency }}</span>
+                    </template>
+                    <template v-slot:tabPanel-1>
+                        <div class="w-full flex justify-center container" v-for="(article,index) in articles"
+                            :key="index">
+                            <Article :article="article" class="blog-post--user-article" />
+                        </div>
+                    </template>
 
-                <template v-slot:tabPanel-2>
-                    <div class="w-full flex justify-center container" v-for="(investment,index) in investments" :key="index">
-                        <Article :article="investment" class="blog-post--user-ivestment" />
-                    </div>
-                </template>
-            </Tabs>
+                    <template v-slot:tabPanel-2>
+                        <div class="w-full flex justify-center container" v-for="(investment,index) in investments"
+                            :key="index">
+                            <Article :article="investment" class="blog-post--user-ivestment" />
+                        </div>
+                    </template>
+                </Tabs>
+            </div>
 
-            <Error/>
+            <Error />
         </div>
 
     </div>

@@ -5,38 +5,42 @@ import Search from '@/components/Search.vue';
 export default ({
   data() {
     return {
-      articles: [
-        {
-            "article_id": 0,
-            "article_title": "Camping is Actually Fun??!!",
-            "date_posted": 1651335773,
-            "hashtag": "camping",
-            "image_url": "http://localhost:8080/dynamic/post-11.png",
-            "name": "Cassandra Mendez",
-            "pfp": "http://localhost:8080/dynamic/profile-7.png",
-            "total_invested": 3286
-        },
-        {
-            "article_id": 1,
-            "article_title": "My Trip to Europe: History",
-            "date_posted": 1651335773,
-            "hashtag": "Travel",
-            "image_url": "http://localhost:8080/dynamic/post-10.png",
-            "name": "John Lee",
-            "pfp": "http://localhost:8080/dynamic/profile-8.png",
-            "total_invested": 537
-        },
-        {
-            "article_id": 2,
-            "article_title": "Web3 and Its Pros & Cons",
-            "date_posted": 1651335773,
-            "hashtag": "for you, business",
-            "image_url": "http://localhost:8080/dynamic/post-12.png",
-            "name": "Tyler Hogle",
-            "pfp": "http://localhost:8080/dynamic/profile-9.png",
-            "total_invested": 537
-        }
-      ],
+      // articles: [
+      //   {
+      //       "article_id": 0,
+      //       "article_title": "Camping is Actually Fun??!!",
+      //       "date_posted": 1651335773,
+      //       "hashtag": "camping",
+      //       "image_url": "http://localhost:8080/dynamic/post-11.png",
+      //       "name": "Cassandra Mendez",
+      //       "pfp": "http://localhost:8080/dynamic/profile-7.png",
+      //       "total_invested": 3286
+      //   },
+      //   {
+      //       "article_id": 1,
+      //       "article_title": "My Trip to Europe: History",
+      //       "date_posted": 1651335773,
+      //       "hashtag": "Travel",
+      //       "image_url": "http://localhost:8080/dynamic/post-10.png",
+      //       "name": "John Lee",
+      //       "pfp": "http://localhost:8080/dynamic/profile-8.png",
+      //       "total_invested": 537
+      //   },
+      //   {
+      //       "article_id": 2,
+      //       "article_title": "Web3 and Its Pros & Cons",
+      //       "date_posted": 1651335773,
+      //       "hashtag": "for you, business",
+      //       "image_url": "http://localhost:8080/dynamic/post-12.png",
+      //       "name": "Tyler Hogle",
+      //       "pfp": "http://localhost:8080/dynamic/profile-9.png",
+      //       "total_invested": 537
+      //   }
+      // ],
+      articlesOffset: 0,
+      articlesLimit: 5,
+      stopscrollAjax: false,
+      articles: [],
       categories: [
         {
           name: 'Fashion',
@@ -73,6 +77,42 @@ export default ({
       ],
     }
   },
+  async created() {
+    this.getArticles();
+  },
+  mounted() {
+    const contentElm = document.querySelector('.content');
+    contentElm.onscroll = () => {
+      if (!this.stopscrollAjax) {
+        let bottomOfWindow = contentElm.scrollTop + contentElm.clientHeight >= contentElm.scrollHeight - 50;
+        if (bottomOfWindow) {
+          this.articlesOffset += this.articlesLimit;
+          this.getArticles();
+        }
+      }
+    }
+  },
+  methods: {
+    async getArticles() {
+      this.stopscrollAjax = true;
+      this.sendApiRequest('get_recommendations', {
+        "user_id": 1,
+        "offset": this.articlesOffset,
+        "limit": this.articlesLimit
+      })
+      .then(articles => {
+        if (articles.length) {
+          this.articles = this.articles.concat(articles);
+          this.stopscrollAjax = false;
+        }
+        else {
+          this.stopscrollAjax = true;
+        }
+      }).catch(() => {
+        this.stopscrollAjax = false;
+      });
+    }
+  },
   components: {
     Category,
     Article,
@@ -87,7 +127,7 @@ export default ({
   <div class="app-wp">
     <Header categories="categories">
       <template v-slot:search>
-        <Search/>
+        <Search />
       </template>
     </Header>
 
@@ -101,19 +141,19 @@ export default ({
           </li>
         </ul>
 
-        <h3 class="mt-2.5 mb-4">Recommended</h3>
+        <h3 class="mt-2.5 mb-4" v-if="articles.length">Recommended</h3>
 
       </div>
 
       <div class="blog-post-wrap container flex flex-wrap" v-if="articles.length">
-          <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
+        <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
 
-            <Article :article="article" />
+          <Article :article="article" />
 
-          </div>
+        </div>
       </div>
 
-      <Error/>
+      <Error />
 
     </div>
 

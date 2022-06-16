@@ -1,7 +1,10 @@
+import Swal from 'sweetalert2/dist/sweetalert2.js'
+import 'sweetalert2/src/sweetalert2.scss';
+
 export default {
     data() {
         return {
-            isError: false,
+            isError: -1,
             currency: currency,
             profileTabs: ['Investments', 'Articles'],
             articleTabs: ['Article', 'Statistics'],
@@ -36,9 +39,9 @@ export default {
             }, 0);
         },
 
-        async sendApiRequest(url, data) {
+        async sendApiRequest(url, data, errorPopup = false) {
 
-            return this.afterApiCall(this.$http.post(url, data));
+            return this.afterApiCall(this.$http.post(url, data), errorPopup);
 
         },
 
@@ -52,7 +55,7 @@ export default {
             toggleLoader();
         },
 
-        afterApiCall(api) {
+        afterApiCall(api, errorPopup) {
 
             this.beforeApiCall();
 
@@ -78,11 +81,17 @@ export default {
                     return Promise.reject(errors.join('\n'));
                 }
                 else {
+                    this.isError = 0;
                     return responses.length == 1 ? responses[0] : responses;
                 }
 
             }).catch((error) => {
-                this.isError = true;
+                if (errorPopup) {
+                    this.swalError(error);
+                }
+                else {
+                    this.isError = true;
+                }
                 return Promise.reject(error);
             }).finally(() => {
                 toggleLoader(false);
@@ -99,6 +108,40 @@ export default {
             });
 
             return requestData;
+        },
+
+        async validate(schema, data) {
+            await schema
+                .validate(data, { abortEarly: false })
+                .catch((err) => {
+                    let errors = [];
+                    err.inner.forEach(e => {
+                        errors.push(e.message);
+                    });
+                    this.swalError(errors);
+                    return Promise.reject(errors);
+                });
+        },
+
+        swalError(errors) {
+
+            errors = Array.isArray(errors) ? errors : [errors];
+
+            let ul = '<ul>';
+            errors.forEach(e => {
+                ul += '<li>' + e + '</li>';
+            });
+            ul += '</ul>';
+
+            Swal.fire({
+                title: 'Error!',
+                html: ul,
+                icon: 'error',
+            });
+        },
+
+        getFullUrl(route) {
+            return new URL(route, window.location.href).href;
         }
     }
 }

@@ -27,6 +27,9 @@ export default {
                     this.$refs.search.focus();
                }, 200);
             }
+        },
+        goToSearch() {
+            this.$router.push({ query: { q: this.q } });
         }
     }
 }
@@ -34,7 +37,7 @@ export default {
 
 <template>
     <div class="container">
-        <form action="" method="GET" :class="['searchbar flex', {'searchbar--trigger': triggerSearch}]">
+        <form action="javascript:void(0)" method="GET" :class="['searchbar flex', {'searchbar--trigger': triggerSearch}]" @submit="goToSearch">
             <button v-if="triggerSearch" type="button" class="close-icon" @click="$router.push({name: 'search'})"><img src="/src/assets/img/close-icon--v2.svg" alt="" width="34"></button>
             <div class="relative searchbar__div">
                 <label for="search" class="pos-middle">

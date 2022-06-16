@@ -11,12 +11,15 @@ import MagicUrl from 'quill-magic-url';
 Quill.register("modules/blotFormatter", BlotFormatter);
 Quill.register("modules/magicUrl", MagicUrl);
 
+import * as yup from 'yup';
+
 export default {
     data() {
         return {
-            'image_url': new URL('../assets/img/img-icon.svg', import.meta.url).href,
+            article_image: '',
             title: '',
             description: '',
+            quill: null,
             publish_description: '',
             publish_description_max: 200,
             publish_price: '0',
@@ -63,6 +66,35 @@ export default {
         });
     },
     methods: {
+        async save() {
+
+            const schema = yup.object().shape({
+                title: yup.string().required(),
+                description: yup.string().required(),
+                article_image: yup.string().required().label('article image'),
+            });
+
+            await this.validate(schema, { title: this.title, description: this.description, article_image: this.article_image }).then(() => {
+
+                // let formData = new FormData();
+                // formData.append("image_url", this.article_image);
+                // formData.append("article_title", this.title);
+                // formData.append("article_description", this.description);
+                // formData.append("user_id", 1);
+
+                this.sendApiRequest('save_article', {
+                    // "image_url": this.article_image,
+                    "image_url": "image",
+                    "article_title": this.title,
+                    "article_description": this.description,
+                    "user_id": 1
+                }, true)
+                .then(() => {
+                    this.$router.push({ name: 'drafts' });
+                });
+            });
+
+        },
         publish() {
             this.showPublish = 0;
             this.$router.push({ name: 'create_article_published' });
@@ -70,14 +102,22 @@ export default {
         hidePublish() {
             this.showPublish = 0;
         },
-        editorReady(e) {
-            e.focus()
-        }
+        editorReady(quill) {
+            this.quill = quill;
+            quill.focus();
+        },
+        editorBlur(quill) {
+        },
+        editorUpdate() {
+            if( this.quill ) {
+                this.description = this.quill.container.firstChild.innerHTML;
+            }
+        },
     },
     components: {
         CreateArticleBanner,
         Category,
-        QuillEditor
+        QuillEditor,
     },
 }
 </script>
@@ -85,34 +125,42 @@ export default {
 <template>
     <div class="app-wp">
 
-        <Header/>
+        <Header />
 
         <!-- Content -->
         <div class="content">
 
-            <CreateArticleBanner :image_url="image_url" @show-publish="showPublish = 1;publish_confirmation = 0" />
+            <CreateArticleBanner :article_image="article_image" @show-publish="showPublish = 1;publish_confirmation = 0"
+                @save-article="save" @article_image="(ar_img) => article_image = ar_img" />
 
             <div class="py-5">
                 <div class="container create_article__form">
                     <form action="javascript:void(0)">
                         <div class="br-b">
-                            <input type="text" placeholder="Insert Title" v-model="title" class="f-20 font-bold pb-1 text-center">
+                            <!-- <input type="text" placeholder="Insert Title" v-model="title"
+                                class="f-20 font-bold pb-1 text-center"> -->
+                            <input name="title" rules="required" placeholder="Insert Title" v-model="title"
+                                class="f-20 font-bold pb-1 text-center" />
                         </div>
                         <div class="mt-6">
-                            <div class="faker f-13 text-center opacity-80 editor_height" @click="showQuillEditor = 1" v-if="showQuillEditor == 0">Start Writing</div>
+                            <div class="faker f-13 text-center opacity-80 editor_height" @click="showQuillEditor = 1"
+                                v-if="showQuillEditor == 0">Start Writing</div>
                             <template v-if="showQuillEditor == 1">
-                                <QuillEditor :options="options" @ready="editorReady($event)" v-model:content="description" class="editor_height" />
+                                <QuillEditor :options="options" @ready="editorReady($event)"
+                                        @blur="editorBlur" @update:content="editorUpdate" class="editor_height" />
                             </template>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div :class="['create_article__publish', {'create_article__publish--visible': showPublish}]" v-click-outside="hidePublish">
+            <div :class="['create_article__publish', {'create_article__publish--visible': showPublish}]"
+                v-click-outside="hidePublish">
                 <div class="create_article__publish__header">
                     <div class="container">
                         <div class="flex justify-between">
-                            <button><img src="@/assets/img/close-icon--v3.svg" alt="" @click="showPublish = 0;"></button>
+                            <button><img src="@/assets/img/close-icon--v3.svg" alt=""
+                                    @click="showPublish = 0;"></button>
                             <button class="font-semibold" @click="publish_confirmation = 1">Publish</button>
                         </div>
                     </div>
@@ -122,18 +170,25 @@ export default {
 
                         <div v-if="!publish_confirmation">
                             <div class="pb-4 font-semibold">Description</div>
-                            <textarea v-model="publish_description" :maxlength="publish_description_max" class="w-full bg-transparent border-white border f-13"></textarea>
-                            <div class="flex justify-end f-13">{{ publish_description.length }}/{{ publish_description_max }}</div>
+                            <textarea v-model="publish_description" :maxlength="publish_description_max"
+                                class="w-full bg-transparent border-white border f-13"></textarea>
+                            <div class="flex justify-end f-13">{{ publish_description.length }}/{{
+                                publish_description_max }}</div>
 
                             <div class="row mt-6">
                                 <div class="w-6/12">
                                     <div class="font-semibold mb-6">Price</div>
                                     <div class="flex items-center">
-                                        <input type="number" class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0" v-model.number="publish_price" @keypress="onlyNumeric" ref="publish_price">
-                                        <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">{{ this.currency }}</span>
+                                        <input type="number"
+                                            class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0"
+                                            v-model.number="publish_price" @keypress="onlyNumeric" ref="publish_price">
+                                        <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">{{ this.currency
+                                            }}</span>
                                         <div>
-                                            <div><img src="@/assets/img/polygon-up.svg" alt="" class="cursor-pointer mb-1" @click="publish_price++"></div>
-                                            <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer" @click="publish_price > 0 ? publish_price-- : ''"></div>
+                                            <div><img src="@/assets/img/polygon-up.svg" alt=""
+                                                    class="cursor-pointer mb-1" @click="publish_price++"></div>
+                                            <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer"
+                                                    @click="publish_price > 0 ? publish_price-- : ''"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -141,11 +196,15 @@ export default {
                                 <div class="w-6/12">
                                     <div class="font-semibold mb-6">Theta</div>
                                     <div class="flex items-center">
-                                        <input type="number" class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0" v-model.number="publish_theta" @keypress="onlyNumeric" ref="publish_theta">
+                                        <input type="number"
+                                            class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0"
+                                            v-model.number="publish_theta" @keypress="onlyNumeric" ref="publish_theta">
                                         <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">%</span>
                                         <div>
-                                            <div><img src="@/assets/img/polygon-up.svg" alt="" class="cursor-pointer mb-1" @click="publish_theta++"></div>
-                                            <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer" @click="publish_theta > 0 ? publish_theta-- : ''"></div>
+                                            <div><img src="@/assets/img/polygon-up.svg" alt=""
+                                                    class="cursor-pointer mb-1" @click="publish_theta++"></div>
+                                            <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer"
+                                                    @click="publish_theta > 0 ? publish_theta-- : ''"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +213,8 @@ export default {
                             <div class="mt-8">
                                 <div class="font-semibold mb-5">Tags</div>
                                 <ul class="categories whitespace-normal">
-                                    <li class="categories__plus categories__plus--white mb-4"><a href="#"><img src="@/assets/img/plus-icon--v2.svg" alt=""></a></li>
+                                    <li class="categories__plus categories__plus--white mb-4"><a href="#"><img
+                                                src="@/assets/img/plus-icon--v2.svg" alt=""></a></li>
                                     <li v-for="(category, index) in categories" :key="index" class="mb-4">
                                         <Category :category="category" bright="true" />
                                     </li>
@@ -165,8 +225,10 @@ export default {
                         <div v-else class="create_article__publish__body__confirmation text-center">
                             <div class="font-semibold mb-5">Are you sure?</div>
                             <div class="flex justify-center">
-                                <button class="f-13 font-semibold bg-white primary-color border-radius mr-5" @click="publish_confirmation = 0">No</button>
-                                <button class="f-13 font-semibold bg-white primary-color border-radius" @click="publish">Yes</button>
+                                <button class="f-13 font-semibold bg-white primary-color border-radius mr-5"
+                                    @click="publish_confirmation = 0">No</button>
+                                <button class="f-13 font-semibold bg-white primary-color border-radius"
+                                    @click="publish">Yes</button>
                             </div>
                         </div>
 
@@ -174,7 +236,7 @@ export default {
                 </div>
             </div>
 
-            <Error/>
+            <Error />
         </div>
 
     </div>
