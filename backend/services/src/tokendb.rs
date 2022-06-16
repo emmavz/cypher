@@ -58,6 +58,7 @@ pub fn rollback_transaction(glue: &mut SledGlue) -> TokenStateResult<()> {
 	Ok(())
 }
 
+// exec multiple lines of sql commmand
 pub fn exec_cmd(
 	glue: &mut SledGlue,
 	sql: &str,
@@ -74,6 +75,7 @@ pub fn exec_cmd(
 	// Ok(bincode::serialize(&payloads)?)
 }
 
+//execute single query. sql is a single query
 pub fn exec_query(glue: &mut SledGlue, sql: &str) -> TokenStateResult<Payload> {
 	println!("enter exec_query, sql: {}", sql);
 	let statement: Statement = block_on(glue.plan(sql))?;

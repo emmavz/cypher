@@ -225,6 +225,7 @@ pub fn payload_to_json(payload: &Payload)->Result<serde_json::Value>{
             }
             Ok(json!(obj_array))
         },
+        
         _ => {
             Ok(json!({
                 "error": "not payload::select result"
@@ -445,6 +446,31 @@ where F: FnOnce(&serde_json::Value, Arc<AppState>)->Result<Payload> + Send + 'st
     }).join().unwrap().into()
 }
 
+pub async fn run_multi_sql_json<F>(
+    state: Arc<AppState>,
+    input: serde_json::Value,
+    sql_json: F
+) -> axum::extract::Json<Value>
+where F: FnOnce(&serde_json::Value, Arc<AppState>)->Result<Vec<Payload>> + Send + 'static{
+    thread::spawn(move || {
+        match sql_json(&input, state){
+            Ok(payloads) =>{
+                let results: Vec<Payload> = Vec::new();
+                for payload in payloads {
+                    let result_json = payload_to_json(&payload).unwrap_or_else(|e|
+                        json!({
+                            "error": e.to_string()
+                        })
+                    );
+                }
+                json!(results)
+            },
+            Err(e) => json!({
+                "error": e.to_string(),
+            })
+        }
+    }).join().unwrap().into()
+}
 fn get_recommendations_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Payload>{
     let offset = input.get("offset")
@@ -547,7 +573,7 @@ pub async fn get_notifications(
 }
 
 fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
-        ->Result<Payload>{
+        ->Result<Vec<Payload>> {
     let article_title = input.get("article_title")
         .ok_or(anyhow!("input has no article_title"))?;
     let article_description = input.get("article_description")
@@ -575,12 +601,15 @@ fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
 
 
     let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
-    exec_cmd(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+    match exec_cmd(&mut glue, &sql){
+        Ok(r)=> Ok(r),
+        Err(e)=> Err(anyhow!(e.to_string())),
+    }
 }
 
 pub async fn save_article(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
-    run_sql_json(state, input, save_article_inner).await
+    run_multi_sql_json(state, input, save_article_inner).await
 }
