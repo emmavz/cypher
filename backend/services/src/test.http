@@ -419,3 +419,13 @@ return
 ]
 ###
 GET http://192.168.1.15:3000/
+
+
+
+###
+POST http://localhost:3000/api/get_id
+content-type: application/json
+
+{
+    "user_id": 4
+}

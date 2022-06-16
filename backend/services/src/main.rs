@@ -626,22 +626,30 @@ pub async fn save_article(
 }
 
 fn get_id_inner(input: &serde_json::Value, state: Arc<AppState>)
-        ->Result<Vec<Payload>> {
+        ->Result<Payload> {
 
     let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
 
     // Find the latest article Id and store into variable
     let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
-    let result = exec_query(&mut glue, &sql);
-
-    let article_id = "...";
+    match exec_query(&mut glue, &sql){
+        Ok(payload)=>Ok(payload),
+        Err(e) =>Err(anyhow!("Glue query error {}", e.to_string())), 
+    }
 }
 
 pub async fn get_id(
     Extension(state):Extension<Arc<AppState>>,
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
-    run_multi_sql_json(state, input, get_id_inner).await
+    // et article_id = "...";
+    let result = run_sql_json(state, input, get_id_inner).await;
+    let ar = result.as_array().unwrap();
+    let first = &ar[0];
+    let id = first.get("article_id").unwrap().as_i64().unwrap();
+    println!("id {:?}", id);
+
+    result
 }
 
 fn get_draft_articles_inner(input: &serde_json::Value, state: Arc<AppState>)
