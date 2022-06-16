@@ -3,7 +3,7 @@ content-type: application/json
 
 {
     "sql":[
-        "DROP TABLE articles ",
+        "DROP TABLE articles",
         "DROP TABLE top_ids",
         "DROP TABLE users",
         "DROP TABLE pay_read_tx",
@@ -11,7 +11,7 @@ content-type: application/json
         "DROP TABLE notifications",
         "DROP TABLE user_notification",
         "DROP TABLE tags",
-        "DROP TABLE user_tag",
+        "DROP TABLE user_tag"
     ]
 }
 

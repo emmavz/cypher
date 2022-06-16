@@ -111,6 +111,8 @@ async fn main(){     // create our static file handler
             .route("/api/get_article_homepage", post(article_homepage))
             .route("/api/check_already_paid", post(check_already_paid))
             .route("/api/get_user_profile", post(get_user_profile))
+            .route("/api/get_draft_articles", post(get_draft_articles))
+            .route("/api/get_id", post(get_id))
             .route("/api/save_article", post(save_article))
             .route("/api/get_recommendations", post(get_recommendations))
             .route("/api/search_articles", post(search_articles))
@@ -225,7 +227,7 @@ pub fn payload_to_json(payload: &Payload)->Result<serde_json::Value>{
             }
             Ok(json!(obj_array))
         },
-        
+
         _ => {
             Ok(json!({
                 "error": "not payload::select result"
@@ -583,24 +585,33 @@ fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
     let image_url = input.get("image_url")
         .ok_or(anyhow!("input has no image_url"))?;
 
-    // Save image to some folder and store path in a variable
-
-    let sql=  format!(r#"INSERT INTO articles (article_id, author_id, article_title, article_description, image_url, is_published) VALUES (5,{},{},{},{},{})
-         "#, user_id, article_title, article_description, image_url, false);
-
-    // Run this query and get `id` of the record and store in a variable
-    let notification_text = "Some random text";
-    let sql=  format!(r#"INSERT INTO notifications (text) VALUES ({})
-         "#, notification_text);
-
-    let notification_id = "";
-    let local: DateTime<Local> = Local::now();
-
-    let sql=  format!(r#"INSERT INTO user_notification (notification_id, user_id, created_at) VALUES ({},{},{})
-         "#, notification_id, user_id, local.timestamp());
-
-
     let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+
+    // Find the latest article Id and store into variable
+    // let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
+    // let result = exec_query(&mut glue, &sql);
+    // match result{
+    //     Ok(r)=>  Ok(r),
+    //     Err(e)=> Err(anyhow!(e.to_string())),
+    // }
+
+    let new_article_id = "";
+
+    let sql=  format!(r#"INSERT INTO articles (article_id, author_id, article_title, article_description, image_url, is_published) VALUES ({},{},{},{},{},{})
+         "#, new_article_id, user_id, article_title, article_description, image_url, false);
+
+    // // Run this query and get `id` of the record and store in a variable
+    // let notification_text = "Some random text";
+    // let sql=  format!(r#"INSERT INTO notifications (text) VALUES ({})
+    //      "#, notification_text);
+
+    // let notification_id = "";
+    // let local: DateTime<Local> = Local::now();
+
+    // let sql=  format!(r#"INSERT INTO user_notification (notification_id, user_id, created_at) VALUES ({},{},{})
+    //      "#, notification_id, user_id, local.timestamp());
+
+
     match exec_cmd(&mut glue, &sql){
         Ok(r)=> Ok(r),
         Err(e)=> Err(anyhow!(e.to_string())),
@@ -612,4 +623,43 @@ pub async fn save_article(
     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
 ) -> axum::extract::Json<Value> {
     run_multi_sql_json(state, input, save_article_inner).await
+}
+
+fn get_id_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Vec<Payload>> {
+
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+
+    // Find the latest article Id and store into variable
+    let sql=  format!(r#"SELECT article_id FROM articles ORDER BY article_id DESC LIMIT 1"#);
+    let result = exec_query(&mut glue, &sql);
+
+    let article_id = "...";
+}
+
+pub async fn get_id(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    run_multi_sql_json(state, input, get_id_inner).await
+}
+
+fn get_draft_articles_inner(input: &serde_json::Value, state: Arc<AppState>)
+        ->Result<Payload>{
+    let user_id = input.get("user_id")
+        .ok_or(anyhow!("input has no user_id"))?;
+
+    let sql=  format!(r#"SELECT a.article_id, a.article_title,
+        b.name, b.pfp, a.image_url
+        FROM articles a INNER JOIN users b
+        ON b.id = a.author_id WHERE is_published = {} AND a.author_id = {} ORDER BY a.article_id DESC"#, false, user_id);
+
+    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+    exec_query(&mut glue, &sql).map_err(|e| anyhow!("GlueSQL error: {}", e.to_string()))
+}
+pub async fn get_draft_articles(
+    Extension(state):Extension<Arc<AppState>>,
+    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+) -> axum::extract::Json<Value> {
+    run_sql_json(state, input, get_draft_articles_inner).await
 }
