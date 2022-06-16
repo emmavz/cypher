@@ -9,7 +9,9 @@ content-type: application/json
         "DROP TABLE pay_read_tx",
         "DROP TABLE follows",
         "DROP TABLE notifications",
-        "DROP TABLE user_notification"
+        "DROP TABLE user_notification",
+        "DROP TABLE tags",
+        "DROP TABLE user_tag",
     ]
 }
 
@@ -25,7 +27,9 @@ content-type: application/json
         "CREATE TABLE pay_read_tx (id INTEGER, payer_id INTEGER, article_id INTEGER, tx_time TEXT, tx_amount INTEGER);",
         "CREATE TABLE follows (id INTEGER, follower_id INTEGER, followed_id INTEGER);",
         "CREATE TABLE notifications (id INTEGER, text TEXT);",
-        "CREATE TABLE user_notification (id INTEGER, notification_id INTEGER, user_id INTEGER, read_at INTEGER null, created_at INTEGER);"
+        "CREATE TABLE user_notification (id INTEGER, notification_id INTEGER, user_id INTEGER, read_at INTEGER null, created_at INTEGER);",
+        "CREATE TABLE tags (id INTEGER, name text);",
+        "CREATE TABLE user_tag (id INTEGER, tag_id INTEGER, article_id INTEGER, created_at INTEGER);"
     ]
 }
 
