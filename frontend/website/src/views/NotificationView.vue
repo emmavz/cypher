@@ -58,12 +58,12 @@ export default ({
         <!-- Content -->
         <div class="content i-wrap pt-8">
 
-            <div v-if="!isError">
+            <div>
                 <div class="container">
                     <h2 class="mb-7 ml-2">Notifications</h2>
                 </div>
 
-                <ul class="notifications">
+                <ul class="notifications" v-if="!isError">
                     <template v-if="notifications.length">
                         <li v-for="(notification, index) in notifications" :key="index"
                             :class="{'unread': typeof notification.read_at === 'undefined'}">

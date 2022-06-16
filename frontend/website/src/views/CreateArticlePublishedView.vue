@@ -45,7 +45,8 @@ export default {
                                     <button><img src="@/assets/img/facebook-icon.svg" alt=""></button>
                                 </ShareNetwork>
                             </div>
-                            <div><button class="ml-6"><img src="@/assets/img/website-icon.svg" alt=""></button></div>
+                            <div><button class="ml-6" @click="$copyText(getFullUrl('other-profile'))"><img
+                                        src="@/assets/img/website-icon.svg" alt=""></button></div>
                         </div>
                     </div>
                 </div>
