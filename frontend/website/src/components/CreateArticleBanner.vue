@@ -1,6 +1,6 @@
 <script>
 export default {
-    props: ['article_image'],
+    props: ['article_image', 'article_image_form_input'],
     methods: {
         onFileChange(e) {
             if(e.target.files.length) {
@@ -9,11 +9,14 @@ export default {
                 reader.readAsDataURL(file);
                 reader.onload = () => {
                     this.$emit('article_image', reader.result);
+                    this.$emit('article_image_form_input', file);
                 };
                 // this.$emit('article_image', URL.createObjectURL(file));
+                // this.$emit('article_image', file);
             }
             else {
                 this.$emit('article_image', null);
+                this.$emit('article_image_form_input', null);
             }
         },
         getDefaultImage() {

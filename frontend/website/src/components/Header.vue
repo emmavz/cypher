@@ -22,7 +22,7 @@ export default {
             <ul class="categories" v-if="contentLoaded">
                 <li class="categories__plus"><a href="#"><img src="@/assets/img/plus-icon.svg" alt=""></a></li>
                 <li v-for="(category, index) in categories" :key="index">
-                    <Category :category="category" bright="true" />
+                    <Category :category="category" class_name="category--bright" />
                 </li>
             </ul>
 

@@ -18,26 +18,37 @@ export default ({
     },
     created() {
 
-        this.sendAllMultiApiRequests([
-            {
-                url: 'get_article_homepage',
-                data: {
-                    "article_id": Number(this.$route.params.articleId)
-                }
-            },
-            {
-                url: 'get_user_profile',
-                data: {
-                    "user_id": 2
-                }
-            },
-        ])
+        this.sendApiRequest('get_article_homepage', {
+            "article_id": Number(this.$route.params.articleId),
+            "auth_id": window.user_id
+        })
         .then((reponses) => {
             this.article = reponses[0];
             this.image_url = this.article[0].image_url;
             this.userWalletBalance = reponses[1];
-            this.user_wallet_balance = this.userWalletBalance[0].user_wallet_balance;
+            this.user_wallet_balance = this.userWalletBalance[0].balance;
         });
+
+        // this.sendApiRequest([
+        //     {
+        //         url: 'get_article_homepage',
+        //         data: {
+        //             "article_id": Number(this.$route.params.articleId)
+        //         }
+        //     },
+        //     {
+        //         url: 'get_user_profile',
+        //         data: {
+        //             "user_id": Number(this.$route.params.userId)
+        //         }
+        //     },
+        // ])
+        // .then((reponses) => {
+        //     this.article = reponses[0];
+        //     this.image_url = this.article[0].image_url;
+        //     this.userWalletBalance = reponses[1];
+        //     this.user_wallet_balance = this.userWalletBalance[0].balance;
+        // });
 
     },
     methods: {
@@ -71,20 +82,21 @@ export default ({
                     <div class="container">
 
                         <div class="text-center mb-4">
-                            <h1 class="mb-3">{{ article.article_title }}</h1>
+                            <h1 class="mb-3">{{ article.title }}</h1>
                             <div class="mb-3">
                                 <a href="#" class="inline-flex items-center i-wrap--v2__profile">
-                                    <img :src="article.author_pfp" alt="" class="mr-4" width="35">
-                                    {{ article.article_author }}
+                                    <img :src="article.user.pfp" alt="" class="mr-4" width="35">
+                                    {{ article.user.name }}
                                 </a>
                             </div>
                             <p class="mb-6">
-                                {{ article.article_description }}
+                                {{ article.description }}
                             </p>
                             <div class="mb-6"><a href="#" class="btn i-wrap--v2__btn"
-                                    @click="showPaytoReadConfirmation = 1">Pay to Read (20 {{ this.currency }})</a>
+                                    @click="showPaytoReadConfirmation = 1">Pay to Read ({{ article.price }} {{ this.currency }})</a>
                             </div>
-                            <SharePopup :share_btn="share_btn" :share_heading="share_heading" :share_description="share_description"  :share_link="share_link" />
+                            <SharePopup :share_btn="share_btn" :share_heading="share_heading"
+                                :share_description="share_description" :share_link="share_link" />
                         </div>
                     </div>
 
@@ -113,12 +125,12 @@ export default ({
                                 <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto">
                             </div>
                             <div class="stats__right">
-                                <div><span class="aquamarine-color mr-1.5">{{ article.article_liquidation_time
-                                }}</span>Days until liquidation</div>
+                                <div><span class="aquamarine-color mr-1.5">{{ article.liquidation_days
+                                        }}</span>Days until liquidation</div>
                                 <div><span class="aquamarine-color mr-1.5">{{ article.article_total_reads }}</span>Reads
                                 </div>
                                 <div><span class="aquamarine-color mr-1.5">{{ article.article_total_shares
-                                }}</span>Shares</div>
+                                        }}</span>Shares</div>
                             </div>
                         </div>
                     </div>

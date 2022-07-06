@@ -72,7 +72,7 @@
     padding: 7px 14px;
     margin: 0 9px;
 
-    &:not(&--bright) {
+    &:not(&--bright):not(&--primary) {
         color: rgba(0, 0, 0, 0.5);
         background-color: #eaeaea;
     }
@@ -80,6 +80,11 @@
     &--bright {
         background-color: $white;
         color: $primary-color;
+    }
+
+    &--primary {
+        background-color: $primary-color;
+        color: $white;
     }
 }
 
@@ -99,7 +104,7 @@
         background: $bright-gray;
         box-shadow: $box-shadow;
         border-radius: $border-radius;
-        padding: 4.9px 13px 4.9px 33px;
+        padding: 4.9px 13px 4.9px 40px;
         width: 100%;
     }
 

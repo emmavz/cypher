@@ -55,18 +55,20 @@ export default ({
         {
             url: 'get_user_profile',
             data: {
-                "user_id": 1,
+                "user_id": window.user_id,
+                "auth_id": window.user_id,
             }
         },
         {
             url: 'get_user_profile_articles',
             data: {
-                "user_id": 1
+                "user_id": window.user_id
             }
         },
     ])
     .then((reponses) => {
-        this.author= reponses[0];
+        this.author = reponses[0][0];
+        this.articles = reponses[1];
         // this.authors = reponses[1];
         // this.image_url = this.article[0].image_url;
         // this.userWalletBalance = reponses[1];
@@ -95,14 +97,21 @@ export default ({
 
                 <Tabs :tabList="profileTabs.slice().reverse()">
                     <template v-slot:btns>
-                        <span class="currency-tag currency-tag--opacity-70">{{ author.user_wallet_balance }} {{
-                        this.currency }}</span>
+                        <span class="currency-tag currency-tag--opacity-70">{{ author.balance }} {{
+                            this.currency }}</span>
                     </template>
                     <template v-slot:tabPanel-1>
-                        <div class="w-full flex justify-center container" v-for="(article,index) in articles"
-                            :key="index">
-                            <Article :article="article" class="blog-post--user-article" />
-                        </div>
+                        <template v-if="articles.length">
+                            <div class="w-full flex justify-center container" v-for="(article,index) in articles"
+                                :key="index">
+                                <Article :article="article"
+                                    :url="{ name: 'article_homepage', params: { articleId: article.id  } }"
+                                    class="blog-post--user-article" />
+                            </div>
+                        </template>
+                        <template v-else-if="isError == 0">
+                            <div class="text-center">No article found!</div>
+                        </template>
                     </template>
 
                     <template v-slot:tabPanel-2>

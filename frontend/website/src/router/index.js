@@ -58,7 +58,7 @@ const router = createRouter({
       component: () => import('../views/UserProfileView.vue')
     },
     {
-      path: '/other-profile',
+      path: '/other-profile/:userId',
       name: 'other-profile',
       component: () => import('../views/OtherProfileView.vue')
     },
@@ -68,12 +68,12 @@ const router = createRouter({
       component: () => import('../views/DraftArticleView.vue')
     },
     {
-      path: '/create_article',
+      path: '/create_article/:articleId?',
       name: 'create_article',
       component: () => import('../views/CreateArticleView.vue')
     },
     {
-      path: '/create_article_published',
+      path: '/create_article_published/:articleId',
       name: 'create_article_published',
       component: () => import('../views/CreateArticlePublishedView.vue')
     }

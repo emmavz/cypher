@@ -583,7 +583,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
 
     &__body {
 
-      input {
+      &__input {
         width: 1ch;
         min-width: 1ch !important;
         margin-right: 8px;
@@ -605,6 +605,12 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
           min-width: 76px;
           padding: 7px 5px;
         }
+      }
+
+      &__searchbar {
+        width: 100%;
+        max-width: 238px;
+        margin: auto;
       }
     }
   }

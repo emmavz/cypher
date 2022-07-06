@@ -41,50 +41,24 @@ export default ({
       articlesLimit: 5,
       stopscrollAjax: false,
       articles: [],
-      categories: [
-        {
-          name: 'Fashion',
-          url: '#'
-        },
-        {
-          name: 'Beauty',
-          url: '#'
-        },
-        {
-          name: 'Writing',
-          url: '#'
-        },
-        {
-          name: 'Plants',
-          url: '#'
-        },
-        {
-          name: 'Knitting',
-          url: '#'
-        },
-        {
-          name: 'Gaming',
-          url: '#'
-        },
-        {
-          name: 'Movies',
-          url: '#'
-        },
-        {
-          name: 'Books',
-          url: '#'
-        },
-      ],
+      categories: [],
     }
   },
   async created() {
+
+    this.sendApiRequest('get_tags', {}, false, { removeLoaderAfterApi: false })
+    .then(tags => {
+      this.categories = tags;
+    });
+
     this.getArticles();
+
   },
   mounted() {
     const contentElm = document.querySelector('.content');
     contentElm.onscroll = () => {
       if (!this.stopscrollAjax) {
-        let bottomOfWindow = contentElm.scrollTop + contentElm.clientHeight >= contentElm.scrollHeight - 50;
+        let bottomOfWindow = contentElm.scrollTop + contentElm.clientHeight >= contentElm.scrollHeight - window.bottomGap;
         if (bottomOfWindow) {
           this.articlesOffset += this.articlesLimit;
           this.getArticles();
@@ -96,7 +70,6 @@ export default ({
     async getArticles() {
       this.stopscrollAjax = true;
       this.sendApiRequest('get_recommendations', {
-        "user_id": 1,
         "offset": this.articlesOffset,
         "limit": this.articlesLimit
       })
@@ -148,7 +121,8 @@ export default ({
       <div class="blog-post-wrap container flex flex-wrap" v-if="articles.length">
         <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
 
-          <Article :article="article" />
+          <Article :article="article"
+            :url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
 
         </div>
       </div>

@@ -16,7 +16,10 @@ import * as yup from 'yup';
 export default {
     data() {
         return {
+            article: null,
+            article_id: this.$route.params.articleId ? Number(this.$route.params.articleId) : '',
             article_image: '',
+            article_image_form_input: '',
             title: '',
             description: '',
             quill: null,
@@ -26,13 +29,11 @@ export default {
             publish_theta: '0',
             showPublish: 0,
             publish_confirmation: 0,
-            categories: [
-                {
-                    name: 'Fashion',
-                    url: '#'
-                },
-            ],
+            show_categories: 0,
+            search_category: '',
             showQuillEditor: 0,
+            categories: [],
+            categoriesFiltered: [],
             options: {
                 modules: {
                     toolbar: [
@@ -57,54 +58,119 @@ export default {
             },
         }
     },
-    created() {
+    async created() {
         this.$watch('publish_price', function(value){
             this.setInputDynamicWidth(this.$refs.publish_price);
         });
         this.$watch('publish_theta', function(value){
             this.setInputDynamicWidth(this.$refs.publish_theta);
         });
+
+        if (this.article_id) await this.getArticle();
+
+        this.sendApiRequest('get_tags', {}, false, { removeLoaderAfterApi: this.article_id ? false : true })
+        .then(categories => {
+            categories.forEach(category => {
+                category.selected = false;
+
+                if (this.article) {
+                    this.article.tags.forEach(tag => {
+                        if (tag.id == category.id) {
+                            category.selected = true;
+                        }
+                    });
+                }
+
+            });
+            this.categories = categories;
+            this.categoriesFiltered = this.categories;
+        });
     },
     methods: {
-        async save() {
+        async getArticle() {
+            this.sendApiRequest('get_user_draft_article', {
+                "user_id": window.user_id,
+                "article_id": this.article_id
+            })
+            .then(article => {
+                if (article.length) {
+                    this.article = article[0];
+                    this.title = article[0].title;
+                    this.description = article[0].description;
+                    this.quill.container.firstChild.innerHTML = this.description;
+                    this.article_image = article[0].image_url;
 
-            const schema = yup.object().shape({
-                title: yup.string().required(),
-                description: yup.string().required(),
-                article_image: yup.string().required().label('article image'),
+                    if (article[0].content) this.publish_description = article[0].content;
+                    if (article[0].price) this.publish_price = article[0].price;
+                }
+            });
+        },
+        async save(should_publish) {
+
+            let categoryIds = []
+            this.categories.forEach(category => {
+                if (category.selected) {
+                    categoryIds.push(category.id);
+                }
             });
 
-            await this.validate(schema, { title: this.title, description: this.description, article_image: this.article_image }).then(() => {
+            let validations = {
+                title: yup.string().required(),
+            };
 
-                // let formData = new FormData();
-                // formData.append("image_url", this.article_image);
-                // formData.append("article_title", this.title);
-                // formData.append("article_description", this.description);
-                // formData.append("user_id", 1);
+            if(should_publish) {
+                validations.description = yup.string().required();
+                validations.publish_description =  yup.string().required();
+                validations.publish_price =  yup.string().required();
+                validations.publish_theta =  yup.string().required();
+                validations.tags = yup.array().required().min(1);
 
-                this.sendApiRequest('save_article', {
-                    // "image_url": this.article_image,
-                    "image_url": "image",
-                    "article_title": this.title,
-                    "article_description": this.description,
-                    "user_id": 1
-                }, true)
-                .then(() => {
-                    this.$router.push({ name: 'drafts' });
-                });
+                if (!this.article_id || (this.article_id && !this.article_image)) {
+                    validations.article_image_form_input = yup.string().required().label('article image');
+                }
+            }
+
+            // if (!this.article_id || (this.article_id && !this.article_image)) {
+            //     validations.article_image_form_input = yup.string().required().label('article image');
+            // }
+
+            const schema = yup.object().shape(validations);
+
+            await this.validate(schema, { title: this.title, description: this.description, article_image_form_input: this.article_image_form_input,
+                publish_description: this.publish_description, publish_price: this.publish_price, publish_theta: this.publish_theta, tags: categoryIds });
+
+            let formData = new FormData();
+            if (this.article_id) formData.append("article_id", this.article_id);
+            formData.append("image_url", this.article_image_form_input);
+            formData.append("title", this.title);
+            formData.append("description", this.description);
+            formData.append("user_id", window.user_id);
+
+            formData.append("p_description", this.publish_description);
+            formData.append("price", this.publish_price);
+            formData.append("theta", this.publish_theta);
+            formData.append("tags[]", categoryIds);
+            formData.append("should_publish", should_publish ? 1 : 0);
+
+            this.sendApiRequest('save_draft_article', formData, true)
+            .then((articleId) => {
+                if (!should_publish) this.$router.push({ name: 'drafts' });
+                else this.$router.push({ name: 'create_article_published', params: { articleId: articleId[0].id } });
             });
 
         },
-        publish() {
+        async publish() {
+
             this.showPublish = 0;
-            this.$router.push({ name: 'create_article_published' });
+            this.save(1);
         },
         hidePublish() {
             this.showPublish = 0;
         },
         editorReady(quill) {
             this.quill = quill;
-            quill.focus();
+            if (this.article_id) quill.setText(this.description);
+            else quill.focus();
         },
         editorBlur(quill) {
         },
@@ -113,6 +179,28 @@ export default {
                 this.description = this.quill.container.firstChild.innerHTML;
             }
         },
+        toggleCategorySelection(categoryId) {
+            this.categoriesFiltered = [];
+
+            this.categories.forEach(category => {
+                if (category.id == categoryId) {
+                    category.selected = !category.selected;
+                    this.show_categories = 0;
+                    this.publish_confirmation = 0;
+                }
+            });
+
+            this.categoriesFiltered = this.categories;
+        },
+        searchCategory() {
+            this.categoriesFiltered = [];
+
+            this.categories.forEach(category => {
+                if (category.name.toLowerCase().indexOf(this.search_category.toLowerCase()) >= 0) {
+                    this.categoriesFiltered.push(category);
+                }
+            });
+        }
     },
     components: {
         CreateArticleBanner,
@@ -130,8 +218,10 @@ export default {
         <!-- Content -->
         <div class="content">
 
-            <CreateArticleBanner :article_image="article_image" @show-publish="showPublish = 1;publish_confirmation = 0"
-                @save-article="save" @article_image="(ar_img) => article_image = ar_img" />
+            <CreateArticleBanner :article_image="article_image" :article_image_form_input="article_image_form_input"
+                @show-publish="showPublish = 1;publish_confirmation = 0" @save-article="save(0)"
+                @article_image="(ar_img) => article_image = ar_img"
+                @article_image_form_input="(ar_img) => article_image_form_input = ar_img" />
 
             <div class="py-5">
                 <div class="container create_article__form">
@@ -144,15 +234,17 @@ export default {
                         </div>
                         <div class="mt-6">
                             <div class="faker f-13 text-center opacity-80 editor_height" @click="showQuillEditor = 1"
-                                v-if="showQuillEditor == 0">Start Writing</div>
-                            <template v-if="showQuillEditor == 1">
-                                <QuillEditor :options="options" @ready="editorReady($event)"
-                                        @blur="editorBlur" @update:content="editorUpdate" class="editor_height" />
+                                v-if="showQuillEditor == 0 && !this.article_id">Start Writing</div>
+                            <template v-if="showQuillEditor == 1 || this.article_id">
+                                <QuillEditor :options="options" @ready="editorReady($event)" @blur="editorBlur"
+                                    @update:content="editorUpdate" class="editor_height" />
                             </template>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <div v-if="showPublish" class="overlay"></div>
 
             <div :class="['create_article__publish', {'create_article__publish--visible': showPublish}]"
                 v-click-outside="hidePublish">
@@ -161,7 +253,8 @@ export default {
                         <div class="flex justify-between">
                             <button><img src="@/assets/img/close-icon--v3.svg" alt=""
                                     @click="showPublish = 0;"></button>
-                            <button class="font-semibold" @click="publish_confirmation = 1">Publish</button>
+                            <button class="font-semibold"
+                                @click="publish_confirmation = 1;show_categories = 0">Publish</button>
                         </div>
                     </div>
                 </div>
@@ -180,8 +273,9 @@ export default {
                                     <div class="font-semibold mb-6">Price</div>
                                     <div class="flex items-center">
                                         <input type="number"
-                                            class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0"
-                                            v-model.number="publish_price" @keypress="onlyNumeric" ref="publish_price">
+                                            class="create_article__publish__body__input f-20 font-bold bg-transparent aquamarine-color opacity-80"
+                                            min="0" v-model.number="publish_price" @keypress="onlyNumeric"
+                                            ref="publish_price">
                                         <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">{{ this.currency
                                             }}</span>
                                         <div>
@@ -197,8 +291,9 @@ export default {
                                     <div class="font-semibold mb-6">Theta</div>
                                     <div class="flex items-center">
                                         <input type="number"
-                                            class="f-20 font-bold bg-transparent aquamarine-color opacity-80" min="0"
-                                            v-model.number="publish_theta" @keypress="onlyNumeric" ref="publish_theta">
+                                            class="create_article__publish__body__input f-20 font-bold bg-transparent aquamarine-color opacity-80"
+                                            min="0" v-model.number="publish_theta" @keypress="onlyNumeric"
+                                            ref="publish_theta">
                                         <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">%</span>
                                         <div>
                                             <div><img src="@/assets/img/polygon-up.svg" alt=""
@@ -213,16 +308,46 @@ export default {
                             <div class="mt-8">
                                 <div class="font-semibold mb-5">Tags</div>
                                 <ul class="categories whitespace-normal">
-                                    <li class="categories__plus categories__plus--white mb-4"><a href="#"><img
-                                                src="@/assets/img/plus-icon--v2.svg" alt=""></a></li>
-                                    <li v-for="(category, index) in categories" :key="index" class="mb-4">
-                                        <Category :category="category" bright="true" />
+                                    <li class="categories__plus categories__plus--white mb-4"
+                                        @click="show_categories = 1;publish_confirmation = 1"><a
+                                            href="javascript:void(0)"><img src="@/assets/img/plus-icon--v2.svg"
+                                                alt=""></a></li>
+                                    <li v-for="(category, index) in categories" :key="index">
+                                        <Category :category="category" class="mb-3.5" class_name="category--bright"
+                                            v-if="category.selected" />
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div v-else class="create_article__publish__body__confirmation text-center">
+                        <div v-else-if="show_categories == 1">
+
+                            <form action="javascript:void(0)" method="GET" :class="['searchbar flex mb-8']"
+                                @submit="searchCategory">
+                                <div class="relative create_article__publish__body__searchbar">
+                                    <label for="search" class="pos-middle">
+                                        <img src="@/assets/img/search-icon--dark.svg" alt="">
+                                    </label>
+                                    <input type="text" placeholder="Search for a tag" v-model="search_category"
+                                        class="text-black">
+                                </div>
+                            </form>
+
+                            <template v-if="categoriesFiltered.length">
+                                <ul class="categories whitespace-normal">
+                                    <li v-for="(category, index) in categoriesFiltered" :key="index">
+                                        <Category :category="category" choose="true" class="mb-3.5"
+                                            @category_id="toggleCategorySelection" />
+                                    </li>
+                                </ul>
+                            </template>
+                            <template v-else>
+                                <div class="text-center">No tag found!</div>
+                            </template>
+                        </div>
+
+                        <div v-else-if="publish_confirmation"
+                            class="create_article__publish__body__confirmation text-center">
                             <div class="font-semibold mb-5">Are you sure?</div>
                             <div class="flex justify-center">
                                 <button class="f-13 font-semibold bg-white primary-color border-radius mr-5"

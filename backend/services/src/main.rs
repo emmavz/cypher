@@ -113,7 +113,7 @@ async fn main(){     // create our static file handler
             .route("/api/get_user_profile", post(get_user_profile))
             .route("/api/get_draft_articles", post(get_draft_articles))
             .route("/api/get_id", post(get_id))
-            .route("/api/save_article", post(save_article))
+            // .route("/api/save_article", post(save_article))
             .route("/api/get_recommendations", post(get_recommendations))
             .route("/api/search_articles", post(search_articles))
             .route("/api/search_authors", post(search_authors))
@@ -587,52 +587,58 @@ fn get_latest_article_id_inner(input: &serde_json::Value, state: Arc<AppState>)
     }
 }
 
-fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
-        ->Result<Vec<Payload>> {
-    let article_title = input.get("article_title")
-        .ok_or(anyhow!("input has no article_title"))?;
-    let article_description = input.get("article_description")
-        .ok_or(anyhow!("input has no article_description"))?;
-    let user_id = input.get("user_id")
-        .ok_or(anyhow!("input has no user_id"))?;
-    let image_url = input.get("image_url")
-        .ok_or(anyhow!("input has no image_url"))?;
+// fn save_article_inner(input: &serde_json::Value, state: Arc<AppState>)
+//         ->Result<Vec<Payload>> {
+//     let article_title = input.get("article_title")
+//         .ok_or(anyhow!("input has no article_title"))?;
+//     let article_description = input.get("article_description")
+//         .ok_or(anyhow!("input has no article_description"))?;
+//     let user_id = input.get("user_id")
+//         .ok_or(anyhow!("input has no user_id"))?;
+//     let image_url = input.get("image_url")
+//         .ok_or(anyhow!("input has no image_url"))?;
 
-    let article_result = run_sql_json(state, json!(input), get_latest_article_id_inner).await;
-    let ar = article_result.as_array().unwrap();
-    let article_result_first = &ar[0];
-    let id = article_result_first.get("article_id").unwrap().as_i64().unwrap();
+//     // let article_result = run_sql_json(state, json!(input), get_latest_article_id_inner).await;
+//     // let ar = article_result.as_array().unwrap();
+//     // let article_result_first = &ar[0];
+//     // let id = article_result_first.get("article_id").unwrap().as_i64().unwrap();
 
-    let new_article_id = id+1;
+//     // let new_article_id = id+1;
 
-    let sql=  format!(r#"INSERT INTO articles (article_id, author_id, article_title, article_description, image_url, is_published) VALUES ({},{},{},{},{},{})
-         "#, new_article_id, user_id, article_title, article_description, image_url, false);
+//     let sql=  format!(r#"INSERT INTO articles (article_id, author_id, article_title, article_description, image_url, is_published) VALUES ({},{},{},{},{},{})
+//          "#, new_article_id, user_id, article_title, article_description, image_url, false);
 
-    // // Run this query and get `id` of the record and store in a variable
-    // let notification_text = "Some random text";
-    // let sql=  format!(r#"INSERT INTO notifications (text) VALUES ({})
-    //      "#, notification_text);
+//     // // Run this query and get `id` of the record and store in a variable
+//     // let notification_text = "Some random text";
+//     // let sql=  format!(r#"INSERT INTO notifications (text) VALUES ({})
+//     //      "#, notification_text);
 
-    // let notification_id = "";
-    // let local: DateTime<Local> = Local::now();
+//     // let notification_id = "";
+//     // let local: DateTime<Local> = Local::now();
 
-    // let sql=  format!(r#"INSERT INTO user_notification (notification_id, user_id, created_at) VALUES ({},{},{})
-    //      "#, notification_id, user_id, local.timestamp());
+//     // let sql=  format!(r#"INSERT INTO user_notification (notification_id, user_id, created_at) VALUES ({},{},{})
+//     //      "#, notification_id, user_id, local.timestamp());
 
-    let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
+//     let mut glue = state.glue.write().unwrap();//tokendb::init_glue(&state.glue_path).unwrap();
 
-    match exec_cmd(&mut glue, &sql){
-        Ok(r)=> Ok(r),
-        Err(e)=> Err(anyhow!(e.to_string())),
-    }
-}
+//     match exec_cmd(&mut glue, &sql){
+//         Ok(r)=> Ok(r),
+//         Err(e)=> Err(anyhow!(e.to_string())),
+//     }
+// }
 
-pub async fn save_article(
-    Extension(state):Extension<Arc<AppState>>,
-    axum::extract::Json(input): axum::extract::Json<serde_json::Value>
-) -> axum::extract::Json<Value> {
-    run_multi_sql_json(state, input, save_article_inner).await
-}
+// pub async fn save_article(
+//     Extension(state):Extension<Arc<AppState>>,
+//     axum::extract::Json(input): axum::extract::Json<serde_json::Value>
+// ) -> axum::extract::Json<Value> {
+
+//     let article_result = run_sql_json(state, input, get_latest_article_id_inner).await;
+//     let ar = article_result.as_array().unwrap();
+//     let article_result_first = &ar[0];
+//     let id = article_result_first.get("article_id").unwrap().as_i64().unwrap();
+
+//     run_multi_sql_json(state, input, save_article_inner).await
+// }
 
 fn get_id_inner(input: &serde_json::Value, state: Arc<AppState>)
         ->Result<Payload> {

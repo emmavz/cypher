@@ -9,35 +9,37 @@ import StatsStakes from '@/components/StatsStakes.vue';
 export default ({
   data() {
     return {
-        author: {
-            "pfp": "http://localhost:8080/dynamic/profile-2.png",
-            "name": "Eliza Mae",
-            "followers": "987",
-            "following": "53",
-            "description": "Just another baker blogger",
-        },
-        articles: [
-            {
-                "article_id": 0,
-                "article_title": "Super Chewy Cookies Recipe",
-                "date_posted": 1651335773,
-                "hashtag": "for you, baking",
-                "image_url": "http://localhost:8080/dynamic/post-2.png",
-                "name": "Eliza Mae",
-                "pfp": "http://localhost:8080/dynamic/profile-2.png",
-                "total_invested": 7342
-            },
-            {
-                "article_id": 1,
-                "article_title": "The ORIGINAL Quillmates?!",
-                "date_posted": 1651335773,
-                "hashtag": "for you, Gossip",
-                "image_url": "http://localhost:8080/dynamic/post-9.png",
-                "name": "Eliza Mae",
-                "pfp": "http://localhost:8080/dynamic/profile-2.png",
-                "total_invested": 7342
-            }
-        ],
+        // author: {
+        //     "pfp": "http://localhost:8080/dynamic/profile-2.png",
+        //     "name": "Eliza Mae",
+        //     "followers": "987",
+        //     "following": "53",
+        //     "description": "Just another baker blogger",
+        // },
+        // articles: [
+        //     {
+        //         "article_id": 0,
+        //         "article_title": "Super Chewy Cookies Recipe",
+        //         "date_posted": 1651335773,
+        //         "hashtag": "for you, baking",
+        //         "image_url": "http://localhost:8080/dynamic/post-2.png",
+        //         "name": "Eliza Mae",
+        //         "pfp": "http://localhost:8080/dynamic/profile-2.png",
+        //         "total_invested": 7342
+        //     },
+        //     {
+        //         "article_id": 1,
+        //         "article_title": "The ORIGINAL Quillmates?!",
+        //         "date_posted": 1651335773,
+        //         "hashtag": "for you, Gossip",
+        //         "image_url": "http://localhost:8080/dynamic/post-9.png",
+        //         "name": "Eliza Mae",
+        //         "pfp": "http://localhost:8080/dynamic/profile-2.png",
+        //         "total_invested": 7342
+        //     }
+        // ],
+        author: {},
+        articles: [],
         statsInvestment: {
             amount: 7342,
             investors: 43
@@ -48,6 +50,28 @@ export default ({
         }
     }
   },
+    async created() {
+
+        this.sendAllMultiApiRequests([
+            {
+                url: 'get_user_profile',
+                data: {
+                    "user_id": Number(this.$route.params.userId),
+                    "auth_id": window.user_id,
+                }
+            },
+            {
+                url: 'get_user_profile_articles',
+                data: {
+                    "user_id": Number(this.$route.params.userId)
+                }
+            },
+        ])
+        .then((reponses) => {
+            this.author = reponses[0][0];
+            this.articles = reponses[1];
+        });
+    },
   components: {
     Article,
     Author,
@@ -63,34 +87,38 @@ export default ({
 
     <div class="app-wp">
 
-        <Header/>
+        <Header />
 
         <!-- Content -->
         <div class="content i-wrap">
 
-            <Author :author="author" anotherProfile="true" />
+            <div v-if="!isError">
+                <Author :author="author" anotherProfile="true" />
 
-            <Tabs :tabList="profileTabs">
-                <template v-slot:btns>
-                    <UpVotePopup />
-                </template>
+                <Tabs :tabList="profileTabs">
+                    <template v-slot:btns>
+                        <UpVotePopup />
+                    </template>
 
 
-                <template v-slot:tabPanel-1>
-                     <div class="container">
-                        <StatsInvestment :statsInvestment="statsInvestment" class="mt-4" />
-                        <StatsStakes :statsStakes="statsStakes" class="mt-8" />
-                     </div>
-                </template>
+                    <template v-slot:tabPanel-1>
+                        <div class="container">
+                            <StatsInvestment :statsInvestment="statsInvestment" class="mt-4" />
+                            <StatsStakes :statsStakes="statsStakes" class="mt-8" />
+                        </div>
+                    </template>
 
-                <template v-slot:tabPanel-2>
-                     <div class="w-full flex justify-center container" v-for="(article,index) in articles" :key="index">
-                        <Article :article="article" />
-                    </div>
-                </template>
-            </Tabs>
+                    <template v-slot:tabPanel-2>
+                        <div class="w-full flex justify-center container" v-for="(article,index) in articles"
+                            :key="index">
+                            <Article :article="article"
+                                :url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
+                        </div>
+                    </template>
+                </Tabs>
+            </div>
 
-            <Error/>
+            <Error />
         </div>
 
     </div>

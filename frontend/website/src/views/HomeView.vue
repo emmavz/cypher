@@ -1,5 +1,4 @@
 <script>
-import Category from '@/components/Category.vue';
 import Article from '@/components/Article.vue';
 
 export default ({
@@ -34,7 +33,7 @@ export default ({
     const contentElm = document.querySelector('.content');
     contentElm.onscroll = () => {
       if (!this.stopscrollAjax) {
-        let bottomOfWindow = contentElm.scrollTop + contentElm.clientHeight >= contentElm.scrollHeight;
+        let bottomOfWindow = contentElm.scrollTop + contentElm.clientHeight >= contentElm.scrollHeight - window.bottomGap;
         if (bottomOfWindow) {
           this.articlesOffset += this.articlesLimit;
           this.getArticles();
@@ -46,7 +45,6 @@ export default ({
     async getArticles() {
       this.stopscrollAjax = true;
       this.sendApiRequest('get_article_list_and_view', {
-        "user_id": 1,
         "offset": this.articlesOffset,
         "limit": this.articlesLimit
       })
@@ -64,7 +62,6 @@ export default ({
     }
   },
   components: {
-    Category,
     Article
   }
 })
@@ -82,13 +79,14 @@ export default ({
 
         <div class="w-full flex justify-center" v-for="(article,index) in articles" :key="index">
 
-          <Article :article="article" />
+          <Article :article="article"
+            :url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
 
         </div>
 
       </div>
 
-      <Error/>
+      <Error />
 
     </div>
 

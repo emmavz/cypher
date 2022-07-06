@@ -23,13 +23,15 @@ export default ({
         {
             url: 'get_article_homepage',
             data: {
-                "article_id": Number(this.$route.params.articleId)
+                "article_id": Number(this.$route.params.articleId),
+                "auth_id": window.user_id
             }
         },
         {
             url: 'get_user_profile',
             data: {
-                "user_id": 2
+                "user_id": 2,
+                "auth_id": window.user_id
             }
         },
     ])

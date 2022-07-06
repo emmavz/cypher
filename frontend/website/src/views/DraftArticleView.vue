@@ -29,7 +29,7 @@ export default {
     methods: {
         async getArticles() {
             this.sendApiRequest('get_draft_articles', {
-                "user_id": 1,
+                "user_id": window.user_id,
             })
             .then(articles => {
                 if (articles.length) {
@@ -62,7 +62,9 @@ export default {
                         <template v-if="articles.length">
                             <div class="w-full flex justify-center container mb-5" v-for="(article,index) in articles"
                                 :key="index">
-                                <Article :article="article" class="blog-post--user-article" />
+                                <Article :article="article"
+                                    :url="{ name: 'create_article', params: { articleId: article.id } }"
+                                    class="blog-post--user-article" />
                             </div>
                         </template>
                         <template v-else>

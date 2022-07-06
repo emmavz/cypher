@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp } from 'vue/dist/vue.esm-bundler'
 import * as vars from './global-vars.js'
 import * as methods from './global-methods.js'
 import App from './App.vue'
@@ -17,6 +17,7 @@ import Header from '@/components/Header.vue';
 import Error from '@/components/Error.vue';
 
 const app = createApp(App)
+window.vue = app
 
 app.use(router)
 app.use(VueClipboard)

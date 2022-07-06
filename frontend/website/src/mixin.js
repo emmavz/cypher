@@ -39,23 +39,23 @@ export default {
             }, 0);
         },
 
-        async sendApiRequest(url, data, errorPopup = false) {
+        async sendApiRequest(url, data, errorPopup = false, meta = {}) {
 
-            return this.afterApiCall(this.$http.post(url, data), errorPopup);
+            return this.afterApiCall(this.$http.post(url, data), errorPopup, meta);
 
         },
 
-        async sendAllMultiApiRequests(array) {
+        async sendAllMultiApiRequests(array, meta = {}) {
 
-            return this.afterApiCall(Promise.all(this.prepareMultiApiRequest(array)));
+            return this.afterApiCall(Promise.all(this.prepareMultiApiRequest(array)), false, meta);
 
         },
 
         beforeApiCall() {
-            toggleLoader();
+            toggleLoader(1);
         },
 
-        afterApiCall(api, errorPopup) {
+        afterApiCall(api, errorPopup, meta) {
 
             this.beforeApiCall();
 
@@ -72,13 +72,14 @@ export default {
                         responses.push(data);
                     }
                     else {
-                        errors.push(data.error);
+                        // errors.push(data.error);
+                        // errors.push(response);
                     }
                 });
 
                 if (errors.length) {
-                    console.log(errors.join('\n'));
-                    return Promise.reject(errors.join('\n'));
+                    // console.log(errors.join('\n'));
+                    // return Promise.reject(errors.join('\n'));
                 }
                 else {
                     this.isError = 0;
@@ -86,15 +87,23 @@ export default {
                 }
 
             }).catch((error) => {
+                error = error.response.data;
                 if (errorPopup) {
-                    this.swalError(error);
+                    this.swalError(this.errorFormatting(error));
                 }
                 else {
                     this.isError = true;
                 }
-                return Promise.reject(error);
+
+                console.log(this.errorFormatting(error));
+                return Promise.reject(this.errorFormatting(error));
             }).finally(() => {
-                toggleLoader(false);
+                if (typeof meta.removeLoaderAfterApi !== 'undefined' && !meta.removeLoaderAfterApi) {
+
+                }
+                else {
+                    toggleLoader(false);
+                }
             });
         },
 
@@ -121,6 +130,13 @@ export default {
                     this.swalError(errors);
                     return Promise.reject(errors);
                 });
+        },
+
+        errorFormatting(data) {
+            let err = '';
+            if (typeof data.errors !== 'undefined') err = Object.values(data.errors).join('<br>');
+            else err = data.message;
+            return err;
         },
 
         swalError(errors) {
