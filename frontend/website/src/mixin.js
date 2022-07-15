@@ -18,7 +18,7 @@ export default {
             user_id = sessionStorage.getItem('cypher_user_id');
         }
         else {
-            let userIds = [1, 2, 3, 4, 5];
+            let userIds = [1, 2, 3, 4, 5, 6];
             user_id = userIds[Math.floor(Math.random() * userIds.length)];
             sessionStorage.setItem('cypher_user_id', user_id);
         }
