@@ -1,11 +1,3 @@
-# Ignore everything
 *
-
-# But not these files...
-!.gitignore
-!dynamic
 !dynamic/
-# etc...
-
-# ...even if they are in subdirectories
-!*/
+!.gitignore
