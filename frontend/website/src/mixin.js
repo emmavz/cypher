@@ -12,6 +12,19 @@ export default {
         }
     },
     created() {
+
+        let user_id = window.user_id;
+        if (sessionStorage.getItem('cypher_user_id')) {
+            user_id = sessionStorage.getItem('cypher_user_id');
+        }
+        else {
+            let userIds = [1, 2, 3, 4, 5];
+            user_id = userIds[Math.floor(Math.random() * userIds.length)];
+            sessionStorage.setItem('cypher_user_id', user_id);
+        }
+
+        window.user_id = user_id;
+
         // isError
         this.$watch('isError', (isError) => {
             this.emitter.emit('isError', isError);
@@ -68,13 +81,15 @@ export default {
                 apiResponses.forEach(response => {
                     let data = response.data;
 
-                    if (Array.isArray(data)) {
-                        responses.push(data);
-                    }
-                    else {
-                        // errors.push(data.error);
-                        // errors.push(response);
-                    }
+                    responses.push(data);
+
+                    // if (Array.isArray(data)) {
+                    //     responses.push(data);
+                    // }
+                    // else {
+                    //     // errors.push(data.error);
+                    //     // errors.push(response);
+                    // }
                 });
 
                 if (errors.length) {
@@ -134,7 +149,15 @@ export default {
 
         errorFormatting(data) {
             let err = '';
-            if (typeof data.errors !== 'undefined') err = Object.values(data.errors).join('<br>');
+            if (typeof data.errors !== 'undefined') {
+                let errors = [];
+                for (let errs in data.errors) {
+                    data.errors[errs].forEach(error => {
+                        errors.push(error);
+                    });
+                }
+                err = errors.join('<br>');
+            }
             else err = data.message;
             return err;
         },
@@ -158,6 +181,39 @@ export default {
 
         getFullUrl(route) {
             return new URL(route, window.location.href).href;
+        },
+
+        getUserProfileRoute(user_id, query = null) {
+            let r = { name: 'profile', params: { userId: window.user_id == user_id ? '' : user_id } };
+            if (query) r.query = query;
+            return r;
+        },
+
+        checkPreviousPage() {
+            return this.$router.options.history.state.back ? true : false;
+        },
+
+        storeReferralToken(referral_token) {
+            if (referral_token && this.getReferralToken() != referral_token) {
+                localStorage.setItem('cypher_referral_token', referral_token);
+
+                // this.sendApiRequest('set_referred_id', {
+                //     "referral_token": referral_token,
+                //     "auth_id": window.user_id
+                // });
+
+            }
+        },
+
+        getReferralToken() {
+            return localStorage.getItem('cypher_referral_token');
+        },
+
+        getLiquidationDays(current_time, date_posted) {
+            current_time = this.moment(current_time);
+            let posted_time_after_days = this.moment(date_posted).add(window.liquidation_days_limit, 'days');
+            let liquidation_days = Math.ceil((posted_time_after_days.valueOf() - current_time.valueOf()) / (1000 * 3600 * 24));
+            return liquidation_days < 0 ? 0 : liquidation_days;
         }
     }
 }

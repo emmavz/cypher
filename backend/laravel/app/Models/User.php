@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Follow;
+use App\Models\Article;
+use App\Models\ArticleUserPaid;
 
 class User extends Authenticatable
 {
@@ -51,6 +53,30 @@ class User extends Authenticatable
     public function followed()
     {
         return $this->hasMany(Follow::class, 'follower_id');
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    public function paid_articles()
+    {
+        return $this->belongToMany(Article::class, 'article_user_paids', 'user_id', 'article_id');
+    }
+
+    public function total_invested($userId = null)
+    {
+        $relation = $this->hasMany(ArticleUserPaid::class);
+        if ($userId) $relation->where('user_id', $userId);
+        return $relation;
+    }
+
+    public function author_total_invested($userId = null)
+    {
+        $relation = $this->hasMany(ArticleUserPaid::class, 'author_id', 'id');
+        if ($userId) $relation->where('author_id', $userId);
+        return $relation;
     }
 
     public static function rules()

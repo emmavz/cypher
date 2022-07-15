@@ -47,8 +47,7 @@ export default ({
 </script>
 
 <template>
-    <RouterLink :to="url"
-        v-if="newArticle" class="blog-post inline-flex flex-wrap justify-between">
+    <RouterLink :to="url" v-if="newArticle" class="blog-post inline-flex flex-wrap justify-between">
         <span :style="{'background': 'linear-gradient(206.14deg, '+newArticle.palette+' 0%, #4F4D55 145.34%)'}"></span>
         <div class="blog-post__left">
             <div class="blog-post__left__header flex items-center mb-4">
@@ -63,8 +62,8 @@ export default ({
                 </div>
             </div>
 
-            <ul :class="['categories mb-4', {'mt-6': 'stakes' in newArticle }]">
-                <li v-for="(tag, i) in newArticle.tags.slice(0,2)" :key="i">
+            <ul :class="['categories mb-4', {'mt-6': 'stakes' in newArticle }]" v-if="'tags' in newArticle">
+                <li v-for=" (tag, i) in newArticle.tags.slice(0,2)" :key="i">
                     <Category :category="tag" />
                 </li>
             </ul>
@@ -73,26 +72,27 @@ export default ({
                 <div class="mr-3">{{ newArticle.date_posted }}</div>
             </div>
 
-            <div class="blog-post__left__stock" v-if="'total_invested' in newArticle.user">
-                {{ newArticle.user.total_invested }} {{ this.currency }} Invested
+            <div class="blog-post__left__stock" v-if="'total_invested_count' in newArticle">
+                {{ newArticle.total_invested_count ? newArticle.total_invested_count: 0 }} {{ this.currency }} Invested
             </div>
 
-            <div class="flex f-13 items-center mb-3" v-if="'stakes' in newArticle">
+            <div class="flex f-13 items-center mb-3" v-if="'total_stakes' in newArticle">
                 <div>
                     <img src="@/assets/img/stats-icon--v2.svg" alt="">
                 </div>
                 <div class="pl-3 opacity-80">
-                    <div><b>{{ newArticle.stakes }}% Stake</b></div>
-                    <div class="mt-1.5"><b>{{ newArticle.amount }} {{ this.currency }}</b></div>
+                    <div><b>{{ newArticle.total_stakes }}% Stake</b></div>
+                    <div class="mt-1.5"><b>{{ newArticle.user_total_investments }}/{{ newArticle.total_investments }} {{
+                    this.currency }}</b></div>
                 </div>
             </div>
 
-            <div class="f-11 opacity-80" v-if="'followers' in newArticle">
-                <b>{{ newArticle.followers }}</b> Followers
+            <div class="f-11 opacity-80" v-if="'user_followers_count' in newArticle">
+                <b>{{ newArticle.user_followers_count }}</b> Followers
             </div>
 
-            <div class="f-11 pt-1 opacity-80" v-if="'following' in newArticle">
-                <b>{{ newArticle.following }}</b> Following
+            <div class="f-11 pt-1 opacity-80" v-if="'user_followed_count' in newArticle">
+                <b>{{ newArticle.user_followed_count }}</b> Following
             </div>
         </div>
 

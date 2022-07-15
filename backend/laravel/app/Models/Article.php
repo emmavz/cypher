@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Tag;
+use App\Models\ArticleUserPaid;
 use Storage;
 
 class Article extends Model
@@ -19,15 +20,17 @@ class Article extends Model
      */
     protected $casts = [];
 
+    public function getContentAttribute($value)
+    {
+        return str_replace(config('website.editor_utf'), '', $value);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'user_id', 'title', 'description', 'content', 'liquidation_days', 'price', 'category', 'hashtag_id',
-        'image_url', 'article_total_reads', 'article_total_shares', 'is_published', 'date_posted'
-    ];
+    protected $fillable = [];
 
     public function user()
     {
@@ -37,6 +40,27 @@ class Article extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    public function total_reads($userId = null)
+    {
+        $relation = $this->belongsToMany(User::class, 'article_read', 'article_id', 'user_id');
+        if ($userId) $relation->where('user_id', $userId);
+        return $relation;
+    }
+
+    public function total_shares($userId = null)
+    {
+        $relation = $this->belongsToMany(User::class, 'article_share', 'article_id', 'referee_id');
+        if ($userId) $relation->where('referee_id', $userId);
+        return $relation;
+    }
+
+    public function total_invested($userId = null)
+    {
+        $relation = $this->hasMany(ArticleUserPaid::class);
+        if ($userId) $relation->where('user_id', $userId);
+        return $relation;
     }
 
     public static function boot()
@@ -55,8 +79,8 @@ class Article extends Model
             $data['image_url'] = Storage::url(self::$path . $img);
         }
 
-        if (strip_tags($request->description)) {
-            $data['description'] = summernote($request->description, self::$path, $oldmodel ? $oldmodel->description : null);
+        if (strip_tags($request->content)) {
+            $data['content'] = summernote($request->content, self::$path, $oldmodel ? $oldmodel->content : null);
         }
 
         return $data;
@@ -69,7 +93,7 @@ class Article extends Model
         }
 
         if ($request == null) {
-            summernote(null, self::$path, $oldmodel->description);
+            summernote(null, self::$path, $oldmodel->content);
         }
     }
 }

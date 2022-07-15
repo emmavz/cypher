@@ -7,37 +7,45 @@ import Tabs from '@/components/Tabs.vue';
 export default ({
   data() {
     return {
-      article: [],
+      articleId: Number(this.$route.params.articleId),
+      article: null,
+      user: null,
+      auth_id: window.user_id,
       image_url: '',
       share_btn: 'Share',
       share_heading: 'Share Article',
       share_description: 'Thanks for helping an author out! Remember, the more people who invest in this author, the more CPHR you can earn! appy sharing!',
-      share_link: 'https://insert-link-here.com',
+      share_link: '',
       isModalVisible: false,
-      showPaytoReadConfirmation: false,
+      liquidation_days: 0,
+      stats: null,
     }
   },
   created() {
 
-    this.sendAllMultiApiRequests([
-        {
-            url: 'get_article_homepage',
-            data: {
-                "article_id": Number(this.$route.params.articleId),
-                "auth_id": window.user_id
-            }
-        },
-        {
-            url: 'get_user_profile',
-            data: {
-                "user_id": 2,
-                "auth_id": window.user_id
-            }
-        },
-    ])
-    .then((reponses) => {
-        this.article = reponses[0];
-        this.image_url = this.article[0].image_url;
+      this.share_link = this.getFullUrl(this.$router.resolve({ name: 'article_homepage', params: { articleId: this.articleId } }).fullPath);
+
+    this.sendApiRequest('get_full_article', {
+        "article_id": this.articleId,
+        "auth_id": this.auth_id,
+        'referral_token': this.getReferralToken()
+    })
+    .then((responses) => {
+
+        if (typeof responses[0].is_article_paid !== 'undefined' && !responses[0].is_article_paid) {
+            return this.$router.push({ name: 'article_homepage', params: { articleId: this.articleId } });
+        }
+
+        this.article = responses[0];
+        this.image_url = this.article.image_url;
+
+        this.user = responses[1];
+
+        this.stats = responses[2];
+
+        this.liquidation_days = this.getLiquidationDays(this.current_time, this.article.date_posted);
+
+        this.share_link = this.getFullUrl(this.$router.resolve({ name: 'article_homepage', params: { articleId: this.articleId, referralToken: this.user.referral_token } }).fullPath);
     });
 
   },
@@ -48,10 +56,6 @@ export default ({
       closeModal() {
         this.isModalVisible = false;
       },
-      processToPayment() {
-          this.showPaytoReadConfirmation = false;
-          this.$router.push({ name: 'routename' });
-      }
   },
   components: {
       ArticleBanner,
@@ -66,26 +70,27 @@ export default ({
 
     <div class="app-wp">
 
-        <Header/>
+        <Header />
 
         <!-- Content -->
         <div class="content">
 
-            <ArticleBanner :image_url="image_url" />
-
-            <div v-for="(article, index) in article" :key="index">
+            <div v-if="!isError && article">
+                <ArticleBanner :image_url="image_url"
+                    :back_url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
 
                 <div class="i-wrap--v2 border-b-0 -mb-4">
 
                     <div class="container">
 
                         <div class="text-center mb-0">
-                            <h1 class="mb-3">{{ article.article_title }}</h1>
+                            <h1 class="mb-3">{{ article.title }}</h1>
                             <div class="mb-0">
-                                <a href="#" class="inline-flex items-center i-wrap--v2__profile">
-                                    <img :src="article.author_pfp" alt="" class="mr-4" width="35">
-                                    {{ article.article_author }}
-                                </a>
+                                <RouterLink :to="getUserProfileRoute(article.user_id)"
+                                    class="inline-flex items-center i-wrap--v2__profile">
+                                    <img :src="article.user.pfp" alt="" class="mr-4" width="35">
+                                    {{ article.user.name }}
+                                </RouterLink>
                             </div>
                         </div>
                     </div>
@@ -96,14 +101,20 @@ export default ({
 
                     <template v-slot:btns>
                         <div class="flex">
-                            <UpvotePopup class="sm-btns-container" />
-                            <SharePopup :share_btn="share_btn" :share_heading="share_heading" :share_description="share_description"  :share_link="share_link" class="sm-btns-container ml-1.5"  />
+                            <div class="sm-btns-container" v-if="article.user_id != auth_id">
+                                <RouterLink :to="getUserProfileRoute(article.user_id, {v: 1})">
+                                    <button class=" currency-tag currency-tag--opacity-70" @click="$r">Upvote</button>
+                                </RouterLink>
+                            </div>
+                            <SharePopup :share_btn="share_btn" :share_heading="share_heading"
+                                :share_description="share_description" :share_link="share_link"
+                                class="sm-btns-container ml-1.5" />
                         </div>
                     </template>
 
                     <template v-slot:tabPanel-1>
-                        <div class="mb-10 f-14 container">
-                            <p>
+                        <div class="mb-10 f-14 container w_template" v-html="article.content"></div>
+                        <!-- <p>
                                 Hiya there!<br><br>
                                 If you asked me how many recipes I’ve tried to get super chewy, PERFECT cookies, I couldn’t even tell you. But what I can tell you, is the recipe that FINALLY worked for me.
                             </p>
@@ -112,8 +123,7 @@ export default ({
                             </p>
                             <p>
                                 Brown sugar is where a lot of people get it wrong. Before you buy brown sugar from the store, make sure to look at the consistency. It’s suuuuper important that you get the right kind or else your cookies are going to be suuuuper NOT chewy. Trust me. Been there, done that. Below, you’ll find a list of things to look out for when buying brown sugar during your next trip to the grocery.
-                            </p>
-                        </div>
+                            </p> -->
                     </template>
 
                     <template v-slot:tabPanel-2>
@@ -125,45 +135,49 @@ export default ({
                                         <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto">
                                     </div>
                                     <div class="stats__right">
-                                        <div><span class="aquamarine-color mr-1.5">{{ article.article_liquidation_time }}</span>Days until liquidation</div>
-                                        <div><span class="aquamarine-color mr-1.5">{{ article.article_total_reads }}</span>Reads</div>
-                                        <div><span class="aquamarine-color mr-1.5">{{ article.article_total_shares }}</span>Shares</div>
+                                        <div><span class="aquamarine-color mr-1.5">{{
+                                                liquidation_days
+                                                }}</span>Days until liquidation</div>
+                                        <div><span class="aquamarine-color mr-1.5">{{ article.total_reads_count
+                                                }}</span>Reads</div>
+                                        <div><span class="aquamarine-color mr-1.5">{{ article.total_shares_count
+                                                }}</span>Shares</div>
                                     </div>
                                 </div>
 
-                                <div class="mb-6 mt-10 f-20"><b>Your investment in <span class="aquamarine-color">Eliza Mae</span></b></div>
-                                <div class="flex items-center">
-                                    <div class="mr-6">
-                                        <img src="@/assets/img/stats-icon--v3.svg" alt="" class="ml-auto">
+                                <template v-if="stats">
+                                    <div>
+                                        <div class="mb-6 mt-10 f-20"><b>Your investment in
+                                                <RouterLink :to="getUserProfileRoute(article.user_id)">
+                                                    <span class="aquamarine-color">{{
+                                                        article.user.name }}</span>
+                                                </RouterLink>
+                                            </b></div>
+                                        <div class="flex items-center">
+                                            <div class="mr-6">
+                                                <img src="@/assets/img/stats-icon--v3.svg" alt="" class="ml-auto">
+                                            </div>
+                                            <div class="stats__right">
+                                                <div>You Own<span class="aquamarine-color mr-1.5 ml-1.5 mb-1">{{
+                                                        stats.total_stakes }}%</span>Stake
+                                                </div>
+                                                <div class="-mt-2"><span class="aquamarine-color mr-1.5">{{
+                                                        stats.user_total_investments
+                                                        }}</span><span class="mr-1.5">{{this.currency}}</span>Invested
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="stats__right">
-                                        <div>You Own<span class="aquamarine-color mr-1.5 ml-1.5 mb-1">16.67%</span>Stake</div>
-                                        <div class="-mt-2"><span class="aquamarine-color mr-1.5">20</span><span class="mr-1.5">{{this.currency}}</span>Invested</div>
-                                    </div>
-                                </div>
+                                </template>
+
                             </div>
                         </div>
                     </template>
                 </Tabs>
 
-                <!-- Pay to read confirmation  -->
-                <div class="confirmation-popup" v-if="showPaytoReadConfirmation">
-                    <div class="container">
-                        <div class="flex justify-center items-center w-full">
-                            <div>
-                                <b class="f-18 primary-color">Are you sure?</b>
-                            </div>
-                            <div>
-                                <button @click="processToPayment()" class="cn-btn ml-7 f-13 font-semibold">Yes</button>
-                                <button @click="showPaytoReadConfirmation = 0" class="cn-btn ml-6 f-13 font-semibold">No</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <Error/>
+            <Error />
         </div>
 
     </div>

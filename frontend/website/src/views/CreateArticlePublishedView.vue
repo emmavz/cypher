@@ -6,6 +6,8 @@ export default {
             article_id: '0', // 0 is required otherwise it will throw an error in $router.resolve
             title: '',
             image_url: '',
+            user: {},
+            share_link: '',
         }
     },
     async created() {
@@ -14,10 +16,13 @@ export default {
             "auth_id": window.user_id
         })
         .then(response => {
-            if (response[0].length) {
-                this.article_id = response[0][0].id;
-                this.title = response[0][0].title;
-                this.image_url = response[0][0].image_url;
+            if (response[0]) {
+                this.article_id = response[0].id;
+                this.title = response[0].title;
+                this.image_url = response[0].image_url;
+                this.user = response[1];
+
+                this.share_link = this.getFullUrl(this.$router.resolve({ name: 'article_homepage', params: { articleId: this.article_id, referralToken: this.user.referral_token } }).fullPath);
             }
         });
     },
@@ -34,7 +39,10 @@ export default {
 
             <div v-if="!isError">
                 <div class="font-semibold f-18 br-b py-5 banner_img">
-                    <button class="close-icon"><img src="/src/assets/img/close-icon--v2.svg" alt="" width="34"></button>
+                    <RouterLink :to="{ name: 'drafts' }">
+                        <button class="close-icon"><img src="/src/assets/img/close-icon--v2.svg" alt=""
+                                width="34"></button>
+                    </RouterLink>
                     Congratulations!
                 </div>
 
@@ -56,14 +64,14 @@ export default {
                             <div class="flex justify-center">
                                 <div>
                                     <ShareNetwork network="facebook"
-                                        :url="getFullUrl($router.resolve({ name: 'article_homepage', params: { articleId: article_id } }).fullPath)"
+                                        :url="share_link"
                                         title="Say hi to Vite! A brand new, extremely fast development setup for Vue."
                                         description="This week, I’d like to introduce you to 'Vite', which means 'Fast'. It’s a brand new development setup created by Evan You.">
                                         <button><img src="@/assets/img/facebook-icon.svg" alt=""></button>
                                     </ShareNetwork>
                                 </div>
                                 <div><button class="ml-6"
-                                        @click="$copyText(getFullUrl($router.resolve({ name: 'article_homepage', params: { articleId: article_id } }).fullPath))"><img
+                                        @click="$copyText(share_link)"><img
                                             src="@/assets/img/website-icon.svg" alt=""></button></div>
                             </div>
                         </div>

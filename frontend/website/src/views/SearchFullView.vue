@@ -130,8 +130,7 @@ export default ({
         <template v-slot:tabPanel-1>
           <template v-if="articles.length">
             <div class="w-full flex justify-center container" v-for="(article,index) in articles" :key="index">
-              <Article :article="article"
-                :url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
+              <Article :article="article" :url="{ name: 'article_homepage', params: { articleId: article.id  } }" />
             </div>
           </template>
           <template v-else-if="isError == 0">
@@ -144,14 +143,14 @@ export default ({
             <div class="w-full author-container" v-for="(author,ai) in authors" :key="ai">
               <div :class="['flex pb-7 pt-7 container', ai == 0 ? '-mt-9': '-mt-6']">
                 <div>
-                  <RouterLink :to="{ name: 'other-profile', params: { userId: author.id  } }">
+                  <RouterLink :to="getUserProfileRoute(author.id)">
                     <img :src="author.pfp" alt="" width="40" height="40" class="rounded-full">
                   </RouterLink>
                 </div>
                 <div class="pl-5">
                   <div class="flex justify-between">
                     <div class="f-20 font-semibold mb-2 mr-2">
-                      <RouterLink :to="{ name: 'other-profile',  params: { userId: author.id  } }">
+                      <RouterLink :to="getUserProfileRoute(author.id)">
                         {{ author.name }}
                       </RouterLink>
                     </div>

@@ -8,4 +8,8 @@ return [
     'maximgheight' => 10000,
     'user_min_pass' => 6,
     'admin_min_pass' => 6,
+
+    'total_stakes_decimal_points' => 4,
+    'editor_utf' => '<?xml encoding="utf-8" ?>',
+    'max_article_shares' => 8
 ];

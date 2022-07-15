@@ -47,7 +47,7 @@ class BaseController extends Controller
         //     $response = $errorMessages;
         // }
 
-        throw new ValidationException($errorMessages);
+        throw ValidationException::withMessages($errorMessages);
 
         // return response()->json($response, $code);
     }

@@ -13,7 +13,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/article/:articleId',
+      path: '/article/:articleId/:referralToken?',
       name: 'article_homepage',
       // route level code-splitting
       // this generates a separate chunk (Article.[hash].js) for this route
@@ -21,14 +21,9 @@ const router = createRouter({
       component: () => import('../views/ArticleView.vue')
     },
     {
-      path: '/article_paid/:articleId',
+      path: '/full_article/:articleId',
       name: 'full_article_homepage',
       component: () => import('../views/FullArticleView.vue')
-    },
-    {
-      path: '/article_afterpaid/:articleId',
-      name: 'article_afterpaid',
-      component: () => import('../views/ArticleAfterPaid.vue')
     },
     {
       path: '/search',
@@ -48,19 +43,9 @@ const router = createRouter({
       component: () => import('../views/NotificationView.vue'),
     },
     {
-      path: '/notifications/article/:articleId',
-      name: 'notifications.article',
-      component: () => import('../views/NotificationArticleView.vue'),
-    },
-    {
-      path: '/profile',
+      path: '/profile/:userId?',
       name: 'profile',
       component: () => import('../views/UserProfileView.vue')
-    },
-    {
-      path: '/other-profile/:userId',
-      name: 'other-profile',
-      component: () => import('../views/OtherProfileView.vue')
     },
     {
       path: '/drafts',
@@ -73,7 +58,7 @@ const router = createRouter({
       component: () => import('../views/CreateArticleView.vue')
     },
     {
-      path: '/create_article_published/:articleId',
+      path: '/article_published/:articleId',
       name: 'create_article_published',
       component: () => import('../views/CreateArticlePublishedView.vue')
     }

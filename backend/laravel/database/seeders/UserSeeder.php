@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Storage;
+use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -22,10 +24,13 @@ class UserSeeder extends Seeder
         $user->email = "user@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =  Storage::url("dynamic/profile-1.png");
-        $user->total_invested = 10025;
+
         $user->wallet_address = "abcd1234";
         $user->balance = 123;
-        $user->bio = "bio";
+        $user->bio = "Just another baker blogger";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        // $user->referral_token = (string)Uuid::uuid1();
+        $user->referral_token = $this->generateReferral();
         $user->save();
 
         $user = new User();
@@ -33,10 +38,11 @@ class UserSeeder extends Seeder
         $user->email = "user2@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =   Storage::url("dynamic/profile-2.png");
-        $user->total_invested = 7342;
         $user->wallet_address = "abcd1234";
         $user->balance = 222;
-        $user->bio = "bio";
+        $user->bio = "Just another baker blogger";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = $this->generateReferral();
         $user->save();
 
         $user = new User();
@@ -44,10 +50,11 @@ class UserSeeder extends Seeder
         $user->email = "user3@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =   Storage::url("dynamic/profile-3.png");
-        $user->total_invested = 8961;
         $user->wallet_address = "abcd1234";
         $user->balance = 111;
-        $user->bio = "bio";
+        $user->bio = "Just another baker blogger";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = $this->generateReferral();
         $user->save();
 
         $user = new User();
@@ -55,10 +62,11 @@ class UserSeeder extends Seeder
         $user->email = "user4@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =   Storage::url("dynamic/profile-4.png");
-        $user->total_invested = 9456;
         $user->wallet_address = "abcd1234";
         $user->balance = 333;
-        $user->bio = "bio";
+        $user->bio = "Just another baker blogger";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = $this->generateReferral();
         $user->save();
 
         $user = new User();
@@ -66,10 +74,34 @@ class UserSeeder extends Seeder
         $user->email = "user5@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =   Storage::url("dynamic/profile-5.png");
-        $user->total_invested = 11275;
         $user->wallet_address = "abcd1234";
         $user->balance = 444;
-        $user->bio = "bio";
+        $user->bio = "Just another baker blogger";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = $this->generateReferral();
         $user->save();
+
+        $user = new User();
+        $user->name = "Jessica Covington";
+        $user->email = "user6@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   Storage::url("dynamic/userprofile-1.png");
+        $user->wallet_address = "abcd1234";
+        $user->balance = 1256;
+        $user->bio = "She turned her can't into can and her dreams into plans.";
+        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = $this->generateReferral();
+        $user->save();
+    }
+
+    protected function generateReferral()
+    {
+        $length = 5;
+
+        do {
+            $referral = Str::random($length);
+        } while (User::where('referral_token', $referral)->exists());
+
+        return $referral;
     }
 }

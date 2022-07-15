@@ -7,7 +7,9 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 import BlotFormatter from 'quill-blot-formatter';
 import MagicUrl from 'quill-magic-url';
+import ImageFormats from '@/quill-align-images';
 
+Quill.register("formats/image", ImageFormats);
 Quill.register("modules/blotFormatter", BlotFormatter);
 Quill.register("modules/magicUrl", MagicUrl);
 
@@ -21,12 +23,12 @@ export default {
             article_image: '',
             article_image_form_input: '',
             title: '',
-            description: '',
+            content: '',
             quill: null,
-            publish_description: '',
+            description: '',
             publish_description_max: 200,
-            publish_price: '0',
-            publish_theta: '0',
+            price: '0',
+            theta: '0',
             showPublish: 0,
             publish_confirmation: 0,
             show_categories: 0,
@@ -59,11 +61,11 @@ export default {
         }
     },
     async created() {
-        this.$watch('publish_price', function(value){
-            this.setInputDynamicWidth(this.$refs.publish_price);
+        this.$watch('price', function(value){
+            this.setInputDynamicWidth(this.$refs.price);
         });
-        this.$watch('publish_theta', function(value){
-            this.setInputDynamicWidth(this.$refs.publish_theta);
+        this.$watch('theta', function(value){
+            this.setInputDynamicWidth(this.$refs.theta);
         });
 
         if (this.article_id) await this.getArticle();
@@ -93,16 +95,15 @@ export default {
                 "article_id": this.article_id
             })
             .then(article => {
-                if (article.length) {
-                    this.article = article[0];
-                    this.title = article[0].title;
-                    this.description = article[0].description;
-                    this.quill.container.firstChild.innerHTML = this.description;
-                    this.article_image = article[0].image_url;
+                this.article = article;
+                this.title = this.article.title;
+                this.content = this.article.content ? this.article.content: '';
+                this.quill.container.firstChild.innerHTML = this.content;
+                this.article_image = this.article.image_url;
 
-                    if (article[0].content) this.publish_description = article[0].content;
-                    if (article[0].price) this.publish_price = article[0].price;
-                }
+                if (this.article.description) this.description = this.article.description;
+                if (this.article.price) this.price = this.article.price;
+                if (this.article.theta) this.theta = this.article.theta;
             });
         },
         async save(should_publish) {
@@ -119,10 +120,10 @@ export default {
             };
 
             if(should_publish) {
-                validations.description = yup.string().required();
-                validations.publish_description =  yup.string().required();
-                validations.publish_price =  yup.string().required();
-                validations.publish_theta =  yup.string().required();
+                validations.content = yup.string().required();
+                validations.description =  yup.string().required();
+                validations.price = yup.number().required().min(0);
+                validations.theta = yup.number().required().integer().max(100);
                 validations.tags = yup.array().required().min(1);
 
                 if (!this.article_id || (this.article_id && !this.article_image)) {
@@ -136,23 +137,23 @@ export default {
 
             const schema = yup.object().shape(validations);
 
-            await this.validate(schema, { title: this.title, description: this.description, article_image_form_input: this.article_image_form_input,
-                publish_description: this.publish_description, publish_price: this.publish_price, publish_theta: this.publish_theta, tags: categoryIds });
+            await this.validate(schema, { title: this.title, content: this.content, article_image_form_input: this.article_image_form_input,
+                description: this.description, price: this.price, theta: this.theta, tags: categoryIds });
 
             let formData = new FormData();
             if (this.article_id) formData.append("article_id", this.article_id);
             formData.append("image_url", this.article_image_form_input);
             formData.append("title", this.title);
-            formData.append("description", this.description);
+            formData.append("content", this.content);
             formData.append("user_id", window.user_id);
 
-            formData.append("p_description", this.publish_description);
-            formData.append("price", this.publish_price);
-            formData.append("theta", this.publish_theta);
+            formData.append("description", this.description);
+            formData.append("price", this.price);
+            formData.append("theta", this.theta);
             formData.append("tags[]", categoryIds);
             formData.append("should_publish", should_publish ? 1 : 0);
 
-            this.sendApiRequest('save_draft_article', formData, true)
+            this.sendApiRequest('store_article', formData, true)
             .then((articleId) => {
                 if (!should_publish) this.$router.push({ name: 'drafts' });
                 else this.$router.push({ name: 'create_article_published', params: { articleId: articleId[0].id } });
@@ -169,14 +170,14 @@ export default {
         },
         editorReady(quill) {
             this.quill = quill;
-            if (this.article_id) quill.setText(this.description);
+            if (this.article_id) quill.setText(this.content);
             else quill.focus();
         },
         editorBlur(quill) {
         },
         editorUpdate() {
             if( this.quill ) {
-                this.description = this.quill.container.firstChild.innerHTML;
+                this.content = this.quill.container.firstChild.innerHTML;
             }
         },
         toggleCategorySelection(categoryId) {
@@ -221,7 +222,8 @@ export default {
             <CreateArticleBanner :article_image="article_image" :article_image_form_input="article_image_form_input"
                 @show-publish="showPublish = 1;publish_confirmation = 0" @save-article="save(0)"
                 @article_image="(ar_img) => article_image = ar_img"
-                @article_image_form_input="(ar_img) => article_image_form_input = ar_img" />
+                @article_image_form_input="(ar_img) => article_image_form_input = ar_img"
+                :back_url="{ name: 'drafts' }" />
 
             <div class="py-5">
                 <div class="container create_article__form">
@@ -237,7 +239,7 @@ export default {
                                 v-if="showQuillEditor == 0 && !this.article_id">Start Writing</div>
                             <template v-if="showQuillEditor == 1 || this.article_id">
                                 <QuillEditor :options="options" @ready="editorReady($event)" @blur="editorBlur"
-                                    @update:content="editorUpdate" class="editor_height" />
+                                    @update:content="editorUpdate" class="editor_height w_template" />
                             </template>
                         </div>
                     </form>
@@ -263,10 +265,10 @@ export default {
 
                         <div v-if="!publish_confirmation">
                             <div class="pb-4 font-semibold">Description</div>
-                            <textarea v-model="publish_description" :maxlength="publish_description_max"
+                            <textarea v-model="description" :maxlength="publish_description_max"
                                 class="w-full bg-transparent border-white border f-13"></textarea>
-                            <div class="flex justify-end f-13">{{ publish_description.length }}/{{
-                                publish_description_max }}</div>
+                            <div class="flex justify-end f-13">{{ description.length }}/{{
+                            publish_description_max }}</div>
 
                             <div class="row mt-6">
                                 <div class="w-6/12">
@@ -274,15 +276,14 @@ export default {
                                     <div class="flex items-center">
                                         <input type="number"
                                             class="create_article__publish__body__input f-20 font-bold bg-transparent aquamarine-color opacity-80"
-                                            min="0" v-model.number="publish_price" @keypress="onlyNumeric"
-                                            ref="publish_price">
+                                            min="0" v-model.number="price" @keypress="onlyNumeric" ref="price">
                                         <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">{{ this.currency
-                                            }}</span>
+                                        }}</span>
                                         <div>
                                             <div><img src="@/assets/img/polygon-up.svg" alt=""
-                                                    class="cursor-pointer mb-1" @click="publish_price++"></div>
+                                                    class="cursor-pointer mb-1" @click="price++"></div>
                                             <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer"
-                                                    @click="publish_price > 0 ? publish_price-- : ''"></div>
+                                                    @click="price > 0 ? price-- : ''"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -292,14 +293,13 @@ export default {
                                     <div class="flex items-center">
                                         <input type="number"
                                             class="create_article__publish__body__input f-20 font-bold bg-transparent aquamarine-color opacity-80"
-                                            min="0" v-model.number="publish_theta" @keypress="onlyNumeric"
-                                            ref="publish_theta">
+                                            min="0" v-model.number="theta" @keypress="onlyNumeric" ref="theta">
                                         <span class="aquamarine-color opacity-80 f-20 font-bold mr-2">%</span>
                                         <div>
                                             <div><img src="@/assets/img/polygon-up.svg" alt=""
-                                                    class="cursor-pointer mb-1" @click="publish_theta++"></div>
+                                                    class="cursor-pointer mb-1" @click="theta++"></div>
                                             <div><img src="@/assets/img/polygon-down.svg" alt="" class="cursor-pointer"
-                                                    @click="publish_theta > 0 ? publish_theta-- : ''"></div>
+                                                    @click="theta > 0 ? theta-- : ''"></div>
                                         </div>
                                     </div>
                                 </div>

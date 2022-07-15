@@ -1,5 +1,10 @@
 <?php
 
+function stake_format($number)
+{
+    return round($number, 4);
+}
+
 function d_format($datetime)
 {
     return date('d/m/Y h:i:s a', strtotime($datetime));
@@ -227,9 +232,8 @@ function summernote($text = null, $path = null, $oldtext = null)
     // It will not trigger for delete
     if ($text) {
         // Store new images + text
-        $dom->loadHtml('' . $text, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+        $dom->loadHtml(config('website.editor_utf') . $text, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
         $images = $dom->getElementsByTagName('img');
-
 
         foreach ($images as $img) {
             $src = $img->getAttribute('src');

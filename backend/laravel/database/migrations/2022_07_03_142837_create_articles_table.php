@@ -19,14 +19,11 @@ class CreateArticlesTable extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('content')->nullable();
-            $table->bigInteger('liquidation_days')->default(0);
-            $table->float('price')->default(0);
-            $table->bigInteger('category')->default(0);
+            $table->float('price')->nullable();
             $table->string('image_url')->nullable();
-            $table->bigInteger('article_total_reads')->default(0);
-            $table->bigInteger('article_total_shares')->default(0);
             $table->boolean('is_published')->default(0);
             $table->dateTime('date_posted')->nullable();
+            $table->bigInteger('theta')->nullable();
             $table->timestamps();
         });
     }

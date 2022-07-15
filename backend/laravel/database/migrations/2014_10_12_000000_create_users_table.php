@@ -16,8 +16,9 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('referral_token')->nullable()->unique()->index();
             $table->string('pfp')->nullable();
-            $table->bigInteger('total_invested')->default(0);
+            $table->string('bg')->nullable();
             $table->string('wallet_address')->nullable();
             $table->bigInteger('balance')->default(0);
             $table->string('profile_url')->nullable();
