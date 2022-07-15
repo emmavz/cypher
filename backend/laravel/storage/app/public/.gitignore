@@ -1,4 +1,10 @@
+# Ignore everything
 *
-!dynamic/
-!.gitignore
 
+# But not these files...
+!.gitignore
+!dynamic/
+# etc...
+
+# ...even if they are in subdirectories
+!*/
