@@ -247,9 +247,11 @@ class ApiController extends BaseController
      */
     public function get_draft_articles(Request $request)
     {
-        $articles = Article::with(['user' => function ($query) use ($request) {
-            $query->select('id', 'name', 'pfp')->where('id', $request->user_id);
-        }])->select('id', 'title', 'date_posted', 'image_url', 'user_id')->latest()->where('is_published', 0)->get();
+        $articles = Article::with(['user' => function ($query) {
+            $query->select('id', 'name', 'pfp');
+        }])->whereHas('user', function($query) use ($request){
+            $query->where('id', $request->user_id);
+        })->select('id', 'title', 'date_posted', 'image_url', 'user_id')->latest()->where('is_published', 0)->get();
 
         return $this->sendResponse($articles);
     }
@@ -702,6 +704,27 @@ class ApiController extends BaseController
 
 
         return $this->sendResponse($userStats);
+    }
+
+    /**
+     * facebook share.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function facebookshare(Request $request, $article_id, $user_id, $version)
+    {
+        $article = Article::where('id', $article_id)->where('is_published', 1)->firstOrFail();
+        $user = User::findOrFail($user_id);
+
+        $v = ($request->v) ? '?v='.$request->v : '';
+
+        $ref = \Request::server('HTTP_REFERER');
+        if( ($request->fbclid) || (strpos($ref,'m.facebook') > -1) ){
+            return redirect()->to(env('VUE_URL').'/article/'.$article_id.'/'.$user->referral_token);
+        }
+
+        return view('front.facebookshare', ['article' => $article, 'user' => $user, 'v' => $version]);
     }
 
     /**

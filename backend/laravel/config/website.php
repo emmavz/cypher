@@ -11,5 +11,8 @@ return [
 
     'total_stakes_decimal_points' => 4,
     'editor_utf' => '<?xml encoding="utf-8" ?>',
-    'max_article_shares' => 8
+    'max_article_shares' => 8,
+
+    'socialimagewidth' => 680,
+	'socialimageheight' => 357,
 ];

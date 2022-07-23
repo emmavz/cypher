@@ -37,4 +37,5 @@ Route::post('get_full_article', [ApiController::class, 'get_full_article']);
 Route::post('upvote', [ApiController::class, 'upvote']);
 Route::post('get_other_user_investments', [ApiController::class, 'get_other_user_investments']);
 Route::post('get_user_investments', [ApiController::class, 'get_user_investments']);
+Route::get('{article_id}/{user_id}/{version}/facebookshare', [ApiController::class, 'facebookshare'])->name('api.facebookshare');
 // });
