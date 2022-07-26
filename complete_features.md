@@ -8,12 +8,12 @@ Cypher missing features:
 - [x]  Pay to read an article
 - [x]  Share-to-read function
 - [x]  Upvote function
-
-**Sprint 2 - Advanced features**
-
 - [ ]  Add ‘lucky day’ feature to the share-to-read
     - [ ]  Create an algorithm that grants a free read to a few lucky sharers
     - [ ]  If a user is chosen, display the UI on their screen and deduct the price of the article from admin’s account. Give them (and the rest of the sharing chain) access to that article
+
+**Sprint 2 - Advanced features**
+
 - [ ]  Allow users to edit profiles
     - [ ]  Create UI to allow users to edit their profiles (upload a photo, add a bio)
 - [ ]  Adjustable theta value (alr exists? Have to test)
