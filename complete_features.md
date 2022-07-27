@@ -1,6 +1,6 @@
 Cypher missing features:
 
-**Sprint 1 - Basic features**
+**Sprint 1 - Demo Version**
 
 - [ ]  Top up features (Fake money/currency system to allow admin to distribute CPHR to user accounts)
 - [ ]  Login/sign up system
@@ -12,15 +12,13 @@ Cypher missing features:
     - [ ]  Create an algorithm that grants a free read to a few lucky sharers
     - [ ]  If a user is chosen, display the UI on their screen and deduct the price of the article from admin’s account. Give them (and the rest of the sharing chain) access to that article
 
-**Sprint 2 - Advanced features**
+**Sprint 2 - Open Release**
 
 - [ ]  Allow users to edit profiles
     - [ ]  Create UI to allow users to edit their profiles (upload a photo, add a bio)
 - [ ]  Adjustable theta value (alr exists? Have to test)
 - [ ]  Allow users to delete/edit articles
     - [ ]  Create UI for the option to delete/edit articles after being published
-
-**Sprint 3**
 
 - [ ]  Advanced settings to allow for share-to-read to be turned off
     - [ ]  Create UI for advanced settings on the upload-an-article page
