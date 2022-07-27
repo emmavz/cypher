@@ -16,7 +16,7 @@ Cypher missing features:
 **Sprint 2 - Open Release**
 
 - [ ]  More user features from profile
-    - [ ]  Create UI to allow users to edit their profiles (upload a photo, add a bio, log out)
+    - [x]  Create UI to allow users to edit their profiles (upload a photo, add a bio, log out)
 - [ ]  Adjustable theta value (alr exists? Have to test)
 - [ ]  Allow users to delete/edit articles
     - [ ]  Create UI for the option to delete/edit articles after being published
