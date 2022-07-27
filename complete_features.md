@@ -4,6 +4,7 @@ Cypher missing features:
 
 - [ ]  Top up features (Fake money/currency system to allow admin to distribute CPHR to user accounts)
 - [ ]  Login/sign up system
+- [ ]  Cash out features
 - [x]  Upload an article
 - [x]  Pay to read an article
 - [x]  Share-to-read function
