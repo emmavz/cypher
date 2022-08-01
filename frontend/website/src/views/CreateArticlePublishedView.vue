@@ -13,6 +13,7 @@ export default {
     this.sendApiRequest("get_article_homepage", {
       article_id: Number(this.$route.params.articleId),
       auth_id: window.user_id,
+      article_published: 1,
     }).then((response) => {
       if (response[0]) {
         this.article_id = response[0].id;
