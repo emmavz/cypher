@@ -57,7 +57,11 @@ class ApiController extends BaseController
     public function get_article_homepage(Request $request)
     {
 
-        $article = Article::with(['user:id,name,pfp'])->select('id', 'title', 'date_posted', 'image_url', 'price',  'description', 'user_id')->withCount(['total_reads', 'total_shares'])->where('id', $request->article_id)->where('is_published', 1)->firstOrFail();
+        $article = Article::with(['user:id,name,pfp'])->select('id', 'title', 'date_posted', 'image_url', 'price',  'description', 'user_id')->withCount(['total_reads', 'total_shares'])->where('id', $request->article_id)->where('is_published', 1);
+        if($request->article_published) {
+            $article->where('user_id', $request->auth_id);
+        }
+        $article = $article->firstOrFail();
         $article->total_investments = $article->total_invested->sum('price');
 
         $request->merge(['user_id' => $request->auth_id]);
@@ -717,10 +721,8 @@ class ApiController extends BaseController
         $article = Article::where('id', $article_id)->where('is_published', 1)->firstOrFail();
         $user = User::findOrFail($user_id);
 
-        $v = ($request->v) ? '?v='.$request->v : '';
-
         $ref = \Request::server('HTTP_REFERER');
-        if( ($request->fbclid) || (strpos($ref,'m.facebook') > -1) ){
+        if( (strpos($ref,'l.facebook') > -1) || (strpos($ref,'lm.facebook') > -1) ){
             return redirect()->to(env('VUE_URL').'/article/'.$article_id.'/'.$user->referral_token);
         }
 
