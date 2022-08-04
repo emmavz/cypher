@@ -21,6 +21,7 @@ Cypher missing features:
 - [ ]  Allow users to delete/edit articles
     - [ ]  Create UI for the option to delete/edit articles after being published
 
+- [ ]  Allow users to block/report other users from their profile
 - [ ]  Advanced settings to allow for share-to-read to be turned off
     - [ ]  Create UI for advanced settings on the upload-an-article page
 - [ ]  Customizable days until liquidation
