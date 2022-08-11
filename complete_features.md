@@ -2,7 +2,7 @@ Cypher missing features:
 
 **Sprint 1 - Demo Version**
 
-- [ ]  Top up features (Fake money/currency system to allow admin to distribute CPHR to user accounts)
+- [ ]  Top up features (Fake money/currency system)
 - [ ]  Login/sign up system
 - [ ]  Cash out features
 - [x]  Upload an article
@@ -10,7 +10,7 @@ Cypher missing features:
 - [x]  Share-to-read function
 - [x]  Upvote function
 - [ ]  Add ‘lucky day’ feature to the share-to-read
-    - [ ]  Create an algorithm that grants a free read to a few lucky sharers
+    - [x]  Create an algorithm that grants a free read to a few lucky sharers (add 2.5% each layer of the sharing chain)
     - [ ]  If a user is chosen, display the UI on their screen and deduct the price of the article from admin’s account. Give them (and the rest of the sharing chain) access to that article
 
 **Sprint 2 - Open Release**
