@@ -14,16 +14,9 @@ class BaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendResponse($result)
+    public function sendResponse($result, $status = 200)
     {
-        // $response = [
-        //     'success' => true,
-        //     'data'    => $result,
-        // ];
-
-        $response = $result;
-
-        return response()->json($response, 200);
+        return response()->json($result, $status);
     }
 
 
@@ -32,7 +25,7 @@ class BaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendError($errorMessages, $code = 404)
+    public function sendError($errorMessages,  $exceptions = false, $status = 404)
     {
         // $response = [
         //     'success' => false,
@@ -47,8 +40,11 @@ class BaseController extends Controller
         //     $response = $errorMessages;
         // }
 
-        throw ValidationException::withMessages($errorMessages);
-
-        // return response()->json($response, $code);
+        if($exceptions) {
+            throw ValidationException::withMessages($errorMessages);
+        }
+        else {
+            return response()->json($errorMessages, $status);
+        }
     }
 }

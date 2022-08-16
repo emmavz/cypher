@@ -12,7 +12,6 @@ export default {
   async created() {
     this.sendApiRequest("get_article_homepage", {
       article_id: Number(this.$route.params.articleId),
-      auth_id: window.user_id,
       article_published: 1,
     }).then((response) => {
       if (response[0]) {
@@ -40,7 +39,7 @@ export default {
         window.apiRoot +
         this.article_id +
         "/" +
-        window.user_id +
+        this.getAuthId() +
         "/" +
         new Date().getTime() +
         Math.floor(Math.random() * 10000) +
@@ -104,17 +103,6 @@ export default {
               </div>
               <div class="flex justify-center">
                 <div>
-                  <!-- <ShareNetwork
-                    network="facebook"
-                    :url="share_link"
-                    title="Say hi to Vite! A brand new, extremely fast development setup for Vue."
-                    description="This week, I’d like to introduce you to 'Vite', which means 'Fast'. It’s a brand new development setup created by Evan You."
-                  >
-                    <button>
-                      <img src="@/assets/img/facebook-icon.svg" alt="" />
-                    </button>
-                  </ShareNetwork> -->
-
                   <button @click="popupwindow()">
                     <img src="@/assets/img/facebook-icon.svg" alt="" />
                   </button>

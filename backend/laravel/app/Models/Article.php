@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Tag;
-use App\Models\ArticleUserPaid;
+// use App\Models\ArticleUserPaid;
+use App\Models\UserInvestment;
+use App\Models\ArticleShare;
 use Storage;
 
 class Article extends Model
@@ -44,22 +46,43 @@ class Article extends Model
 
     public function total_reads($userId = null)
     {
-        $relation = $this->belongsToMany(User::class, 'article_read', 'article_id', 'user_id');
+        $relation = $this->belongsToMany(User::class, 'article_read', 'article_id', 'user_id')->withTimestamps();
         if ($userId) $relation->where('user_id', $userId);
         return $relation;
     }
 
     public function total_shares($userId = null)
     {
-        $relation = $this->belongsToMany(User::class, 'article_share', 'article_id', 'referee_id');
+        $relation = $this->belongsToMany(User::class, 'article_share', 'article_id', 'referee_id')->withTimestamps();
         if ($userId) $relation->where('referee_id', $userId);
         return $relation;
     }
 
     public function total_invested($userId = null)
     {
-        $relation = $this->hasMany(ArticleUserPaid::class);
+        $relation = $this->user_investments();
         if ($userId) $relation->where('user_id', $userId);
+        return $relation;
+    }
+
+    public function user_investments()
+    {
+        return $this->morphMany(UserInvestment::class, 'user_investmentable');
+    }
+
+    public function is_paid_by_user()
+    {
+        $authId = auth('sanctum')->user() ? auth('sanctum')->user()->id : null;
+        $relation = $this->morphOne(UserInvestment::class, 'user_investmentable');
+        if ($authId) $relation->where('user_id', $authId);
+        return $relation;
+    }
+
+    public function is_paid_by_referrals()
+    {
+        $authId = auth('sanctum')->user() ? auth('sanctum')->user()->id : null;
+        $relation = $this->hasOne(ArticleShare::class);
+        if ($authId) $relation->where('is_paid', true)->where('referrer_id', $authId)->orWhere('referee_id', $authId);
         return $relation;
     }
 
@@ -75,7 +98,8 @@ class Article extends Model
     public static function storeFiles($request, $data, $oldmodel = null)
     {
         if ($request->hasFile('image_url')) {
-            $img = storeImage(['image' => $request->image_url, 'path' => self::$path, 'webp' => false]);
+            list($width, $height, $type, $attr) = getimagesize($request->image_url);
+            $img = storeImage(['image' => $request->image_url, 'path' => self::$path, 'webp' => false, 'fit' => [$width, 262]]);
             $data['image_url'] = Storage::url(self::$path . $img);
         }
 
@@ -93,7 +117,7 @@ class Article extends Model
         }
 
         if ($request == null) {
-            summernote(null, self::$path, $oldmodel->content);
+            summernote(null, self::$path, $model->content);
         }
     }
 }

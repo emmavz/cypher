@@ -1,4 +1,5 @@
 <script>
+import CopyLinkInput from "@/components/CopyLinkInput.vue";
 
 export default {
     props: ['share_btn', 'share_heading', 'share_description', 'share_link'],
@@ -15,6 +16,9 @@ export default {
         this.isModalVisible = false;
       },
     },
+    components: {
+        CopyLinkInput
+    }
 }
 </script>
 
@@ -23,19 +27,14 @@ export default {
     <div>
         <div><button class="btn i-wrap--v2__btn" @click.stop="showModal">{{ share_btn }}</button></div>
 
-        <div class="share-modal text-black" v-show="isModalVisible">
+        <div class="default-modal-styles share-modal text-black" v-show="isModalVisible">
             <div class="pt-5 pb-6 px-10" v-click-outside="closeModal">
                 <h2 class="mb-1.5">{{ share_heading }}</h2>
 
                 <p class="f-14 mb-4" v-html="share_description">
                 </p>
 
-                <div class="relative f-14">
-                    <input type="text" v-model="share_link" readonly>
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                        <img src="@/assets/img/copy-icon.svg" alt="" @click="$copyText(share_link)">
-                    </span>
-                </div>
+                <CopyLinkInput :url="share_link" />
 
             </div>
         </div>

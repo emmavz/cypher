@@ -1,8 +1,8 @@
-@import './partials/include-media';
-@import './partials/base';
-@import './partials/header';
-@import './partials/footer';
-@import './partials/auth';
+@import "./partials/include-media";
+@import "./partials/base";
+@import "./partials/header";
+@import "./partials/footer";
+@import "./partials/auth";
 
 /*****************************************
   Components
@@ -43,7 +43,6 @@
 }
 
 .banner_img {
-
   .currency-tag {
     position: absolute;
     top: 11px;
@@ -59,6 +58,12 @@
   }
 }
 
+.article-banner-img {
+  max-height: 262px;
+  width: 100%;
+  object-fit: cover;
+}
+
 $stats-border-color: rgba(255, 255, 255, 0.3);
 
 .stats {
@@ -69,7 +74,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     font-size: 16px;
     font-weight: 700;
 
-    >div:not(:last-of-type) {
+    > div:not(:last-of-type) {
       margin-bottom: 15px;
     }
   }
@@ -99,7 +104,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
   Blog Post
  ************************/
 
-.blog-post-wrap>div:not(:last-of-type) {
+.blog-post-wrap > div:not(:last-of-type) {
   margin-bottom: 18px;
 }
 
@@ -124,7 +129,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     }
   }
 
-  >span {
+  > span {
     position: absolute;
     top: 0;
     left: 0;
@@ -139,7 +144,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     position: relative;
 
     &__header {
-
       h2 {
         font-size: 14px !important;
       }
@@ -185,7 +189,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
       font-size: 14px;
       opacity: $opacity;
     }
-
   }
 
   &__right {
@@ -196,7 +199,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     position: relative;
     z-index: 0;
 
-    >span {
+    > span {
       position: absolute;
       z-index: 2;
       top: 0;
@@ -234,7 +237,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
 }
 
 .i-wrap--v3 {
-
   &__btn {
     padding-left: 27px;
     padding-right: 27px;
@@ -280,7 +282,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
  ****************************************/
 
 .userprofile {
-
   &__left {
     width: 83px;
 
@@ -338,7 +339,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
         border-bottom-color: $white;
       }
     }
-
   }
 }
 
@@ -387,7 +387,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     border-radius: $border-radius--3;
     font-size: 12px;
     text-align: center;
-    background-color: #FBF7F7;
+    background-color: #fbf7f7;
   }
 }
 
@@ -395,7 +395,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
   Share Popup
  ****************************************/
 
-.share-modal {
+.default-modal-styles {
   background-color: rgb(196, 196, 196, 0.5);
   position: fixed;
   top: 0;
@@ -409,25 +409,32 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
   text-align: center;
   overflow-y: auto;
   padding: 0 15px;
+}
 
-  >div {
+.share-modal {
+
+  > div {
     width: 100%;
     max-width: 343px;
     background: $white;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-    border-radius: $border-radius--2
+    border-radius: $border-radius--2;
   }
 
+}
+
+.copy-link-input {
+  max-width: 264px;
+  margin: auto;
+
   input {
-    background: #F4F7F5;
+    background: #f4f7f5;
     box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: $border-radius--2;
     width: 100%;
-    max-width: 264px;
     text-align: center;
     padding: 6px 33px 6px 10px;
   }
-
 }
 
 /*****************************************
@@ -480,13 +487,12 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
  ****************************************/
 
 .author-container {
-
   .container {
-    >div:first-of-type {
+    > div:first-of-type {
       width: 40px;
     }
 
-    >div:last-of-type {
+    > div:last-of-type {
       width: calc(100% - 40px);
     }
   }
@@ -506,7 +512,6 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
 }
 
 .banner_img {
-
   &__label {
     z-index: 0;
 
@@ -525,9 +530,7 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
 }
 
 .create_article {
-
   &__form {
-
     input,
     textarea {
       color: $editor-color;
@@ -577,12 +580,11 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
     }
 
     &__header {
-      background-color: #4E4E4E;
+      background-color: #4e4e4e;
       padding: 14.5px 0;
     }
 
     &__body {
-
       &__input {
         width: 1ch;
         min-width: 1ch !important;
@@ -614,6 +616,340 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
       }
     }
   }
+}
+
+/*****************************************
+  Edit Profile
+ ****************************************/
+
+.profile-edit__header {
+  &__profile {
+    width: 142px;
+    height: 142px;
+    border-radius: 50%;
+  }
+}
+
+.profile-edit__body {
+  margin-top: -71px;
+  form > div {
+    margin-bottom: 21px;
+  }
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
+  input,
+  textarea {
+    font-size: 12px;
+    width: 100%;
+    padding: 10.5px 12px;
+    border: solid 1px #a9a9a9;
+    border-radius: 8px;
+  }
+  textarea {
+    height: 105px;
+  }
+}
+
+.cpe-btn {
+  font-size: 15px;
+  font-weight: bold;
+  color: $white;
+  width: 100%;
+  border-radius: 10px;
+  padding: 9.5px 5px;
+
+  &--primary {
+    background-color: $primary-color !important;
+  }
+
+  &--secondary {
+    background-color: #171f1d !important;
+  }
+}
+/*****************************************
+  Auth
+ ****************************************/
+.auth-container {
+  &__img {
+    margin-left: -9px;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 24px !important;
+  }
+
+  p {
+    font-size: 10px;
+    margin-bottom: 50px;
+    margin-top: 3px;
+  }
+
+  form > div {
+    margin-bottom: 25px;
+  }
+
+  label {
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 4px;
+    display: inline-block;
+    color: $white;
+    opacity: 0.7;
+  }
+  input {
+    font-size: 10px;
+    width: 100%;
+    padding: 6.5px 12px;
+    border: solid 1px #a9a9a9;
+    border-radius: 8px;
+    color: $black;
+  }
+
+  &__footer {
+    div {
+      font-size: 13px;
+      font-weight: bold;
+    }
+    button {
+      font-size: 13px;
+      padding: 5.5px 5px;
+    }
+  }
+}
+
+/*****************************************
+  Menu Popup
+ ****************************************/
+
+.menu-modal {
+  z-index: 1002;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  text-align: center;
+  background-color: $white;
+  color: $black;
+  min-width: 123px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: default;
+
+  ul {
+    padding: 0 10px;
+    li {
+      padding: 6px 0px;
+
+      &:not(:last-of-type) {
+        border-bottom: solid 1px $black;
+      }
+
+      a,
+      button {
+        display: block;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.csp-btn {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 153px;
+  padding: 10px 10px;
+  border: solid 1px $black;
+  border-radius: $border-radius--4;
+}
+
+.italic-placeholder::-webkit-input-placeholder {
+  /* Edge */
+  font-style: italic;
+}
+
+.italic-placeholder:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  font-style: italic;
+}
+
+.italic-placeholder::placeholder {
+  font-style: italic;
+}
+
+/*****************************************
+  Article Controls
+ ****************************************/
+
+.empty-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 101;
+}
+
+.article_controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: $white;
+  z-index: 102;
+  border-top-left-radius: $border-radius--5;
+  border-top-right-radius: $border-radius--5;
+  color: $black;
+  padding-top: 20px;
+  padding-bottom: 15px;
+  padding-left: 12px;
+  padding-right: 12px;
+  visibility: hidden;
+  transform: translateY(100%);
+  transition: all 0.3s;
+  overflow-y: auto;
+  max-height: 100%;
+
+  &--active {
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  &__line {
+    background-color: $bright-gray--2;
+    height: 5px;
+    border-radius: 100px;
+    max-width: 134px;
+    margin: 0 auto;
+  }
+
+  &__li {
+    border: solid 1px transparent;
+
+    &--border {
+      border: solid 1px $black;
+      border-radius: $border-radius--5;
+    }
+
+    ul {
+      padding-left: 30px;
+      padding-right: 30px;
+      padding-top: 46px;
+      padding-bottom: 43px;
+
+      li {
+        border: solid 1px $black;
+        border-left: 0;
+        border-right: 0;
+
+        &:last-of-type {
+          border-top: 0;
+        }
+
+        a,
+        button {
+          width: 100%;
+          display: block;
+          text-align: center;
+          font-size: 14px;
+          font-weight: 700;
+          padding: 13px 10px;
+        }
+      }
+    }
+
+  }
+}
+
+/*****************************************
+  Info Box
+ ****************************************/
+
+.info-box {
+  font-weight: 300;
+  font-size: 10px;
+  color: $black;
+  background-color: rgba(255,255,255,0.5);
+  padding: 10px 10px;
+}
+
+/*****************************************
+  Toggle Button
+ ****************************************/
+
+.can-toggle {
+  position: relative;
+  display: inline-flex;
+}
+.can-toggle input[type=checkbox] {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.can-toggle label {
+  user-select: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+}
+.can-toggle.demo-rebrand-2 label .can-toggle__switch {
+  height: 32px;
+  flex: 0 0 103px;
+  border-radius: 60px;
+  transition: background-color 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+  background: $white;
+  position: relative;
+}
+.can-toggle.demo-rebrand-2 label .can-toggle__switch:before {
+  right: 55px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 100%;
+  color: $primary-color;
+  content: attr(data-checked);
+  position: absolute;
+  top: 0;
+  text-align: center;
+}
+.can-toggle.demo-rebrand-2 label .can-toggle__switch:after {
+  top: 0px;
+  right: 0px;
+  border-radius: 30px;
+  width: 58px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+  color: $white;
+  background-color: $primary-color;
+  content: attr(data-unchecked);
+  position: absolute;
+  z-index: 5;
+  text-align: center;
+  transform: translate3d(0, 0, 0);
+}
+
+
+.can-toggle input[type=checkbox]:checked~label .can-toggle__switch:before {
+  content: attr(data-unchecked);
+  transform: translate3d(52px, 0, 0);
+}
+.can-toggle.demo-rebrand-2 input[type=checkbox]:checked~label .can-toggle__switch:after {
+  transform: translate3d(-45px, 0, 0);
+  content: attr(data-checked);
 }
 
 

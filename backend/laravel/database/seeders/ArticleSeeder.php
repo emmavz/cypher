@@ -28,6 +28,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 2;
         $article->image_url = Storage::url("dynamic/post-1.png");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([1, 2]);
@@ -42,6 +43,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 2;
         $article->image_url =  Storage::url("dynamic/post-2.jpg");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([3, 1]);
@@ -56,6 +58,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 2;
         $article->image_url =  Storage::url("dynamic/post-3.jpg");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([1, 4]);
@@ -70,6 +73,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 2;
         $article->image_url =  Storage::url("dynamic/post-4.jpg");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([6, 7]);
@@ -84,6 +88,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 2;
         $article->image_url =  Storage::url("dynamic/post-5.jpg");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([8, 7]);
@@ -98,6 +103,7 @@ class ArticleSeeder extends Seeder
         $article->theta = 10;
         $article->image_url =  Storage::url("dynamic/create_article.png");
         $article->is_published = 1;
+        $article->liquidation_days = config('website.liquidation_days_limit');
         $article->save();
 
         $article->tags()->sync([1]);
