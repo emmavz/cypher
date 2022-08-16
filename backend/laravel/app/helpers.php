@@ -1,5 +1,18 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Str;
+
+function generateReferral()
+{
+    $length = 5;
+    do {
+        $referral = Str::random($length);
+    } while (User::where('referral_token', $referral)->exists());
+
+    return $referral;
+}
+
 function stake_format($number)
 {
     return round($number, 4);

@@ -1,34 +1,37 @@
 $primary-color: #068550;
-$secondary-color: #2C2C2C;
-$aquamarine-color: #87F6C8;
+$secondary-color: #2c2c2c;
+$aquamarine-color: #87f6c8;
 $white: #ffffff;
 $black: #000000;
-$bright-gray: #EDEDED;
+$bright-gray: #ededed;
+$bright-gray--2: #C4C4C4;
+$red: #AF0808;
 
-$primary-font: 'Open Sans',
-    sans-serif;
+$primary-font: "Open Sans", sans-serif;
 $container-width: 18px;
 $footer-height: 90px;
 $border-radius: 14px;
 $border-radius--2: 24px;
 $border-radius--3: 35px;
+$border-radius--4: 10px;
+$border-radius--5: 21px;
 $box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 $editor-color: rgb(255, 255, 255, 0.8);
 
 html,
 body {
-    line-height: 1.4 !important;
-    height: 100%;
+  line-height: 1.4 !important;
+  height: 100%;
 }
 
 body {
-    font-size: 16px;
-    font-family: $primary-font;
-    color: $secondary-color;
-    font-weight: 400;
-    min-height: 100%;
-    background-color: $secondary-color;
-    letter-spacing: -0.3px;
+  font-size: 16px;
+  font-family: $primary-font;
+  color: $secondary-color;
+  font-weight: 400;
+  min-height: 100%;
+  background-color: $secondary-color;
+  letter-spacing: -0.3px;
 }
 
 h1,
@@ -37,190 +40,198 @@ h3,
 h4,
 h5,
 h6 {
-    font-weight: 700 !important;
+  font-weight: 700 !important;
 }
 
 .container,
 .container-fluid {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .container,
 .container-fluid,
-.row>div {
-    padding-left: #{$container-width};
-    padding-right: #{$container-width};
+.row > div {
+  padding-left: #{$container-width};
+  padding-right: #{$container-width};
 }
 
 .row,
 .row {
-    margin-left: -#{$container-width};
-    margin-right: - #{$container-width};
+  margin-left: -#{$container-width};
+  margin-right: -#{$container-width};
 }
 
 .row {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .app,
 #app,
 .app-wp {
-    height: 100%;
+  height: 100%;
 }
 
 .app,
 .app-wp {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-wp {
-    height: calc(100% - $footer-height);
+  height: calc(100% - $footer-height);
+  min-height: calc(100% - $footer-height);
 }
 
 .primary-color {
-    color: $primary-color;
+  color: $primary-color;
 }
 
 .primary-bg {
-    background-color: $primary-color;
+  background-color: $primary-color;
 }
 
 .aquamarine-color {
-    color: $aquamarine-color;
+  color: $aquamarine-color;
+}
+
+.red {
+  color: $red;
 }
 
 .hide {
-    display: none !important;
+  display: none !important;
 }
 
 .border-radius {
-    border-radius: 14px;
+  border-radius: 14px;
 }
 
 .f-11 {
-    font-size: 11px;
+  font-size: 11px;
+}
+
+.f-12 {
+  font-size: 12px;
 }
 
 .f-13 {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .f-14 {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .f-15 {
-    font-size: 15px;
+  font-size: 15px;
 }
 
 .f-16 {
-    font-size: 16px !important;
+  font-size: 16px !important;
 }
 
 .f-17 {
-    font-size: 17px;
+  font-size: 17px;
 }
 
 .f-18 {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .f-20 {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 h2 {
-    font-size: 20px !important;
+  font-size: 20px !important;
 }
 
 h3 {
-    font-size: 18px !important;
+  font-size: 18px !important;
 }
 
 b,
 strong {
-    font-weight: 700 !important;
+  font-weight: 700 !important;
 }
 
 input,
 select,
 textarea {
-    outline: none;
+  outline: none;
 }
 
 .input-hide {
-    position: absolute;
-    z-index: -1;
-    opacity: 0;
-    visibility: hidden;
-    width: 0.01px;
-    height: 0.01px;
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  width: 0.01px;
+  height: 0.01px;
 }
 
 %pos-middle,
 .pos-middle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .m-w-76 {
-    min-width: 76px;
+  min-width: 76px;
 }
 
 .h-27 {
-    height: 27px;
+  height: 27px;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .ql-container {
-
-    input {
-        color: $black  !important;
-    }
+  input {
+    color: $black !important;
+  }
 }
 
 div.ql-editor.ql-blank::before {
-    color: $editor-color;
-    font-style: normal;
-    text-align: center;
+  color: $editor-color;
+  font-style: normal;
+  text-align: center;
 }
 
 div.ql-editor {
-    * {
-        color: $editor-color;
-    }
+  * {
+    color: $editor-color;
+  }
 }
 
 .ql-container {
-    font-family: $primary-font  !important;
+  font-family: $primary-font !important;
 }
 
 .w_template {
-    font-size: 14px !important;
+  font-size: 14px !important;
 
-    h3 {
-        font-size: 17px !important;
-    }
+  h3 {
+    font-size: 17px !important;
+  }
 }
 
 span[role="alert"] {
-    font-size: 12px;
-    color: #f27474;
+  font-size: 12px;
+  color: #f27474;
 }

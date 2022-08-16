@@ -1,6 +1,7 @@
 <script>
 import ArticleBanner from "@/components/ArticleBanner.vue";
 import SharePopup from "@/components/SharePopup.vue";
+import SuccessPopup from "@/components/SuccessPopup.vue";
 
 export default {
   data() {
@@ -10,72 +11,61 @@ export default {
       user: null,
       image_url: "",
       user_wallet_balance: "",
-      share_btn: "Share to Read",
-      share_heading: "Share to Read",
       share_description:
         "Each time you share this unique link, you start a <b>sharing chain</b>. Once somebody pays, everybody in that chain can read the article for free. You can share this link with up to <b>eight</b> friends.",
       share_link: "",
       showPaytoReadConfirmation: false,
       is_author_article: false,
-      is_already_paid: false,
-      current_time: null,
+      is_already_free: false,
       liquidation_days: 0,
       referral_token: this.$route.params.referralToken,
+      showSuccessPopup: false,
+      successTitle: 'It’s your LUCKY DAY!',
+      successMsg: '',
+      successButton: {}
     };
   },
   created() {
-    this.storeReferralToken(this.referral_token);
+    // this.storeReferralToken(this.referral_token);
 
     this.sendApiRequest("get_article_homepage", {
       article_id: this.articleId,
-      auth_id: window.user_id,
-      referral_token: this.getReferralToken(),
+      // referral_token: this.getReferralToken(),
+      referral_token: this.referral_token,
     }).then((responses) => {
       this.article = responses[0];
       this.image_url = this.article.image_url;
       this.user = responses[1];
       this.user_wallet_balance = this.user.balance;
       this.is_author_article =
-        window.user_id == this.article.user_id ? true : false;
-      this.is_already_paid = responses[2];
-      this.current_time = responses[3];
+        this.getAuthId() == this.article.user_id ? true : false;
+      this.is_already_free = responses[2];
 
-      this.liquidation_days = this.getLiquidationDays(
-        this.current_time,
-        this.article.date_posted
-      );
+      this.liquidation_days = responses[3];
 
+      // article share link
       this.share_link = this.getFullUrl(
         this.$router.resolve({
           name: "article_homepage",
           params: {
             articleId: this.articleId,
-            referralToken: this.user.referral_token,
+            referralToken: responses[4],
           },
         }).fullPath
       );
-    });
 
-    // this.sendApiRequest([
-    //     {
-    //         url: 'get_article_homepage',
-    //         data: {
-    //             "article_id": Number(this.$route.params.articleId)
-    //         }
-    //     },
-    //     {
-    //         url: 'get_user_profile',
-    //         data: {
-    //             "user_id": Number(this.$route.params.userId)
-    //         }
-    //     },
-    // ])
-    // .then((reponses) => {
-    //     this.article = reponses[0];
-    //     this.image_url = this.article[0].image_url;
-    //     this.userWalletBalance = reponses[1];
-    //     this.user_wallet_balance = this.userWalletBalance[0].balance;
-    // });
+      // lucky day winner
+      // this.showSuccessPopup = true;
+      // this.successMsg = 'Thanks for sharing this article! Your sharing chain has been randomly chosen to read this article for free!';
+      // this.successButton = {
+      //   text: 'READ NOW!',
+      //   url: {
+      //     name: "full_article_homepage",
+      //     params: { articleId: this.articleId },
+      //   }
+      // };
+
+    });
   },
   methods: {
     processToPayment(article) {
@@ -83,18 +73,20 @@ export default {
 
       let routeParam = {
         article_id: article.id,
-        auth_id: window.user_id,
-        is_author_article: this.is_author_article,
       };
 
       this.sendApiRequest("pay_article", routeParam, true).then(() => {
         this.$router.push({ name: "full_article_homepage" });
       });
     },
+    closeSuccessPopup() {
+      this.showSuccessPopup = false;
+    }
   },
   components: {
     ArticleBanner,
     SharePopup,
+    SuccessPopup
   },
 };
 </script>
@@ -106,60 +98,44 @@ export default {
     <!-- Content -->
     <div class="content">
       <div v-if="!isError && article">
-        <ArticleBanner
-          :image_url="image_url"
-          :user_wallet_balance="user_wallet_balance"
-          :back_url="{ name: 'home' }"
-        />
+        <ArticleBanner :image_url="image_url" :user_wallet_balance="user_wallet_balance" :back_url="{ name: 'home' }" />
 
         <div class="i-wrap--v2">
           <div class="container">
             <div class="text-center mb-4">
               <h1 class="mb-3">{{ article.title }}</h1>
               <div class="mb-3">
-                <RouterLink
-                  :to="getUserProfileRoute(article.user_id)"
-                  class="inline-flex items-center i-wrap--v2__profile"
-                >
-                  <img :src="article.user.pfp" alt="" class="mr-4" width="35" />
+                <RouterLink :to="getUserProfileRoute(article.user_id)"
+                  class="inline-flex items-center i-wrap--v2__profile">
+                  <img :src="getPfpImage(article.user.pfp)" alt="" class="mr-4 rounded-full" width=" 35" />
                   {{ article.user.name }}
                 </RouterLink>
               </div>
               <p class="mb-6">
                 {{ article.description }}
               </p>
-              <template
-                v-if="is_author_article || is_already_paid || !liquidation_days"
-              >
+              <template v-if="is_already_free">
                 <div>
                   <div>
-                    <RouterLink
-                      :to="{
-                        name: 'full_article_homepage',
-                        params: { articleId: article.id },
-                      }"
-                      class="btn i-wrap--v3__btn"
-                      >Read</RouterLink
-                    >
+                    <RouterLink :to="{
+                      name: 'full_article_homepage',
+                      params: { articleId: article.id },
+                    }" class="btn i-wrap--v2__btn">Read</RouterLink>
+                  </div>
+                  <div class="mt-6" v-if="article.share_to_read">
+                    <SharePopup share_btn="Share" share_heading="Share" :share_description="share_description"
+                      :share_link="share_link" />
                   </div>
                 </div>
               </template>
               <template v-else>
                 <div>
                   <div class="mb-6">
-                    <a
-                      href="#"
-                      class="btn i-wrap--v2__btn"
-                      @click="showPaytoReadConfirmation = 1"
-                      >Pay to Read ({{ article.price }} {{ this.currency }})</a
-                    >
+                    <a href="#" class="btn i-wrap--v2__btn" @click="showPaytoReadConfirmation = 1">Pay to Read ({{
+                      article.price }} {{ this.currency }})</a>
                   </div>
-                  <SharePopup
-                    :share_btn="share_btn"
-                    :share_heading="share_heading"
-                    :share_description="share_description"
-                    :share_link="share_link"
-                  />
+                  <SharePopup v-if="article.share_to_read" share_btn="Share to Read" share_heading="Share to Read"
+                    :share_description="share_description" :share_link="share_link" />
                 </div>
               </template>
             </div>
@@ -174,16 +150,10 @@ export default {
                 <b class="f-18 primary-color">Are you sure?</b>
               </div>
               <div class="flex">
-                <button
-                  @click="processToPayment(article)"
-                  class="cn-btn ml-7 f-13 font-semibold"
-                >
+                <button @click="processToPayment(article)" class="cn-btn ml-7 f-13 font-semibold">
                   Yes
                 </button>
-                <button
-                  @click="showPaytoReadConfirmation = 0"
-                  class="cn-btn ml-6 f-13 font-semibold"
-                >
+                <button @click="showPaytoReadConfirmation = 0" class="cn-btn ml-6 f-13 font-semibold">
                   No
                 </button>
               </div>
@@ -196,11 +166,7 @@ export default {
             <div class="mb-8 mt-2"><b>Article Statistics</b></div>
             <div class="flex items-center">
               <div class="mr-6">
-                <img
-                  src="@/assets/img/stats-icon--v4.svg"
-                  alt=""
-                  class="ml-auto"
-                />
+                <img src="@/assets/img/stats-icon--v4.svg" alt="" class="ml-auto" />
               </div>
               <div class="stats__right">
                 <div>
@@ -210,8 +176,7 @@ export default {
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
                     article.total_shares_count
-                  }}</span
-                  >Shares
+                    }}</span>Shares
                 </div>
                 <div>
                   {{ article.total_investments }} {{ this.currency
@@ -222,35 +187,30 @@ export default {
           </div>
         </div>
 
-        <div class="stats mb-12" v-else-if="is_already_paid">
+        <div class="stats mb-12" v-else-if="is_already_free">
           <div class="container">
             <div class="mb-8 mt-2"><b>Article Statistics</b></div>
             <div class="flex items-center">
               <div class="mr-6">
-                <img
-                  src="@/assets/img/stats-icon--v4.svg"
-                  alt=""
-                  class="ml-auto"
-                />
+                <img src="@/assets/img/stats-icon--v4.svg" alt="" class="ml-auto" />
               </div>
               <div class="stats__right">
-                <div>
-                  <span class="aquamarine-color mr-1.5">{{
-                    liquidation_days
-                  }}</span
-                  >Days until liquidation
-                </div>
+                <template v-if="!is_already_free">
+                  <div>
+                    <span class="aquamarine-color mr-1.5">{{
+                      liquidation_days
+                      }}</span>Days until liquidation
+                  </div>
+                </template>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
                     article.total_reads_count
-                  }}</span
-                  >Reads
+                    }}</span>Reads
                 </div>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
                     article.total_shares_count
-                  }}</span
-                  >Shares
+                    }}</span>Shares
                 </div>
               </div>
             </div>
@@ -264,29 +224,31 @@ export default {
                 <img src="@/assets/img/stats-icon.svg" alt="" class="ml-auto" />
               </div>
               <div class="stats__right">
-                <div>
-                  <span class="aquamarine-color mr-1.5">{{
-                    liquidation_days
-                  }}</span
-                  >Days until liquidation
-                </div>
+                <template v-if="!is_already_free">
+                  <div>
+                    <span class="aquamarine-color mr-1.5">{{
+                      liquidation_days
+                      }}</span>Days until liquidation
+                  </div>
+                </template>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
                     article.total_reads_count
-                  }}</span
-                  >Reads
+                    }}</span>Reads
                 </div>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
                     article.total_shares_count
-                  }}</span
-                  >Shares
+                    }}</span>Shares
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <SuccessPopup :showpopup="showSuccessPopup" :successTitle="successTitle" :successMsg="successMsg"
+        :successButton="successButton" @showpopup="closeSuccessPopup" />
 
       <Error />
     </div>

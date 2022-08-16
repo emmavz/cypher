@@ -9,11 +9,16 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Follow;
 use App\Models\Article;
+use App\Models\UserInvestment;
+use App\Models\BondingCurve;
 use App\Models\ArticleUserPaid;
+use Storage;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    public static $path = 'users/';
 
     /**
      * The attributes that are mass assignable.
@@ -79,12 +84,59 @@ class User extends Authenticatable
         return $relation;
     }
 
+    public function user_investments()
+    {
+        return $this->morphMany(UserInvestment::class, 'user_investmentable');
+    }
+
+    public function author_bonding_curve()
+    {
+        return $this->hasOne(BondingCurve::class, 'author_id');
+    }
+
+    public function block_user($user_id = null)
+    {
+        $relation = $this->belongsToMany(User::class, 'block_users', 'user_1', 'user_2')->withTimestamps();
+        if ($user_id) {
+            $relation->where('user_2', $user_id);
+        }
+        return $relation;
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            self::deleteFiles($model);
+        });
+    }
+
+    public static function storeFiles($request, $data, $oldmodel = null)
+    {
+        if ($request->hasFile('pfp')) {
+            $img = storeImage(['image' => $request->pfp, 'path' => self::$path, 'webp' => false, 'fit' => [142, 142]]);
+            $data['pfp'] = Storage::url(self::$path . $img);
+        }
+
+        return $data;
+    }
+
+    public static function deleteFiles($model, $request = null, $oldmodel = null)
+    {
+        if ($request == null || $request->hasFile('pfp')) {
+            Storage::delete(str_replace('storage/', '', parse_url($model->pfp)['path']));
+        }
+    }
+
     public static function rules()
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', 'min:' . config('website.user_min_pass')],
+            'password' => ['required', 'min:' . config('website.user_min_pass')],
+            'pfp'   => ['nullable',  'mimes:' . config('website.imgformats')],
+            'bio'   => ['nullable', 'string'],
         ];
 
         return $rules;

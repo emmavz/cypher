@@ -24,6 +24,8 @@ class CreateArticlesTable extends Migration
             $table->boolean('is_published')->default(0);
             $table->dateTime('date_posted')->nullable();
             $table->bigInteger('theta')->nullable();
+            $table->integer('liquidation_days')->default(0);
+            $table->boolean('share_to_read')->default(1);
             $table->timestamps();
         });
     }

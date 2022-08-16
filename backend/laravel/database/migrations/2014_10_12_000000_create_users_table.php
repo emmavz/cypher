@@ -20,8 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('pfp')->nullable();
             $table->string('bg')->nullable();
             $table->string('wallet_address')->nullable();
-            $table->bigInteger('balance')->default(0);
-            $table->string('profile_url')->nullable();
+            $table->float('balance')->default(0);
             $table->text('bio')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

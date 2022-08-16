@@ -9,7 +9,7 @@ export default ({
   },
   computed: {
       dynamicComponent() {
-          if (this.$route.params.userId) {
+          if (this.$route.params.userId && this.$route.params.userId != this.getAuthId()) {
               return OtherUserProfileTemplate;
           }
           else {

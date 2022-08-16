@@ -8,7 +8,6 @@ import mixin from "./mixin.js";
 import moment from "moment";
 import vClickOutside from "click-outside-vue3";
 import VueClipboard from "vue-clipboard2";
-import VueSocialSharing from "vue-social-sharing";
 
 import mitt from "mitt";
 const emitter = mitt();
@@ -22,7 +21,6 @@ window.vue = app;
 app.use(router);
 app.use(VueClipboard);
 app.use(vClickOutside);
-app.use(VueSocialSharing);
 
 app.mixin(mixin);
 
