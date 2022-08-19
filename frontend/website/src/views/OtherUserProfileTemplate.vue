@@ -110,9 +110,7 @@ export default {
       <div v-if="!isError">
         <Author :author="author" anotherProfile="true">
           <template v-slot:btns>
-            <span class="currency-tag currency-tag--opacity-70"
-              >{{ author_balance }} {{ this.currency }}</span
-            >
+            <span class="currency-tag currency-tag--opacity-70">{{ author_balance }} {{ this.currency }}</span>
           </template>
         </Author>
 
@@ -128,28 +126,25 @@ export default {
 
           <template v-slot:tabPanel-2>
             <div class="container">
-              <StatsInvestment
-                :statsInvestment="statsInvestment"
-                class="mt-4"
-              />
+              <StatsInvestment :statsInvestment="statsInvestment" class="mt-4" />
               <StatsStakes :statsStakes="statsStakes" class="mt-8" />
             </div>
           </template>
 
           <template v-slot:tabPanel-1>
-            <div
-              class="w-full flex justify-center container"
-              v-for="(article, index) in articles"
-              :key="index"
-            >
-              <Article
-                :article="article"
-                :url="{
+
+            <template v-if="articles.length">
+              <div class="w-full flex justify-center container" v-for="(article, index) in articles" :key="index">
+                <Article :article="article" :url="{
                   name: 'article_homepage',
                   params: { articleId: article.id },
-                }"
-              />
-            </div>
+                }" />
+              </div>
+            </template>
+            <template v-else-if="isError == 0">
+              <div class="text-center">No article found!</div>
+            </template>
+
           </template>
         </Tabs>
       </div>

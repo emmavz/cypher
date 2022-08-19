@@ -35,13 +35,14 @@ export default {
   <div class="relative flex justify-center banner_img">
     <input type="file" accept="image/*" id="banner_image" class="input-hide" @change="onFileChange" />
     <label for="banner_image" :class="[
-        'w-full relative overflow-hidden banner_img__label',
-        { 'banner_img__label--active': article_image },
-      ]"><img :src="article_image ? article_image : getDefaultImage()" alt=""
+      'w-full relative overflow-hidden banner_img__label',
+      { 'banner_img__label--active': article_image },
+    ]"><img :src="article_image ? article_image : getDefaultImage()" alt=""
         class="w-full cursor-pointer article-banner-img" /></label>
     <div>
       <div class="flex banner_img__btns">
-        <button class="ar-btn mr-2" @click="$emit('saveArticle')">Save</button>
+        <button class="ar-btn mr-2" @click="$emit('saveArticle')">{{ this.$route.params.articleId ? 'Update' : 'Save'
+        }}</button>
         <button class="ar-btn" @click.stop="$emit('showPublish')">
           {{ publish_text }}
         </button>

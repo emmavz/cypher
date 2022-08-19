@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [ApiController::class, 'logout']);
     Route::post('send_token', [ApiController::class, 'send_token']);
     Route::post('block_user', [ApiController::class, 'block_user']);
+    Route::post('lucky_day', [ApiController::class, 'lucky_day']);
 });
 
 Route::post('signin', [ApiController::class, 'signin']);

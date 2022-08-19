@@ -2,6 +2,22 @@
 
 use App\Models\User;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
+
+function getAuthId()
+{
+    $authId = -1;
+    $bearerToken = request()->bearerToken();
+    if (auth()->user()) {
+        $authId = auth()->user()->id;
+    } elseif ($bearerToken) {
+        $token = PersonalAccessToken::findToken($bearerToken);
+        if ($token) {
+            $authId = $token->tokenable_id;
+        }
+    }
+    return $authId;
+}
 
 function generateReferral()
 {

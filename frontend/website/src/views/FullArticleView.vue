@@ -18,7 +18,6 @@ export default {
         "Thanks for helping an author out! Remember, the more people who invest in this author, the more CPHR you can earn! happy sharing!",
       share_link: "",
       isModalVisible: false,
-      liquidation_days: 0,
       stats: null,
       is_already_free: false,
     };
@@ -45,9 +44,7 @@ export default {
 
       this.stats = responses[2];
 
-      this.is_already_free = responses[3];
-
-      this.liquidation_days = responses[4];
+      this.is_already_free = this.isArticleFree(this.article);
 
       // article share link
       this.share_link = this.getFullUrl(
@@ -55,7 +52,7 @@ export default {
           name: "article_homepage",
           params: {
             articleId: this.articleId,
-            referralToken: responses[5],
+            referralToken: responses[3],
           },
         }).fullPath
       );
@@ -86,9 +83,9 @@ export default {
     <div class="content">
       <div v-if="!isError && article">
         <ArticleBanner :image_url="image_url" :back_url="{
-            name: 'article_homepage',
-            params: { articleId: article.id },
-          }" />
+          name: 'article_homepage',
+          params: { articleId: article.id },
+        }" />
 
         <div class="i-wrap--v2 border-b-0 -mb-4">
           <div class="container">
@@ -135,18 +132,18 @@ export default {
                   <div class="stats__right">
                     <div>
                       <span class="aquamarine-color mr-1.5">{{
-                        liquidation_days
-                        }}</span>Days until liquidation
+                        article.remaining_liquidation_days
+                      }}</span>Days until liquidation
                     </div>
                     <div>
                       <span class="aquamarine-color mr-1.5">{{
-                        article.total_reads_count
-                        }}</span>Reads
+                      article.total_reads_count
+                      }}</span>Reads
                     </div>
                     <div>
                       <span class="aquamarine-color mr-1.5">{{
-                        article.total_shares_count
-                        }}</span>Shares
+                      article.total_shares_count
+                      }}</span>Shares
                     </div>
                   </div>
                 </div>
@@ -157,8 +154,8 @@ export default {
                       <b>Your investment in
                         <RouterLink :to="getUserProfileRoute(article.user_id)">
                           <span class="aquamarine-color">{{
-                            article.user.name
-                            }}</span>
+                          article.user.name
+                          }}</span>
                         </RouterLink>
                       </b>
                     </div>
@@ -172,8 +169,8 @@ export default {
                         </div>
                         <div class="-mt-2">
                           <span class="aquamarine-color mr-1.5">{{
-                            stats.user_total_investments
-                            }}</span><span class="mr-1.5">{{ this.currency }}</span>Invested
+                          stats.user_total_investments
+                          }}</span><span class="mr-1.5">{{ this.currency }}</span>Invested
                         </div>
                       </div>
                     </div>

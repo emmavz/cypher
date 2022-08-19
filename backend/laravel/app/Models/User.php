@@ -94,12 +94,19 @@ class User extends Authenticatable
         return $this->hasOne(BondingCurve::class, 'author_id');
     }
 
-    public function block_user($user_id = null)
+    public function block_user_func($user_id = null)
     {
         $relation = $this->belongsToMany(User::class, 'block_users', 'user_1', 'user_2')->withTimestamps();
         if ($user_id) {
             $relation->where('user_2', $user_id);
         }
+        return $relation;
+    }
+
+    public function block_user()
+    {
+        $authId = getAuthId();
+        $relation = $this->hasOne(BlockUser::class, 'user_2', 'id')->where('user_1', $authId);
         return $relation;
     }
 

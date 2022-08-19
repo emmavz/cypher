@@ -40,6 +40,7 @@ export default {
       showQuillEditor: 0,
       categories: [],
       categoriesFiltered: [],
+      selectedCategories: [],
       options: {
         modules: {
           toolbar: [
@@ -85,6 +86,7 @@ export default {
     }).then((categories) => {
       categories.forEach((category) => {
         category.selected = false;
+        category.custom = false;
 
         if (this.article) {
           this.article.tags.forEach((tag) => {
@@ -116,11 +118,9 @@ export default {
       });
     },
     async save(should_publish) {
-      let categoryIds = [];
-      this.categories.forEach((category) => {
-        if (category.selected) {
-          categoryIds.push(category.id);
-        }
+      let selectedCategories = [];
+      this.selectedCategories.forEach((category) => {
+        selectedCategories.push({ name: category.name ,id: category.id, custom: category.custom});
       });
 
       let validations = {
@@ -153,7 +153,7 @@ export default {
         price: this.price,
         theta: this.theta,
         liquidation_days: this.liquidation_days,
-        tags: categoryIds,
+        tags: selectedCategories,
       });
 
       let formData = new FormData();
@@ -167,7 +167,7 @@ export default {
       formData.append("theta", this.theta);
       formData.append("liquidation_days", this.liquidation_days);
       formData.append("share_to_read", this.share_to_read ? 1: 0);
-      formData.append("tags[]", categoryIds);
+      formData.append("tags", JSON.stringify(selectedCategories));
       formData.append("should_publish", should_publish ? 1 : 0);
 
       this.sendApiRequest("store_article", formData, true).then((articleId) => {
@@ -203,13 +203,37 @@ export default {
     toggleCategorySelection(categoryId) {
       this.categoriesFiltered = [];
 
-      this.categories.forEach((category) => {
-        if (category.id == categoryId) {
-          category.selected = !category.selected;
+      let category = null;
+      for (let index = 0; index < this.categories.length; index++) {
+        let category_i = this.categories[index];
+        if (category_i.id == categoryId) {
+          this.categories[index].selected = !category_i.selected;
           this.publish_step = 1;
+          category = category_i;
+          break;
         }
-      });
+      }
 
+      if (this.selectedCategories.length) {
+        for (let j = 0; j < this.selectedCategories.length; j++) {
+          let category_i = this.selectedCategories[j];
+          if (!category.selected && category_i.id == categoryId) {
+            this.selectedCategories.splice(j, 1);
+            this.publish_step = 1;
+            break;
+          }
+          else if(category.selected) {
+            this.selectedCategories.push(category);
+            this.publish_step = 1;
+            break;
+          }
+        }
+      }
+      else {
+        this.selectedCategories.push(category);
+      }
+
+      this.search_category = '';
       this.categoriesFiltered = this.categories;
     },
     searchCategory() {
@@ -224,12 +248,34 @@ export default {
           this.categoriesFiltered.push(category);
         }
       });
+
+      if (!this.categoriesFiltered.length) {
+
+        this.categoriesFiltered = this.categories;
+
+        let customCategories = this.selectedCategories.filter(category => category.custom == true);
+        if (customCategories.length+1 <= this.maxArticleTags()) {
+
+          let lastCategoryId = this.categories[this.categories.length - 1].id;
+          let lastCategoryIdInc = lastCategoryId + 1;
+          let newCategory = { id: lastCategoryIdInc, name: this.search_category, selected: true, custom: true };
+          this.categories.push(newCategory);
+          this.selectedCategories.push(newCategory);
+          // this.categoriesFiltered = this.categories;
+        }
+        this.publish_step = 1;
+        this.search_category = '';
+      }
+
     },
     getNextText() {
       return 'Next';
     },
     getPublishText() {
-      return 'Publish';
+      return this.$route.params.articleId ? this.getNextText(): 'Publish';
+    },
+    getPublishTextForPopup() {
+      return this.$route.params.articleId ? 'Update' : 'Publish';
     },
     getSelectedCategories() {
       let selectedCategories = [];
@@ -315,7 +361,7 @@ export default {
                   @click="publish_step == 2 ? (publish_step = 1) : hidePublish()" />
               </button>
               <button class="font-semibold" @click="publish_step == 3 ? (publish_step = 1) : publish_step = 4">
-                {{ publish_step == 3 ? 'Back': 'Publish' }}
+                {{ publish_step == 3 ? 'Back' : getPublishTextForPopup() }}
               </button>
             </div>
           </div>
@@ -389,9 +435,8 @@ export default {
                   ">
                     <a href="javascript:void(0)"><img src="@/assets/img/plus-icon--v2.svg" alt="" /></a>
                   </li>
-                  <li v-for="(category, index) in categories" :key="index">
-                    <Category :category="category" class="mb-3.5" class_name="category--bright"
-                      v-if="category.selected" />
+                  <li v-for="(category, index) in selectedCategories" :key="index">
+                    <Category :category="category" class="mb-3.5" class_name="category--bright" />
                   </li>
                 </ul>
               </div>
@@ -411,18 +456,20 @@ export default {
               <template v-if="categoriesFiltered.length">
                 <ul class="categories whitespace-normal">
                   <li v-for="(category, index) in categoriesFiltered" :key="index">
-                    <Category :category="category"
+                    <Category :category="category" choose="true" class="mb-3.5"
+                      @category_id="toggleCategorySelection" />
+                    <!-- <Category :category="category"
                       :choose="checkIfCategoryIsAlreadySelected(category.id) || (getSelectedCategories().length != maxArticleTags()) ? true: false"
-                      class="mb-3.5" @category_id="toggleCategorySelection" />
+                      class="mb-3.5" @category_id="toggleCategorySelection" /> -->
                   </li>
                 </ul>
               </template>
               <template v-else>
                 <div class="text-center">No tag found!</div>
               </template>
-              <p class="mt-2 ml-3">
+              <!-- <p class="mt-2 ml-3">
                 <small>You can only select maximum {{ maxArticleTags() }} tags</small>
-              </p>
+              </p> -->
             </div>
 
             <!-- Advanced Settings -->

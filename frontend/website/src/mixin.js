@@ -37,9 +37,11 @@ export default {
     },
 
     setInputDynamicWidth(input) {
-      setTimeout(() => {
+      if(typeof input !== 'undefined'){
+        setTimeout(() => {
         input.style.width = input.value.length + "ch";
       }, 0);
+      }
     },
 
     async sendApiRequest(url, data, errorPopup = false, meta = {}) {
@@ -105,7 +107,7 @@ export default {
           }
 
           if (response.response.status == 404) {
-            this.$router.push({ name: "profile" });
+            this.$router.push({ name: "home" });
             return;
           }
 
@@ -262,6 +264,23 @@ export default {
 
     maxArticleTags() {
       return window.max_article_tags;
+    },
+
+    isArticleFree(article) {
+      let is_article_free = false;
+      if(this.getAuthId() && this.getAuthId() == article.user_id) {
+        is_article_free = true;
+      }
+      else if(article.remaining_liquidation_days == 0) {
+        is_article_free = true;
+      }
+      else if(article.is_paid_by_user_count) {
+        is_article_free = true;
+      }
+      else if(article.is_paid_by_referrals_count) {
+        is_article_free = true;
+      }
+      return is_article_free;
     }
   },
 };

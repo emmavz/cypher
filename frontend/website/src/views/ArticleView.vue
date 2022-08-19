@@ -17,7 +17,6 @@ export default {
       showPaytoReadConfirmation: false,
       is_author_article: false,
       is_already_free: false,
-      liquidation_days: 0,
       referral_token: this.$route.params.referralToken,
       showSuccessPopup: false,
       successTitle: 'It’s your LUCKY DAY!',
@@ -39,9 +38,7 @@ export default {
       this.user_wallet_balance = this.user.balance;
       this.is_author_article =
         this.getAuthId() == this.article.user_id ? true : false;
-      this.is_already_free = responses[2];
-
-      this.liquidation_days = responses[3];
+      this.is_already_free = this.isArticleFree(this.article);
 
       // article share link
       this.share_link = this.getFullUrl(
@@ -49,7 +46,7 @@ export default {
           name: "article_homepage",
           params: {
             articleId: this.articleId,
-            referralToken: responses[4],
+            referralToken: responses[2],
           },
         }).fullPath
       );
@@ -132,7 +129,7 @@ export default {
                 <div>
                   <div class="mb-6">
                     <a href="#" class="btn i-wrap--v2__btn" @click="showPaytoReadConfirmation = 1">Pay to Read ({{
-                      article.price }} {{ this.currency }})</a>
+                    article.price }} {{ this.currency }})</a>
                   </div>
                   <SharePopup v-if="article.share_to_read" share_btn="Share to Read" share_heading="Share to Read"
                     :share_description="share_description" :share_link="share_link" />
@@ -175,8 +172,8 @@ export default {
                 </div>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
-                    article.total_shares_count
-                    }}</span>Shares
+                  article.total_shares_count
+                  }}</span>Shares
                 </div>
                 <div>
                   {{ article.total_investments }} {{ this.currency
@@ -198,19 +195,19 @@ export default {
                 <template v-if="!is_already_free">
                   <div>
                     <span class="aquamarine-color mr-1.5">{{
-                      liquidation_days
-                      }}</span>Days until liquidation
+                    article.remaining_liquidation_days
+                    }}</span>Days until liquidation
                   </div>
                 </template>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
-                    article.total_reads_count
-                    }}</span>Reads
+                  article.total_reads_count
+                  }}</span>Reads
                 </div>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
-                    article.total_shares_count
-                    }}</span>Shares
+                  article.total_shares_count
+                  }}</span>Shares
                 </div>
               </div>
             </div>
@@ -227,19 +224,19 @@ export default {
                 <template v-if="!is_already_free">
                   <div>
                     <span class="aquamarine-color mr-1.5">{{
-                      liquidation_days
-                      }}</span>Days until liquidation
+                      article.remaining_liquidation_days
+                    }}</span>Days until liquidation
                   </div>
                 </template>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
-                    article.total_reads_count
-                    }}</span>Reads
+                  article.total_reads_count
+                  }}</span>Reads
                 </div>
                 <div>
                   <span class="aquamarine-color mr-1.5">{{
-                    article.total_shares_count
-                    }}</span>Shares
+                  article.total_shares_count
+                  }}</span>Shares
                 </div>
               </div>
             </div>

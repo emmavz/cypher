@@ -19,6 +19,8 @@ class CreateArticleShareTable extends Migration
             $table->foreignId('referee_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('referrer_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->boolean('is_paid')->default(0);
+            $table->boolean('lucky_sharer')->default(0);
+            $table->dateTime('lucky_sharer_read_at')->nullable();
             $table->timestamps();
         });
     }

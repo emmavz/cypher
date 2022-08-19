@@ -8,6 +8,7 @@ use App\Models\Tag;
 // use App\Models\ArticleUserPaid;
 use App\Models\UserInvestment;
 use App\Models\ArticleShare;
+use App\Models\BlockUser;
 use Storage;
 
 class Article extends Model
@@ -72,17 +73,26 @@ class Article extends Model
 
     public function is_paid_by_user()
     {
-        $authId = auth('sanctum')->user() ? auth('sanctum')->user()->id : null;
+        $authId = getAuthId();
         $relation = $this->morphOne(UserInvestment::class, 'user_investmentable');
-        if ($authId) $relation->where('user_id', $authId);
+        $relation->where('user_id', $authId);
         return $relation;
     }
 
     public function is_paid_by_referrals()
     {
-        $authId = auth('sanctum')->user() ? auth('sanctum')->user()->id : null;
+        $authId = getAuthId();
         $relation = $this->hasOne(ArticleShare::class);
-        if ($authId) $relation->where('is_paid', true)->where('referrer_id', $authId)->orWhere('referee_id', $authId);
+        $relation->where('is_paid', true)->where(function ($query) use ($authId) {
+            return $query->where('referrer_id', $authId)->orWhere('referee_id', $authId);
+        });
+        return $relation;
+    }
+
+    public function block_user()
+    {
+        $authId = getAuthId();
+        $relation = $this->hasOne(BlockUser::class, 'user_2', 'user_id')->where('user_1', $authId);
         return $relation;
     }
 
