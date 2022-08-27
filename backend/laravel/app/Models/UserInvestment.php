@@ -12,7 +12,7 @@ class UserInvestment extends Model
      * @var array
      */
     protected $fillable = [
-        'author_id', 'user_id', 'amount',
+        'author_id', 'user_id', 'amount', 'tokens', 'investments'
     ];
 
     public function user_investmentable()

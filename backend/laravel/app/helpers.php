@@ -21,7 +21,7 @@ function getAuthId()
 
 function generateReferral()
 {
-    $length = 5;
+    $length = 8;
     do {
         $referral = Str::random($length);
     } while (User::where('referral_token', $referral)->exists());

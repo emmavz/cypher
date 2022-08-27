@@ -1,7 +1,7 @@
 <script>
 import ArticleBanner from "@/components/ArticleBanner.vue";
 import SharePopup from "@/components/SharePopup.vue";
-import SuccessPopup from "@/components/SuccessPopup.vue";
+import LuckySharerPopup from "@/components/LuckySharerPopup.vue";
 
 export default {
   data() {
@@ -19,9 +19,7 @@ export default {
       is_already_free: false,
       referral_token: this.$route.params.referralToken,
       showSuccessPopup: false,
-      successTitle: 'It’s your LUCKY DAY!',
-      successMsg: '',
-      successButton: {}
+
     };
   },
   created() {
@@ -34,34 +32,32 @@ export default {
     }).then((responses) => {
       this.article = responses[0];
       this.image_url = this.article.image_url;
-      this.user = responses[1];
-      this.user_wallet_balance = this.user.balance;
+      this.user = responses[1][0];
+      this.user_wallet_balance = responses[1][1];
       this.is_author_article =
         this.getAuthId() == this.article.user_id ? true : false;
       this.is_already_free = this.isArticleFree(this.article);
 
+      if(responses[3]) {
+        this.showSuccessPopup = true;
+        this.sendApiRequest("lucky_day_seen", {article_id: this.articleId});
+      }
+
       // article share link
+      let params = {
+        articleId: this.articleId,
+      };
+
+      if(!this.is_already_free) {
+        params.referralToken = responses[2];
+      }
+
       this.share_link = this.getFullUrl(
         this.$router.resolve({
           name: "article_homepage",
-          params: {
-            articleId: this.articleId,
-            referralToken: responses[2],
-          },
+          params: params,
         }).fullPath
       );
-
-      // lucky day winner
-      // this.showSuccessPopup = true;
-      // this.successMsg = 'Thanks for sharing this article! Your sharing chain has been randomly chosen to read this article for free!';
-      // this.successButton = {
-      //   text: 'READ NOW!',
-      //   url: {
-      //     name: "full_article_homepage",
-      //     params: { articleId: this.articleId },
-      //   }
-      // };
-
     });
   },
   methods: {
@@ -83,7 +79,7 @@ export default {
   components: {
     ArticleBanner,
     SharePopup,
-    SuccessPopup
+    LuckySharerPopup
   },
 };
 </script>
@@ -244,10 +240,10 @@ export default {
         </div>
       </div>
 
-      <SuccessPopup :showpopup="showSuccessPopup" :successTitle="successTitle" :successMsg="successMsg"
-        :successButton="successButton" @showpopup="closeSuccessPopup" />
+      <LuckySharerPopup :showSuccessPopup="showSuccessPopup" @showpopup="closeSuccessPopup" />
 
       <Error />
+
     </div>
   </div>
 </template>

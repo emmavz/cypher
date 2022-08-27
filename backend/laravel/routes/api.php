@@ -17,10 +17,15 @@ use App\Http\Controllers\API\Front\ApiController;
 */
 
 Route::post('get_article_list_and_view', [ApiController::class, 'get_article_list_and_view']);
+Route::post('signin', [ApiController::class, 'signin']);
+Route::post('signup', [ApiController::class, 'signup']);
+Route::post('is_logged_in', [ApiController::class, 'is_logged_in']);
+Route::post('lucky_day', [ApiController::class, 'lucky_day']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('get_tags', [ApiController::class, 'get_tags']);
+    Route::post('get_article_tags', [ApiController::class, 'get_article_tags']);
     Route::post('get_article_homepage', [ApiController::class, 'get_article_homepage']);
     Route::post('get_user_profile', [ApiController::class, 'get_user_profile']);
     Route::post('get_user_profile_with_balance', [ApiController::class, 'get_user_profile_with_balance']);
@@ -48,8 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [ApiController::class, 'logout']);
     Route::post('send_token', [ApiController::class, 'send_token']);
     Route::post('block_user', [ApiController::class, 'block_user']);
-    Route::post('lucky_day', [ApiController::class, 'lucky_day']);
-});
+    Route::post('lucky_day_seen', [ApiController::class, 'lucky_day_seen']);
 
-Route::post('signin', [ApiController::class, 'signin']);
-Route::post('signup', [ApiController::class, 'signup']);
+    // Route::post('share_article', [ApiController::class, 'share_article']);
+});

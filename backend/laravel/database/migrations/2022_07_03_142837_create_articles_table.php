@@ -19,7 +19,7 @@ class CreateArticlesTable extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('content')->nullable();
-            $table->float('price')->nullable();
+            $table->double('price')->nullable();
             $table->string('image_url')->nullable();
             $table->boolean('is_published')->default(0);
             $table->dateTime('date_posted')->nullable();

@@ -21,8 +21,9 @@ export default {
     },
     methods: {
         async sendToken() {
+
             let validations = {
-                cphr: yup.number().required(),
+                cphr: yup.string().required(),
                 receiver: yup.string().email().required(),
             };
 
@@ -102,14 +103,12 @@ export default {
                                     <button type="submit" class="cpe-btn cpe-btn--primary mb-5">
                                         Send CPHR
                                     </button>
-                                    <button type="button" class="cpe-btn cpe-btn--secondary">
-                                        <router-link :to="{name: 'profile'}">Cancel</router-link>
-                                    </button>
+                                    <router-link :to="{name: 'profile'}" class="cpe-btn cpe-btn--secondary w-full block text-center">Cancel</router-link>
                                 </div>
                             </form>
 
                             <SuccessPopup :showpopup="showSuccessPopup" :successTitle="successTitle"
-                                :successMsg="successMsg" :successButton="successButton"
+                                :successMsg="successMsg"
                                 @showpopup="closeSuccessPopup" />
 
                         </div>

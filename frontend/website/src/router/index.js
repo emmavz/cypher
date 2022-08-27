@@ -73,12 +73,12 @@ const router = createRouter({
       component: () => import("../views/CreateArticlePublishedView.vue"),
     },
     {
-      path: "/signin/",
+      path: "/login/",
       name: "signin",
       component: () => import("../views/Signin.vue"),
     },
     {
-      path: "/signup/",
+      path: "/register/",
       name: "signup",
       component: () => import("../views/Signup.vue"),
     },

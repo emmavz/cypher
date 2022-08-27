@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserInvestmentsTable extends Migration
+class CreateTotalUserInvestmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,12 @@ class CreateUserInvestmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_investments', function (Blueprint $table) {
+        Schema::create('total_user_investments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->double('amount');
-            $table->double('investments');
-            $table->double('tokens');
-            $table->integer('user_investmentable_id');
-            $table->string('user_investmentable_type');
+            $table->double('total_investments');
+            $table->double('total_tokens');
             $table->timestamps();
         });
     }
@@ -33,6 +30,6 @@ class CreateUserInvestmentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_investments');
+        Schema::dropIfExists('total_user_investments');
     }
 }

@@ -41,7 +41,7 @@ export default {
         class="w-full cursor-pointer article-banner-img" /></label>
     <div>
       <div class="flex banner_img__btns">
-        <button class="ar-btn mr-2" @click="$emit('saveArticle')">{{ this.$route.params.articleId ? 'Update' : 'Save'
+        <button class="ar-btn mr-2" @click="$emit('saveArticle')">{{ this.$route.query.edit ? 'Update' : 'Save'
         }}</button>
         <button class="ar-btn" @click.stop="$emit('showPublish')">
           {{ publish_text }}

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BondingCurve extends Model
+class TotalUserInvestment extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,6 +12,11 @@ class BondingCurve extends Model
      * @var array
      */
     protected $fillable = [
-        'author_id', 'tokens', 'investments'
+        'author_id', 'user_id', 'total_investments'
     ];
+
+    public function user_investmentable()
+    {
+        return $this->morphTo();
+    }
 }

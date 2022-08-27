@@ -13,15 +13,25 @@ export default {
 
     this.newArticle = { ...this.article };
 
-    this.posted_date = this.article.date_posted;
-
     let is_article_free = this.isArticleFree(this.article);
 
     if ('tags' in this.article) {
-      this.article_tags = this.article.tags.slice(0, this.maxArticleTags());
+      // this.article_tags = this.article.tags.slice(0, this.maxArticleTags());
+      this.article_tags = this.article.tags;
       if (is_article_free) {
-        this.article_tags = this.article.tags.slice(0, 1);
-        this.article_tags.unshift({ name: 'Free' });
+        // this.article_tags = this.article.tags.slice(0, 1);
+        // this.article_tags.unshift({ name: 'Free' });
+        let alreadyFreeTagAdded = false;
+        for (let index = 0; index < this.article_tags.length; index++) {
+          if(this.article_tags[index].name == 'Free') {
+            alreadyFreeTagAdded = true;
+            break;
+          }
+
+        }
+        if(!alreadyFreeTagAdded) {
+          this.article_tags.unshift({ name: 'Free' });
+        }
       }
     }
 
@@ -79,7 +89,7 @@ export default {
         ' 0%, #4F4D55 145.34%)',
     }"></span>
     <div class="blog-post__left">
-      <div class="blog-post__left__header flex items-center mb-4">
+      <div class="blog-post__left__header flex items-center mb-3">
         <div class="blog-post__left__header__img">
           <img :src="getPfpImage(newArticle.user.pfp)" alt="" width="40" class="rounded-full" />
         </div>

@@ -11,12 +11,14 @@ export default {
     return {
       author: {},
       articles: [],
+      investments: [],
       votes: "",
       cashout: "",
       author_balance: 0,
       delete_article_confirmation: false,
       article_controls_active: false,
       current_article: '',
+      componentKey: 0,
     };
   },
   async created() {
@@ -58,8 +60,9 @@ export default {
           },
           true
         ).then((response) => {
-          this.initStats(response);
           this.author_balance -= this.votes;
+          this.investments = response;
+          this.forceRerender();
         });
       }
     },
@@ -75,16 +78,11 @@ export default {
           },
           true
         ).then((response) => {
-          this.initStats(response);
           this.author_balance += Number(this.cashout);
+          this.investments = response;
+          this.forceRerender();
         });
       }
-    },
-    initStats(user_stats) {
-      // this.statsInvestment.amount = user_stats.total_investments;
-      // this.statsInvestment.investors = user_stats.total_investors;
-      // this.statsStakes.amount = user_stats.user_total_investments;
-      // this.statsStakes.stakes = user_stats.total_stakes;
     },
     showArticleControls(article) {
       this.article_controls_active = true;
@@ -114,6 +112,9 @@ export default {
           }
         }
       });
+    },
+    forceRerender() {
+      this.componentKey += 1;
     }
   },
   components: {
@@ -136,7 +137,7 @@ export default {
       <div v-if="!isError">
         <Author :author="author">
           <template v-slot:btns>
-            <span class="currency-tag currency-tag--opacity-70">{{ author_balance }} {{ this.currency }}</span>
+            <span class="currency-tag currency-tag--opacity-70">{{ this.user_balance(author_balance) }} {{ this.currency }}</span>
           </template>
         </Author>
 
@@ -152,7 +153,7 @@ export default {
 
           <template v-slot:tabPanel-1>
             <template v-if="articles.length">
-              <div class="w-full flex justify-center container" v-for="(article, index) in articles" :key="article.id">
+              <div class="w-full flex justify-center container" v-for="(article) in articles" :key="article.id">
                 <Article :article="article" url="" @article="showArticleControls" class="blog-post--user-article" />
               </div>
             </template>
@@ -163,9 +164,9 @@ export default {
 
           <template v-slot:tabPanel-2>
             <template v-if="investments.length">
-              <div class="w-full flex justify-center container" v-for="(investment, index) in investments" :key="index">
+              <div class="w-full flex justify-center container" v-for="(investment) in investments" :key="investment.author_id">
                 <Article :article="investment" :url="getUserProfileRoute(investment.author_id)"
-                  class="blog-post--user-ivestment" />
+                  class="blog-post--user-ivestment" :key="componentKey" />
               </div>
             </template>
             <template v-else-if="isError == 0">
@@ -190,7 +191,7 @@ export default {
               <div class="article_controls__li article_controls__li--border">
                 <ul>
                   <li>
-                    <router-link :to="{ name: 'create_article', params: { articleId: current_article.id }}">Edit
+                    <router-link :to="{ name: 'create_article', params: { articleId: current_article.id }, query: {edit: true} }">Edit
                     </router-link>
                   </li>
                   <li>

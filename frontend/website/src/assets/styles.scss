@@ -163,19 +163,24 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
 
     .categories {
       opacity: 0.9;
+      $catGap: 4.5px;
+      margin-left: -$catGap;
+      margin-right: -$catGap;
 
       span {
         background: $white;
-        margin: 0 4.5px;
+        margin: 0 $catGap;
+        margin-top: $catGap;
+        margin-bottom: $catGap;
       }
 
-      li:first-of-type span {
-        margin-left: 0;
-      }
+      // li:first-of-type span {
+      //   margin-left: 0;
+      // }
 
-      li:last-of-type span {
-        margin-right: 0;
-      }
+      // li:last-of-type span {
+      //   margin-right: 0;
+      // }
     }
 
     &__meta {
@@ -208,6 +213,11 @@ $stats-border-color: rgba(255, 255, 255, 0.3);
       height: 100%;
       opacity: 0.5;
     }
+  }
+
+  .categories {
+    white-space: normal;
+
   }
 }
 

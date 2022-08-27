@@ -3,6 +3,7 @@ import ArticleBanner from "@/components/ArticleBanner.vue";
 import SharePopup from "@/components/SharePopup.vue";
 import UpvotePopup from "@/components/UpvotePopup.vue";
 import Tabs from "@/components/Tabs.vue";
+import LuckySharerPopup from "@/components/LuckySharerPopup.vue";
 
 export default {
   data() {
@@ -20,6 +21,7 @@ export default {
       isModalVisible: false,
       stats: null,
       is_already_free: false,
+      showSuccessPopup: false,
     };
   },
   created() {
@@ -46,14 +48,24 @@ export default {
 
       this.is_already_free = this.isArticleFree(this.article);
 
+      if(responses[4]) {
+        this.showSuccessPopup = true;
+        this.sendApiRequest("lucky_day_seen", {article_id: this.articleId});
+      }
+
       // article share link
+      let params = {
+        articleId: this.articleId,
+      };
+
+      if(!this.is_already_free) {
+        params.referralToken = responses[3];
+      }
+
       this.share_link = this.getFullUrl(
         this.$router.resolve({
           name: "article_homepage",
-          params: {
-            articleId: this.articleId,
-            referralToken: responses[3],
-          },
+          params: params,
         }).fullPath
       );
     });
@@ -65,12 +77,16 @@ export default {
     closeModal() {
       this.isModalVisible = false;
     },
+    closeSuccessPopup() {
+      this.showSuccessPopup = false;
+    }
   },
   components: {
     ArticleBanner,
     SharePopup,
     UpvotePopup,
     Tabs,
+    LuckySharerPopup
   },
 };
 </script>
@@ -105,7 +121,7 @@ export default {
         <Tabs :tabList="articleTabs">
           <template v-slot:btns>
             <div class="flex">
-              <div class="sm-btns-container" v-if="article.user_id != auth_id">
+              <div class="sm-btns-container">
                 <RouterLink :to="getUserProfileRoute(article.user_id, { v: 1 })">
                   <button class="currency-tag currency-tag--opacity-70" @click="$r">
                     Upvote
@@ -181,6 +197,8 @@ export default {
           </template>
         </Tabs>
       </div>
+
+      <LuckySharerPopup :showSuccessPopup="showSuccessPopup" @showpopup="closeSuccessPopup" />
 
       <Error />
     </div>

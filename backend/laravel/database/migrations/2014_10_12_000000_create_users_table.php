@@ -18,14 +18,14 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('referral_token')->nullable()->unique()->index();
             $table->string('pfp')->nullable();
-            $table->string('bg')->nullable();
             $table->string('wallet_address')->nullable();
-            $table->float('balance')->default(0);
+            $table->double('balance')->default(0);
             $table->text('bio')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('status')->default(0);
+            // $table->boolean('status')->default(0);
+            $table->boolean('is_admin')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

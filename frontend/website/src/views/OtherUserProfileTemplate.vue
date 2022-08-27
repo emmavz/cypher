@@ -110,7 +110,7 @@ export default {
       <div v-if="!isError">
         <Author :author="author" anotherProfile="true">
           <template v-slot:btns>
-            <span class="currency-tag currency-tag--opacity-70">{{ author_balance }} {{ this.currency }}</span>
+            <span class="currency-tag currency-tag--opacity-70">{{ this.user_balance(author_balance) }} {{ this.currency }}</span>
           </template>
         </Author>
 

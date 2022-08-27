@@ -20,6 +20,16 @@ export default {
     this.emitter.on("cashout-step", (cashoutsStep) => {
       this.cashoutsStep = cashoutsStep;
     });
+
+    if(typeof this.$route.query.v !== 'undefined') {
+      this.$router.replace({
+        ...this.$router.currentRoute,
+          query: {
+            v: undefined,
+          }
+      });
+    }
+
   },
 };
 </script>
