@@ -18,6 +18,7 @@ export default {
       votes: "",
       cashout: "",
       author_balance: 0,
+      bondingCurveTokens: 0
     };
   },
   async created() {
@@ -40,11 +41,12 @@ export default {
           user_id: this.user_id,
         },
       },
-    ]).then((reponses) => {
-      this.author = reponses[0][0];
-      this.author_balance = reponses[0][1];
-      this.articles = reponses[1];
-      this.initStats(reponses[2]);
+    ]).then((responses) => {
+      this.author = responses[0][0];
+      this.author_balance = responses[0][1];
+      this.articles = responses[1];
+      this.initStats(responses[2][0]);
+      this.bondingCurveTokens = responses[2][1];
     });
   },
   methods: {
@@ -56,12 +58,13 @@ export default {
           "upvote",
           {
             user_id: this.user_id,
-            amount: this.votes,
+            tokens: this.votes,
           },
           true
         ).then((response) => {
-          this.initStats(response);
-          this.author_balance -= this.votes;
+          this.initStats(response[0]);
+          this.author_balance -= this.calculateIntegral(this.bondingCurveTokens, this.bondingCurveTokens+Number(this.votes));
+          this.bondingCurveTokens = response[1];
         });
       }
     },
@@ -72,13 +75,14 @@ export default {
         this.sendApiRequest(
           "cashout",
           {
-            amount: this.cashout,
             user_id: this.user_id,
+            tokens: this.cashout,
           },
           true
         ).then((response) => {
-          this.initStats(response);
-          this.author_balance += Number(this.cashout);
+          this.initStats(response[0]);
+          this.author_balance += this.calculateIntegralWithConstant(this.bondingCurveTokens-Number(this.cashout), this.bondingCurveTokens);
+          this.bondingCurveTokens = response[1];
         });
       }
     },
@@ -110,17 +114,17 @@ export default {
       <div v-if="!isError">
         <Author :author="author" anotherProfile="true">
           <template v-slot:btns>
-            <span class="currency-tag currency-tag--opacity-70">{{ author_balance }} {{ this.currency }}</span>
+            <span class="currency-tag currency-tag--opacity-70">{{ this.toFixedAmount(author_balance) }} {{ this.currency }}</span>
           </template>
         </Author>
 
         <Tabs :tabList="profileTabs">
           <template v-slot:btns>
             <li>
-              <UpvotePopup @votes="updateVotes" :showpopup="$route.query.v" />
+              <UpvotePopup @votes="updateVotes" :showpopup="$route.query.v" :bondingCurveTokens="bondingCurveTokens" />
             </li>
             <li>
-              <CashoutPopup @cashout="updateCashouts" />
+              <CashoutPopup @cashout="updateCashouts" :bondingCurveTokens="bondingCurveTokens" />
             </li>
           </template>
 

@@ -1,6 +1,7 @@
+
 <script>
 export default {
-  props: ["showpopup"],
+  props: ["showpopup", "bondingCurveTokens"],
   data() {
     return {
       cashout: "",
@@ -16,11 +17,16 @@ export default {
   methods: {
     addCashoutSuffix() {
       let cashout = this.removeCashoutSuffix();
-      if (cashout) this.cashout = cashout + " " + this.currency;
+      let cashoutAmount = this.calculateIntegralWithConstant(this.bondingCurveTokens-Number(cashout), this.bondingCurveTokens);
+      if(isNaN(cashoutAmount)) {
+        this.swalError("You dont have this much tokens into this author!");
+        return;
+      }
+      if (cashout) this.cashout = cashout + " Tokens (" + cashoutAmount + " " + " " +this.currency + ")";
       else this.$emit("cashout", "");
     },
     removeCashoutSuffix() {
-      return this.cashout.replace(/[^0-9\.]+/g, "");
+      return this.cashout.trim().split(" ")[0];
     },
     cashoutFunc() {
       if (this.cashout) {

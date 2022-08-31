@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->hasMany(Article::class);
     }
 
+    public function published_articles()
+    {
+        return $this->articles()->where('is_published', true);
+    }
+
     public function paid_articles()
     {
         return $this->belongToMany(Article::class, 'article_user_paids', 'user_id', 'article_id');

@@ -102,7 +102,7 @@ export default {
         .catch((response) => {
           if (response.response.status == 401 && response.response.data.error == 'Unauthenticated.') {
             this.storeReferrerUrl(this.$route.fullPath);
-            this.$router.push({ name: "signin" });
+            this.$router.replace({ name: "signin" });
             return;
           }
 
@@ -196,10 +196,24 @@ export default {
     getUserProfileRoute(user_id, query = null) {
       let r = {
         name: "profile",
-        params: { userId: window.user_id == user_id ? "" : user_id },
+        params: { userId: this.getAuthId() == user_id ? "" : user_id },
       };
       if (query) r.query = query;
       return r;
+    },
+
+    calculateIntegral($lowerbound, $upperbound)
+    {
+        return this.toFixedAmount2(
+            (2 / 3) * Math.pow($upperbound, 3 / 2) - (2 / 3) * Math.pow($lowerbound, 3 / 2)
+        );
+    },
+
+    calculateIntegralWithConstant($lowerbound, $upperbound)
+    {
+        return this.toFixedAmount2(
+             0.8 * ((2 / 3) * Math.pow($upperbound, 3 / 2) - (2 / 3) * Math.pow($lowerbound, 3 / 2))
+        );
     },
 
     checkPreviousPage() {
@@ -266,6 +280,23 @@ export default {
       return window.max_article_tags;
     },
 
+    toFixedAmount($amount) {
+      return Number($amount.toFixed(2));
+    },
+
+    toFixedAmount2($amount) {
+      return Number($amount.toFixed(4));
+    },
+
+    is_logged_in() {
+      this.sendApiRequest("is_logged_in", {}).then((response) => {
+        if(response != -1) {
+          this.$router.replace({ name: "home" });
+        }
+      });
+    },
+
+    // If you edit this function dont forget to edit same function in backend ApiController
     isArticleFree(article) {
       let is_article_free = false;
       if(this.getAuthId() && this.getAuthId() == article.user_id) {
@@ -278,6 +309,9 @@ export default {
         is_article_free = true;
       }
       else if(article.is_paid_by_referrals_count) {
+        is_article_free = true;
+      }
+      else if(article.price <= 0) {
         is_article_free = true;
       }
       return is_article_free;

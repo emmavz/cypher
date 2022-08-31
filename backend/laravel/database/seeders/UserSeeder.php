@@ -17,16 +17,26 @@ class UserSeeder extends Seeder
     {
         User::getQuery()->delete();
 
+        // Admin Account
+        $user = new User();
+        $user->name = "Super Admin";
+        $user->email = "admin@site.com";
+        $user->password = bcrypt('admin123');
+        $user->balance = 1000000;
+        $user->bio = "Super admin!!!";
+        $user->referral_token = generateReferral();
+        $user->is_admin = 1;
+        $user->save();
+
+        // Users Account
         $user = new User();
         $user->name = "Ephraim Jones";
         $user->email = "user@site.com";
         $user->password = bcrypt('admin123');
         $user->pfp =  Storage::url("dynamic/profile-1.png");
-
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "Just another baker blogger";
-        $user->bg = Storage::url("dynamic/post-8.png");
         // $user->referral_token = (string)Uuid::uuid1();
         $user->referral_token = generateReferral();
         $user->save();
@@ -39,7 +49,6 @@ class UserSeeder extends Seeder
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "Just another baker blogger";
-        $user->bg = Storage::url("dynamic/post-8.png");
         $user->referral_token = generateReferral();
         $user->save();
 
@@ -51,7 +60,6 @@ class UserSeeder extends Seeder
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "Just another baker blogger";
-        $user->bg = Storage::url("dynamic/post-8.png");
         $user->referral_token = generateReferral();
         $user->save();
 
@@ -63,7 +71,6 @@ class UserSeeder extends Seeder
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "Just another baker blogger";
-        $user->bg = Storage::url("dynamic/post-8.png");
         $user->referral_token = generateReferral();
         $user->save();
 
@@ -75,7 +82,6 @@ class UserSeeder extends Seeder
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "Just another baker blogger";
-        $user->bg = Storage::url("dynamic/post-8.png");
         $user->referral_token = generateReferral();
         $user->save();
 
@@ -87,7 +93,72 @@ class UserSeeder extends Seeder
         $user->wallet_address = "abcd1234";
         $user->balance = config('website.balance');
         $user->bio = "She turned her can't into can and her dreams into plans.";
-        $user->bg = Storage::url("dynamic/post-8.png");
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 7";
+        $user->email = "user7@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 8";
+        $user->email = "user8@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 9";
+        $user->email = "user9@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 10";
+        $user->email = "user10@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 11";
+        $user->email = "user11@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
+        $user->referral_token = generateReferral();
+        $user->save();
+
+        $user = new User();
+        $user->name = "User 12";
+        $user->email = "user12@site.com";
+        $user->password = bcrypt('admin123');
+        $user->pfp =   '';
+        $user->wallet_address = "abcd1234";
+        $user->balance = config('website.balance');
+        $user->bio = "";
         $user->referral_token = generateReferral();
         $user->save();
     }

@@ -92,7 +92,9 @@ class Article extends Model
     public function block_user()
     {
         $authId = getAuthId();
-        $relation = $this->hasOne(BlockUser::class, 'user_2', 'user_id')->where('user_1', $authId);
+        $relation = $this->hasOne(BlockUser::class, 'user_2', 'user_id')->where(function ($q) use ($authId) {
+            return $q->where('user_1', $authId)->orWhere('user_2', $authId);
+        });
         return $relation;
     }
 
@@ -108,8 +110,9 @@ class Article extends Model
     public static function storeFiles($request, $data, $oldmodel = null)
     {
         if ($request->hasFile('image_url')) {
-            list($width, $height, $type, $attr) = getimagesize($request->image_url);
-            $img = storeImage(['image' => $request->image_url, 'path' => self::$path, 'webp' => false, 'fit' => [$width, 262]]);
+            // list($width, $height, $type, $attr) = getimagesize($request->image_url);
+            $img = storeImage(['image' => $request->image_url, 'path' => self::$path, 'webp' => false]);
+            // $img = storeImage(['image' => $request->image_url, 'path' => self::$path, 'webp' => false, 'fit' => [2560, 262]]);
             $data['image_url'] = Storage::url(self::$path . $img);
         }
 

@@ -93,7 +93,7 @@ export default {
           </div>
 
           <div>
-            <img :src="image_url" alt="" class="w-full mb-11" />
+            <img :src="image_url" alt="" class="w-full mb-11 article-banner-img" />
           </div>
 
           <div class="br-t">

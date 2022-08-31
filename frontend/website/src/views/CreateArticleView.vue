@@ -21,8 +21,8 @@ export default {
     return {
       article: null,
       article_id: this.$route.params.articleId
-        ? Number(this.$route.params.articleId)
-        : "",
+      ? Number(this.$route.params.articleId)
+      : "",
       article_image: "",
       article_image_form_input: "",
       title: "",
@@ -65,10 +65,13 @@ export default {
       },
       publish_text: this.getNextText(),
       theta_info: false,
-      share_to_read_info: false
+      share_to_read_info: false,
+      custom_tags_count: 0,
     };
   },
   async created() {
+
+    // Update width of inputs for increment/decrement controls
     this.$watch("price", function (value) {
       this.setInputDynamicWidth(this.$refs.price);
     });
@@ -79,9 +82,16 @@ export default {
       this.setInputDynamicWidth(this.$refs.liquidation_days);
     });
 
+    // Fetch article from api
     if (this.article_id) await this.getArticle();
 
-    this.sendApiRequest("get_tags", {}, false, {
+    // Fetch all tags of auth user
+    let obj = {};
+    if(this.article_id) {
+      obj.article_id = this.article_id;
+    }
+
+    this.sendApiRequest("get_article_tags", obj, false, {
       removeLoaderAfterApi: this.article_id ? false : true,
     }).then((categories) => {
       categories.forEach((category) => {
@@ -92,10 +102,16 @@ export default {
           this.article.tags.forEach((tag) => {
             if (tag.id == category.id) {
               category.selected = true;
+              this.selectedCategories.push(category);
+
+              if(tag.user_id) {
+                this.custom_tags_count++;
+              }
             }
           });
         }
       });
+
       this.categories = categories;
       this.categoriesFiltered = this.categories;
     });
@@ -115,14 +131,20 @@ export default {
           this.description = this.article.description;
         if (this.article.price) this.price = this.article.price;
         if (this.article.theta) this.theta = this.article.theta;
+        this.share_to_read = this.article.share_to_read ? true: false;
+        this.liquidation_days = this.article.liquidation_days;
       });
     },
+
     async save(should_publish) {
+
+      // Get selected tags
       let selectedCategories = [];
       this.selectedCategories.forEach((category) => {
         selectedCategories.push({ name: category.name ,id: category.id, custom: category.custom});
       });
 
+      // Validations
       let validations = {
         title: yup.string().required(),
       };
@@ -156,6 +178,7 @@ export default {
         tags: selectedCategories,
       });
 
+      // Prepare data to send via api
       let formData = new FormData();
       if (this.article_id) formData.append("article_id", this.article_id);
       formData.append("image_url", this.article_image_form_input);
@@ -170,13 +193,23 @@ export default {
       formData.append("tags", JSON.stringify(selectedCategories));
       formData.append("should_publish", should_publish ? 1 : 0);
 
-      this.sendApiRequest("store_article", formData, true).then((articleId) => {
-        if (!should_publish) this.$router.push({ name: "drafts" });
-        else
+      this.sendApiRequest("store_article", formData, true).then((article) => {
+        // redirect to draft page
+        if (!article.is_published) {
+          this.$router.push({ name: "drafts" });
+        }
+        // redirect to article published page
+        else if(article.is_published && !this.$route.query.edit) {
           this.$router.push({
             name: "create_article_published",
-            params: { articleId: articleId[0].id },
+            params: { articleId: article.id },
           });
+        }
+        // redirect to profile page when user try to edit an article
+        else {
+          this.$router.push({ name: "profile" });
+        }
+
       });
     },
     async publish() {
@@ -200,9 +233,11 @@ export default {
         this.content = this.quill.container.firstChild.innerHTML;
       }
     },
+    // Triggers when someone try to select/unselect tag
     toggleCategorySelection(categoryId) {
       this.categoriesFiltered = [];
 
+      // toggle selected attribute to categories array
       let category = null;
       for (let index = 0; index < this.categories.length; index++) {
         let category_i = this.categories[index];
@@ -214,6 +249,7 @@ export default {
         }
       }
 
+      // push or remove index from selectedCategories array
       if (this.selectedCategories.length) {
         for (let j = 0; j < this.selectedCategories.length; j++) {
           let category_i = this.selectedCategories[j];
@@ -236,7 +272,10 @@ export default {
       this.search_category = '';
       this.categoriesFiltered = this.categories;
     },
+    // Triggers when someone try to press enter in search tag field
     searchCategory() {
+
+      // Try to match category name with user search query
       this.categoriesFiltered = [];
 
       this.categories.forEach((category) => {
@@ -249,20 +288,29 @@ export default {
         }
       });
 
+      // If no search found
       if (!this.categoriesFiltered.length) {
 
+        let customCategories = this.selectedCategories.filter(category => category.custom == true);
         this.categoriesFiltered = this.categories;
 
-        let customCategories = this.selectedCategories.filter(category => category.custom == true);
-        if (customCategories.length+1 <= this.maxArticleTags()) {
+        // If user already selected this.maxArticleTags() then nothing
+        if(this.selectedCategories.length == this.maxArticleTags()) {}
+
+        // If user already entered custom_tags and they reached to this.maxArticleTags() then nothing
+        else if(this.custom_tags_count == this.maxArticleTags()) {}
+
+        else if(customCategories.length+1 <= this.maxArticleTags()) {
 
           let lastCategoryId = this.categories[this.categories.length - 1].id;
           let lastCategoryIdInc = lastCategoryId + 1;
           let newCategory = { id: lastCategoryIdInc, name: this.search_category, selected: true, custom: true };
           this.categories.push(newCategory);
           this.selectedCategories.push(newCategory);
+          this.custom_tags_count++;
           // this.categoriesFiltered = this.categories;
         }
+
         this.publish_step = 1;
         this.search_category = '';
       }
@@ -272,10 +320,10 @@ export default {
       return 'Next';
     },
     getPublishText() {
-      return this.$route.params.articleId ? this.getNextText(): 'Publish';
+      return this.article && this.article.is_published ? this.getNextText(): 'Publish';
     },
     getPublishTextForPopup() {
-      return this.$route.params.articleId ? 'Update' : 'Publish';
+      return this.$route.query.edit ? 'Update' : 'Publish';
     },
     getSelectedCategories() {
       let selectedCategories = [];
@@ -358,9 +406,19 @@ export default {
             <div class="flex justify-between">
               <button>
                 <img src="@/assets/img/close-icon--v3.svg" alt=""
-                  @click="publish_step == 2 ? (publish_step = 1) : hidePublish()" />
+                  @click="publish_step == 2 || publish_step == 3 ? (publish_step = 1) : hidePublish()" />
               </button>
-              <button class="font-semibold" @click="publish_step == 3 ? (publish_step = 1) : publish_step = 4">
+              <button class="font-semibold" @click="
+                if(publish_step == 3) {
+                  publish_step = 1;
+                }
+                else if(this.$route.query.edit) {
+                  publish();
+                }
+                else {
+                  publish_step = 4
+                }
+                ">
                 {{ publish_step == 3 ? 'Back' : getPublishTextForPopup() }}
               </button>
             </div>
@@ -456,7 +514,7 @@ export default {
               <template v-if="categoriesFiltered.length">
                 <ul class="categories whitespace-normal">
                   <li v-for="(category, index) in categoriesFiltered" :key="index">
-                    <Category :category="category" choose="true" class="mb-3.5"
+                    <Category :category="category" :choose="checkIfCategoryIsAlreadySelected(category.id) || (getSelectedCategories().length != maxArticleTags()) ? true: false"
                       @category_id="toggleCategorySelection" />
                     <!-- <Category :category="category"
                       :choose="checkIfCategoryIsAlreadySelected(category.id) || (getSelectedCategories().length != maxArticleTags()) ? true: false"
@@ -467,9 +525,9 @@ export default {
               <template v-else>
                 <div class="text-center">No tag found!</div>
               </template>
-              <!-- <p class="mt-2 ml-3">
+              <p class="mt-4 ml-3">
                 <small>You can only select maximum {{ maxArticleTags() }} tags</small>
-              </p> -->
+              </p>
             </div>
 
             <!-- Advanced Settings -->

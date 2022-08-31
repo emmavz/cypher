@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["showpopup"],
+  props: ["showpopup", "bondingCurveTokens"],
   data() {
     return {
       votes: "",
@@ -16,11 +16,11 @@ export default {
   methods: {
     addVotesSuffix() {
       let votes = this.removeVotesSuffix();
-      if (votes) this.votes = votes + " " + this.currency;
+      if (votes) this.votes = votes + " Tokens (" + this.calculateIntegral(this.bondingCurveTokens, this.bondingCurveTokens+Number(votes)) + " " + " " +this.currency + ")";
       else this.$emit("votes", "");
     },
     removeVotesSuffix() {
-      return this.votes.replace(/[^0-9\.]+/g, "");
+      return this.votes.trim().split(" ")[0];
     },
     upvote() {
       if (this.votes) {

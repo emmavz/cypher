@@ -11,8 +11,8 @@ export default {
         </div>
 
         <div class="font-bold">
-            <div class="mb-1">You Own {{  this.statsStakes.stakes }}% Stake</div>
-            <div class="aquamarine-color">{{ this.statsStakes.amount }} {{ this.currency }} Invested</div>
+            <div class="mb-1">You Own {{  toFixedAmount2(this.statsStakes.stakes) }}% Stake</div>
+            <div class="aquamarine-color">{{ toFixedAmount2(this.statsStakes.amount) }} Tokens Invested</div>
         </div>
     </div>
 </template>

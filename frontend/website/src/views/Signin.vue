@@ -7,6 +7,9 @@ export default {
       password: "",
     };
   },
+  async created() {
+    await this.is_logged_in();
+  },
   methods: {
     async signin() {
       let validations = {

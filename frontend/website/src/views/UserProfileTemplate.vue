@@ -11,12 +11,15 @@ export default {
     return {
       author: {},
       articles: [],
+      investments: [],
       votes: "",
       cashout: "",
       author_balance: 0,
       delete_article_confirmation: false,
       article_controls_active: false,
       current_article: '',
+      componentKey: 0,
+      bondingCurveTokens: 0
     };
   },
   async created() {
@@ -39,11 +42,12 @@ export default {
           url: "get_user_investments",
           data: {},
         },
-      ]).then((reponses) => {
-        this.author = reponses[0];
+      ]).then((responses) => {
+        this.author = responses[0];
         this.author_balance = this.author.balance;
-        this.articles = reponses[1];
-        this.investments = reponses[2];
+        this.articles = responses[1];
+        this.investments = responses[2][0];
+        this.bondingCurveTokens = responses[2][1];
       });
     },
     updateVotes(votes) {
@@ -54,12 +58,14 @@ export default {
           "upvote",
           {
             user_id: this.getAuthId(),
-            amount: this.votes,
+            tokens: this.votes,
           },
           true
         ).then((response) => {
-          this.initStats(response);
-          this.author_balance -= this.votes;
+          this.author_balance -= this.calculateIntegral(this.bondingCurveTokens, this.bondingCurveTokens+Number(this.votes));
+          this.investments = response[0];
+          this.forceRerender();
+          this.bondingCurveTokens = response[1];
         });
       }
     },
@@ -70,21 +76,17 @@ export default {
         this.sendApiRequest(
           "cashout",
           {
-            amount: this.cashout,
             user_id: this.getAuthId(),
+            tokens: this.cashout,
           },
           true
         ).then((response) => {
-          this.initStats(response);
-          this.author_balance += Number(this.cashout);
+          this.author_balance += this.calculateIntegralWithConstant(this.bondingCurveTokens-Number(this.cashout), this.bondingCurveTokens);;
+          this.investments = response[0];
+          this.forceRerender();
+          this.bondingCurveTokens = response[1];
         });
       }
-    },
-    initStats(user_stats) {
-      // this.statsInvestment.amount = user_stats.total_investments;
-      // this.statsInvestment.investors = user_stats.total_investors;
-      // this.statsStakes.amount = user_stats.user_total_investments;
-      // this.statsStakes.stakes = user_stats.total_stakes;
     },
     showArticleControls(article) {
       this.article_controls_active = true;
@@ -114,6 +116,9 @@ export default {
           }
         }
       });
+    },
+    forceRerender() {
+      this.componentKey += 1;
     }
   },
   components: {
@@ -136,23 +141,23 @@ export default {
       <div v-if="!isError">
         <Author :author="author">
           <template v-slot:btns>
-            <span class="currency-tag currency-tag--opacity-70">{{ author_balance }} {{ this.currency }}</span>
+            <span class="currency-tag currency-tag--opacity-70">{{ this.toFixedAmount(author_balance) }} {{ this.currency }}</span>
           </template>
         </Author>
 
         <Tabs :tabList="profileTabs">
           <template v-slot:btns>
             <li>
-              <UpvotePopup @votes="updateVotes" :showpopup="$route.query.v" />
+              <UpvotePopup @votes="updateVotes" :showpopup="$route.query.v" :bondingCurveTokens="bondingCurveTokens" />
             </li>
             <li>
-              <CashoutPopup @cashout="updateCashouts" />
+              <CashoutPopup @cashout="updateCashouts" :bondingCurveTokens="bondingCurveTokens" />
             </li>
           </template>
 
           <template v-slot:tabPanel-1>
             <template v-if="articles.length">
-              <div class="w-full flex justify-center container" v-for="(article, index) in articles" :key="article.id">
+              <div class="w-full flex justify-center container" v-for="(article) in articles" :key="article.id">
                 <Article :article="article" url="" @article="showArticleControls" class="blog-post--user-article" />
               </div>
             </template>
@@ -163,9 +168,9 @@ export default {
 
           <template v-slot:tabPanel-2>
             <template v-if="investments.length">
-              <div class="w-full flex justify-center container" v-for="(investment, index) in investments" :key="index">
+              <div class="w-full flex justify-center container" v-for="(investment) in investments" :key="investment.author_id">
                 <Article :article="investment" :url="getUserProfileRoute(investment.author_id)"
-                  class="blog-post--user-ivestment" />
+                  class="blog-post--user-ivestment" :key="componentKey" />
               </div>
             </template>
             <template v-else-if="isError == 0">
@@ -190,7 +195,7 @@ export default {
               <div class="article_controls__li article_controls__li--border">
                 <ul>
                   <li>
-                    <router-link :to="{ name: 'create_article', params: { articleId: current_article.id }}">Edit
+                    <router-link :to="{ name: 'create_article', params: { articleId: current_article.id }, query: {edit: true} }">Edit
                     </router-link>
                   </li>
                   <li>

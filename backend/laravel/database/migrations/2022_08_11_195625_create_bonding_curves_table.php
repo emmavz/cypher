@@ -16,8 +16,8 @@ class CreateBondingCurvesTable extends Migration
         Schema::create('bonding_curves', function (Blueprint $table) {
             $table->id();
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->decimal('total_investments', 12, 2);
+            $table->double('investments');
+            $table->double('tokens');
             $table->timestamps();
         });
     }
