@@ -181,12 +181,12 @@ export default {
                       </div>
                       <div class="stats__right">
                         <div>
-                          You Own<span class="aquamarine-color mr-1.5 ml-1.5 mb-1">{{ stats.total_stakes }}%</span>Stake
+                          You Own<span class="aquamarine-color mr-1.5 ml-1.5 mb-1">{{ toFixedAmount2(stats.total_stakes) }}%</span>Stake
                         </div>
                         <div class="-mt-2">
                           <span class="aquamarine-color mr-1.5">{{
-                          stats.user_total_investments
-                          }}</span><span class="mr-1.5">{{ this.currency }}</span>Invested
+                          toFixedAmount2(stats.user_total_investments)
+                          }}</span><span class="mr-1.5"> Tokens </span>Invested
                         </div>
                       </div>
                     </div>

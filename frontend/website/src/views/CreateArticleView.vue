@@ -131,6 +131,8 @@ export default {
           this.description = this.article.description;
         if (this.article.price) this.price = this.article.price;
         if (this.article.theta) this.theta = this.article.theta;
+        this.share_to_read = this.article.share_to_read ? true: false;
+        this.liquidation_days = this.article.liquidation_days;
       });
     },
 

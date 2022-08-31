@@ -172,8 +172,7 @@ export default {
                   }}</span>Shares
                 </div>
                 <div>
-                  {{ article.total_investments }} {{ this.currency
-                  }}<span class="aquamarine-color ml-1.5">earned</span>
+                  {{ toFixedAmount2(article.total_investments) }} Tokens <span class="aquamarine-color ml-1.5">earned</span>
                 </div>
               </div>
             </div>

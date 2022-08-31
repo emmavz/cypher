@@ -122,13 +122,13 @@ export default {
         </div>
         <div class="pl-3 opacity-80">
           <div>
-            <b>{{ newArticle.total_stakes }}% Stake</b>
+            <b>{{ toFixedAmount2(newArticle.total_stakes) }}% Stake</b>
           </div>
           <div class="mt-1.5">
-            <b>{{ newArticle.user_total_investments }}/{{
-                newArticle.total_investments
+            <b>{{ toFixedAmount2(newArticle.user_total_investments) }}/{{
+                toFixedAmount2(newArticle.total_investments)
             }}
-              {{ this.currency }}</b>
+              Tokens</b>
           </div>
         </div>
       </div>

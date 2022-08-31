@@ -22,6 +22,7 @@ use App\Models\UserNotification;
 use Validator;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use App\Notifications\WelcomeEmailNotification;
 
 class ApiController extends BaseController
 {
@@ -33,13 +34,11 @@ class ApiController extends BaseController
      */
     public function get_article_list_and_view(Request $request)
     {
+
         $articles = Article::with('user:id,name,pfp', 'tags:name')->select('id', 'title', 'date_posted', 'image_url', 'user_id', 'price', 'liquidation_days')
             ->addSelect($this->getLiquidationDaysQuery())
+            ->whereNotIn('user_id', $this->blockedUserIds())
             ->withCount('is_paid_by_user', 'is_paid_by_referrals')
-            ->doesnthave('block_user')
-            // ->withCount(['total_invested' => function ($query) {
-            //     return $query->select(DB::raw("SUM(price)"));
-            // }])
             ->limit($request->limit)->skip($request->offset)->where('is_published', 1)->orderBy('date_posted', 'DESC')->get();
 
         return $this->sendResponse($articles);
@@ -85,10 +84,8 @@ class ApiController extends BaseController
      */
     public function get_article_homepage(Request $request)
     {
-
         $article = Article::with(['user:id,name,pfp'])->select('id', 'title', 'date_posted', 'image_url', 'price',  'description', 'user_id', 'share_to_read', 'liquidation_days')
             ->addSelect($this->getLiquidationDaysQuery())
-            ->doesnthave('block_user')
             ->withCount(['total_reads', 'total_shares', 'is_paid_by_user', 'is_paid_by_referrals'])->where('id', $request->article_id)->where('is_published', 1);
 
         // Coming from article published page
@@ -97,7 +94,13 @@ class ApiController extends BaseController
         }
 
         $article = $article->firstOrFail();
-        $article->total_investments = $article->total_invested->sum('price');
+
+        $this->isBlocked($article->user_id);
+
+        if ($this->isArticleFree($article)) {
+            $article->total_investments = $article->total_invested->sum('price');
+            unset($article->total_invested);
+        }
 
         // Get user profile
         $request->merge(['user_id' => $article->user_id]);
@@ -114,12 +117,6 @@ class ApiController extends BaseController
                 });
             })->first();
         }
-
-
-        // Check if article is free
-        // $isArticleFreeArr = $this->isArticleFree($request, $article);
-        // $isArticleFree = $isArticleFreeArr[0];
-        // $liquidation_days = $isArticleFreeArr[1];
 
         // Insert new share in database and increment in total shares count
         if ($this->share_article($request)) $article->total_shares_count++;
@@ -141,8 +138,9 @@ class ApiController extends BaseController
 
         $article = Article::with('user:id,name,pfp')->select('id', 'title', 'date_posted', 'image_url', 'price', 'description', 'user_id', 'content', 'share_to_read', 'liquidation_days')
             ->addSelect($this->getLiquidationDaysQuery())
-            ->doesnthave('block_user')
             ->withCount('total_reads', 'total_shares', 'is_paid_by_user', 'is_paid_by_referrals')->where('id', $request->article_id)->where('is_published', 1)->firstOrFail();
+
+        $this->isBlocked($article->user_id);
 
         // Check if article is free
         if (!$this->isArticleFree($article)) {
@@ -167,11 +165,6 @@ class ApiController extends BaseController
                 });
             })->first();
         }
-
-        // Check if article is free
-        // $isArticleFreeArr = $this->isArticleFree($request, $article);
-        // $isArticleFree = $isArticleFreeArr[0];
-        // $liquidation_days = $isArticleFreeArr[1];
 
         $user = $this->get_user_profile($request, [], 0);
 
@@ -199,7 +192,8 @@ class ApiController extends BaseController
             $params = array_merge($params, $selectParams);
         }
 
-        $user = User::select($params)->withCount(['followers', 'followed'])->where('id', $request->user_id)->doesnthave('block_user')->firstOrFail();
+        $user = User::select($params)->withCount(['followers', 'followed'])->where('id', $request->user_id)->firstOrFail();
+        $this->isBlocked($user->id);
 
         if ($shouldReturnResponse) {
             return $this->sendResponse($user);
@@ -253,11 +247,8 @@ class ApiController extends BaseController
     {
         $articles = Article::with('user:id,name,pfp', 'tags:name')->select('id', 'title', 'date_posted', 'image_url', 'user_id', 'price', 'liquidation_days')
             ->addSelect($this->getLiquidationDaysQuery())
-            ->doesnthave('block_user')
+            ->whereNotIn('user_id', $this->blockedUserIds())
             ->withCount('is_paid_by_user', 'is_paid_by_referrals')
-            // ->withCount(['total_invested' => function ($query) {
-            //     return $query->select(DB::raw("SUM(price)"));
-            // }])
             ->where('is_published', 1)->limit($request->limit)->skip($request->offset)->orderBy('date_posted', 'DESC')->get();
 
         return $this->sendResponse($articles);
@@ -273,11 +264,8 @@ class ApiController extends BaseController
     {
         $articles = Article::with('user:id,name,pfp', 'tags:name')->select('id', 'title', 'date_posted', 'image_url', 'user_id', 'price', 'liquidation_days')
             ->addSelect($this->getLiquidationDaysQuery())
-            ->doesnthave('block_user')
+            ->whereNotIn('user_id', $this->blockedUserIds())
             ->withCount('is_paid_by_user', 'is_paid_by_referrals')
-            // ->withCount(['total_invested' => function ($query) {
-            //     return $query->select(DB::raw("SUM(price)"));
-            // }])
             ->where('title', 'LIKE', '%' . $request->q . '%')->where('is_published', 1)->orderBy('date_posted', 'DESC')->get();
 
         return $this->sendResponse($articles);
@@ -291,7 +279,7 @@ class ApiController extends BaseController
      */
     public function search_authors(Request $request)
     {
-        $users = User::select('id', 'name', 'bio', 'pfp', DB::raw('CASE WHEN EXISTS(SELECT * FROM follows WHERE users.id = followed_id AND follows.follower_id = ' . $request->follower_id . ') THEN 1 ELSE 0 END AS is_followed'))->where('name', 'LIKE', '%' . $request->q . '%')->where('id', '!=', $request->follower_id)->doesnthave('block_user')->latest()->get();
+        $users = User::select('id', 'name', 'bio', 'pfp', DB::raw('CASE WHEN EXISTS(SELECT * FROM follows WHERE users.id = followed_id AND follows.follower_id = ' . $request->follower_id . ') THEN 1 ELSE 0 END AS is_followed'))->where('name', 'LIKE', '%' . $request->q . '%')->where('id', '!=', $request->follower_id)->whereNotIn('id', $this->blockedUserIds())->latest()->get();
 
         return $this->sendResponse($users);
     }
@@ -309,16 +297,18 @@ class ApiController extends BaseController
             'followed_id' => ['required', 'integer', 'exists:users,id']
         ]);
 
-        $this->checkIfUserIsBlocked($request->followed_id);
+        if ($request->followed_id != auth()->user()->id) {
+            $this->isBlocked($request->followed_id, true);
 
-        $follow = Follow::where('follower_id', auth()->user()->id)->where('followed_id', $request->followed_id)->first();
-        if ($follow) {
-            $follow->delete();
-        } else {
-            $follow = new Follow;
-            $follow->follower_id = auth()->user()->id;
-            $follow->followed_id = $request->followed_id;
-            $follow->save();
+            $follow = Follow::where('follower_id', auth()->user()->id)->where('followed_id', $request->followed_id)->first();
+            if ($follow) {
+                $follow->delete();
+            } else {
+                $follow = new Follow;
+                $follow->follower_id = auth()->user()->id;
+                $follow->followed_id = $request->followed_id;
+                $follow->save();
+            }
         }
 
         return $this->sendResponse([]);
@@ -392,7 +382,7 @@ class ApiController extends BaseController
         // Show tags and price only for other user profiles and not for auth user
         if (auth()->user()->id != $request->user_id) {
             $articles->with('tags:name');
-            $articles->doesnthave('block_user');
+            $articles->whereNotIn('user_id', $this->blockedUserIds());
             array_push($articlesSelect, 'price');
             // $articles->withCount(['total_invested' => function ($query) {
             //     return $query->select(DB::raw("SUM(price)"));
@@ -553,14 +543,16 @@ class ApiController extends BaseController
     {
         $article = Article::select('*')->where('id', $request->article_id)->where('is_published', 1)->where('user_id', '!=', auth()->user()->id)
             ->addSelect($this->getLiquidationDaysQuery())
-            ->withCount('is_paid_by_user', 'is_paid_by_referrals')->doesnthave('block_user');
+            ->withCount('is_paid_by_user', 'is_paid_by_referrals');
 
         $article = $article->firstOrFail();
-        $user = User::findOrFail(auth()->user()->id);
+        $this->isBlocked($article->user_id);
 
         if ($this->isArticleFree($article)) {
             return $this->sendError(['paid' => 'This article is already free!'], true);
         }
+
+        $user = User::findOrFail(auth()->user()->id);
 
         if ($user->balance >= $article->price) {
 
@@ -572,7 +564,7 @@ class ApiController extends BaseController
                     'amount' => $article->price,
                 ];
 
-                $this->addToBondingCurve($user, $article->user_id, $article->price, $article, $user, $userInvestments);
+                $tokens = $this->addToBondingCurve($user, $article->user_id, $article->price, $article, $user, $userInvestments);
 
                 // Make is_paid column true of all 8 level parents of current user
                 $articleShare = ArticleShare::where('article_id', $article->id)->where('referee_id', auth()->user()->id)->first();
@@ -589,7 +581,7 @@ class ApiController extends BaseController
                             (SELECT t.id, t.referee_id, t.referrer_id, t.article_id, cte.lvl + 1
                             FROM cte
                             INNER JOIN article_share t ON cte.referrer_id = t.referee_id
-                        WHERE cte.lvl <= " . $maxLevelsLimit . "-1  AND t.article_id = " . $article->id . ") )
+                        WHERE cte.lvl <= " . $maxLevelsLimit . "-2  AND t.article_id = " . $article->id . ") )
                     SELECT id FROM cte;");
 
                     $shareIds = [];
@@ -602,9 +594,11 @@ class ApiController extends BaseController
                             'is_paid' => 1
                         ]);
                     }
+
+                    $this->article_share_seen((new ArticleShare)->newQuery(), $article->id);
                 }
 
-                SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $user->id . ' } }"><b>' . $user->name . '</b></a> just invested <b>' . $article->price . ' CPHR</b>.', 'user_id' => $article->user_id]);
+                SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $user->id . ' } }"><b>' . $user->name . '</b></a> just invested <b>' . (round($tokens, config('website.rounddecimalpoints'))) . ' Tokens</b>.', 'user_id' => $article->user_id]);
             });
         } else {
             return $this->sendError(['balance' => 'You dont have enough balance!'], true);
@@ -621,30 +615,29 @@ class ApiController extends BaseController
     public function upvote(Request $request)
     {
 
-        $this->validate_fields($request, ['amount' => ['required', 'numeric', 'gt:0']]);
+        $this->validate_fields($request, ['tokens' => ['required', 'numeric', 'gt:0']]);
 
-        // if ($request->user_id != auth()->user()->id) {
-        $user = User::doesnthave('block_user')->findOrFail($request->user_id);
+        $user = User::findOrFail($request->user_id);
+        $this->isBlocked($user->id);
         $auth = User::findOrFail(auth()->user()->id);
 
-        if ($auth->balance >= $request->amount) {
+        $totalPreviousTokens = $this->getTotalTokensOfAuthor($user->id);
+        $amount = $this->calculateIntegral($totalPreviousTokens, $totalPreviousTokens + $request->tokens);
 
-            DB::transaction(function () use ($auth, $user, $request) {
+        if ($auth->balance >= $amount) {
 
-                $totalPreviousInvestments = BondingCurve::where('author_id', $user->id)->sum('tokens');
-                $upperBound = $this->calculateUpperbound($totalPreviousInvestments, $request->amount);
-                $tokens = $upperBound - $totalPreviousInvestments;
+            DB::transaction(function () use ($auth, $user, $request, $amount) {
 
                 // Bonding Curve
                 $bondingCurve = BondingCurve::where('author_id', $user->id)->first();
                 if ($bondingCurve) {
-                    $bondingCurve->tokens += $tokens;
-                    $bondingCurve->investments += $request->amount;
+                    $bondingCurve->tokens += $request->tokens;
+                    $bondingCurve->investments += $amount;
                     $bondingCurve->update();
                 } else {
                     $bondingCurve = new BondingCurve();
-                    $bondingCurve->tokens = $tokens;
-                    $bondingCurve->investments = $request->amount;
+                    $bondingCurve->tokens = $request->tokens;
+                    $bondingCurve->investments = $amount;
                     $bondingCurve->author_id = $user->id;
                     $bondingCurve->save();
                 }
@@ -652,13 +645,13 @@ class ApiController extends BaseController
                 // Total Investments
                 $totalUserInvestment = TotalUserInvestment::where('author_id', $user->id)->where('user_id', $auth->id)->first();
                 if ($totalUserInvestment) {
-                    $totalUserInvestment->total_investments += $request->amount;
-                    $totalUserInvestment->total_tokens += $tokens;
+                    $totalUserInvestment->total_investments += $amount;
+                    $totalUserInvestment->total_tokens += $request->tokens;
                     $totalUserInvestment->update();
                 } else {
                     $totalUserInvestment = new TotalUserInvestment();
-                    $totalUserInvestment->total_investments = $request->amount;
-                    $totalUserInvestment->total_tokens = $tokens;
+                    $totalUserInvestment->total_investments = $amount;
+                    $totalUserInvestment->total_tokens = $request->tokens;
                     $totalUserInvestment->author_id = $user->id;
                     $totalUserInvestment->user_id = $auth->id;
                     $totalUserInvestment->save();
@@ -668,17 +661,17 @@ class ApiController extends BaseController
                 $user->user_investments()->create([
                     'user_id' => $auth->id,
                     'author_id' => $user->id,
-                    'amount' => $request->amount,
-                    'tokens' => $tokens,
-                    'investments' => $request->amount,
+                    'amount' => $amount,
+                    'tokens' => $request->tokens,
+                    'investments' => $amount,
                 ]);
 
                 // Deduct amount from user balance
-                $auth->balance -= $request->amount;
+                $auth->balance -= $amount;
                 $auth->update();
 
                 if ($user->id != $auth->id) {
-                    SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $auth->id . ' } }"><b>' . $auth->name . '</b></a> just invested <b>' . $request->amount . ' CPHR</b>.', 'user_id' => $user->id]);
+                    SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $auth->id . ' } }"><b>' . $auth->name . '</b></a> just invested <b>' . (round($request->tokens, config('website.rounddecimalpoints'))) . ' Tokens</b>.', 'user_id' => $user->id]);
                 }
             });
         } else {
@@ -686,12 +679,10 @@ class ApiController extends BaseController
         }
 
         if ($user->id == $auth->id) {
-            return $this->sendResponse($this->get_user_investments($request, false));
+            return $this->sendResponse([$this->get_user_investments($request, false), $this->getTotalTokensOfAuthor($user->id)]);
         } else {
-            return $this->sendResponse($this->get_other_user_investments($request, false));
+            return $this->sendResponse([$this->get_other_user_investments($request, false), $this->getTotalTokensOfAuthor($user->id)]);
         }
-
-        // }
     }
 
     /**Cashout
@@ -699,52 +690,56 @@ class ApiController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function cashout(Request $request)
+    public function cashout(Request $request,  $auth_id = null, $shouldReturnResponse = 1)
     {
-        $this->validate_fields($request, ['amount' => ['required', 'numeric', 'gt:0']]);
+        $this->validate_fields($request, ['tokens' => ['required', 'numeric', 'gt:0']]);
 
-        // Currently I allowed user to cashout from blocked user
-        // $user = User::doesnthave('block_user')->findOrFail($request->user_id);
         $user = User::findOrFail($request->user_id);
-        $auth = User::findOrFail(auth()->user()->id);
+        $auth = User::findOrFail($auth_id ? $auth_id : auth()->user()->id);
 
-        $totalUserInvestment = TotalUserInvestment::where('author_id', $user->id)->where('user_id', auth()->user()->id)->where('total_investments', '!=', 0)->first();
+        $totalUserInvestment = TotalUserInvestment::where('author_id', $user->id)->where('user_id', $auth_id ? $auth_id : auth()->user()->id)->where('total_tokens', '!=', 0)->first();
         $bondingCurve = BondingCurve::where('author_id', $user->id)->first();
 
         if ($totalUserInvestment && $bondingCurve) {
-            if ($totalUserInvestment->total_investments >= $request->amount) {
+
+            if ($totalUserInvestment->total_tokens >= $request->tokens) {
 
                 DB::transaction(function () use ($request, $bondingCurve, $auth, $user, $totalUserInvestment) {
 
-                    // Update bonding curve
-                    $upperBound = $bondingCurve->tokens;
-                    $lowerbound = $upperBound - $request->amount;
-                    $tokens = $this->calculateIntegralWithConstant($lowerbound, $upperBound);
+                    $totalPreviousTokens = $this->getTotalTokensOfAuthor($user->id);
+                    $amount = $this->calculateIntegralWithConstant($totalPreviousTokens - $request->tokens, $totalPreviousTokens);
 
-                    $bondingCurve->investments -= $request->amount;
-                    $bondingCurve->tokens -= $tokens;
+                    // Update bonding curve
+                    $bondingCurve->investments -= $amount;
+                    $bondingCurve->tokens -= $request->tokens;
                     $bondingCurve->update();
 
                     // Update total User Investments
-                    $totalUserInvestment->total_investments -= $request->amount;
-                    $totalUserInvestment->total_tokens -= $tokens;
+                    $totalUserInvestment->total_investments -= $amount;
+                    $totalUserInvestment->total_tokens -= $request->tokens;
                     $totalUserInvestment->update();
 
                     // Add amount into user balance
-                    $auth->balance += $request->amount;
+                    $auth->balance += $amount;
                     $auth->update();
                 });
             } else {
-                return $this->sendError(['balance' => 'You dont have this much amount invested into this author!'], true);
+                if ($shouldReturnResponse) {
+                    return $this->sendError(['balance' => 'You dont have this much tokens into this author!'], true);
+                }
             }
 
-            if ($user->id == $auth->id) {
-                return $this->sendResponse($this->get_user_investments($request, false));
-            } else {
-                return $this->sendResponse($this->get_other_user_investments($request, false));
+            if ($shouldReturnResponse) {
+                if ($user->id == $auth->id) {
+                    return $this->sendResponse([$this->get_user_investments($request, false), $this->getTotalTokensOfAuthor($user->id)]);
+                } else {
+                    return $this->sendResponse([$this->get_other_user_investments($request, false), $this->getTotalTokensOfAuthor($user->id)]);
+                }
             }
         } else {
-            return $this->sendError(['balance' => 'You dont have any investment to this author!'], true);
+            if ($shouldReturnResponse) {
+                return $this->sendError(['balance' => 'You dont own any tokens to this author!'], true);
+            }
         }
     }
 
@@ -765,7 +760,6 @@ class ApiController extends BaseController
         if ($theta > 0) {
             $thetaPercentAmount = ($theta / 100) * $remainingAmount;
             User::where('id', $user_id)->increment('balance', $thetaPercentAmount);
-            // This amount goes into author bonding curve
             $remainingAmount = $remainingAmount - $thetaPercentAmount;
         }
 
@@ -824,7 +818,7 @@ class ApiController extends BaseController
             );
         }
 
-        return true;
+        return $tokens;
     }
 
     /**Read an article
@@ -834,8 +828,9 @@ class ApiController extends BaseController
      */
     public function read_article(Request $request)
     {
-        $article = Article::where('id', $request->article_id)->where('is_published', 1)->doesnthave('block_user');
+        $article = Article::where('id', $request->article_id)->where('is_published', 1);
         $article = $article->first();
+        $this->isBlocked($article->user_id);
 
         if ($article) {
             if (auth()->user()->id != $article->user_id) {
@@ -862,9 +857,11 @@ class ApiController extends BaseController
             $user = User::where('referral_token', $request->referral_token)->where('id', '!=', auth()->user()->id)->first();
             $article = Article::select('*')->where('id', $request->article_id)->where('is_published', 1)->where('user_id', '!=', auth()->user()->id)
                 ->addSelect($this->getLiquidationDaysQuery())
-                ->withCount('is_paid_by_user', 'is_paid_by_referrals')->doesnthave('block_user')->first();
+                ->withCount('is_paid_by_user', 'is_paid_by_referrals')->first();
 
             if ($user && $article && $article->share_to_read) {
+
+                $this->isBlocked($article->user_id);
 
                 if ($this->isArticleFree($article)) {
                     return false;
@@ -928,7 +925,7 @@ class ApiController extends BaseController
     //                 (SELECT t.referee_id, t.referrer_id, cte.article_id, cte.lvl + 1
     //                 FROM cte
     //                 INNER JOIN article_share t ON cte.referee_id = t.referrer_id
-    //             WHERE cte.lvl <= " . $maxLevelsLimit . "-1  AND cte.article_id = " . $request->article_id . " LIMIT " . $maxDirectChildsLimit . ") )
+    //             WHERE cte.lvl <= " . $maxLevelsLimit . "-2  AND cte.article_id = " . $request->article_id . " LIMIT " . $maxDirectChildsLimit . ") )
     //         SELECT * FROM cte;");
 
     //     $refereesIds = [];
@@ -1027,7 +1024,9 @@ class ApiController extends BaseController
 
             $admin = $this->getSuperAdmin();
 
-            $cte = DB::select("with recursive myCTE  as (
+            for ($i = 0; $i < config('website.max_lucky_members_chain'); $i++) {
+
+                $cte = DB::select("with recursive myCTE  as (
                     (select
                         id as root_id,
                         referrer_id as root_referrer_id,
@@ -1055,82 +1054,81 @@ class ApiController extends BaseController
                 group by root_id, article_id HAVING remaining_liquidation_days != 0 ORDER BY max_level DESC
                 ");
 
-            if (count($cte)) {
-                // Remove rows that belongs to same chairing chain from query result
-                $arr = [];
+                if (count($cte)) {
+                    // Remove rows that belongs to same chairing chain from query result
+                    $arr = [];
 
-                foreach ($cte as $k => $ct) {
+                    foreach ($cte as $k => $ct) {
 
-                    $found = false;
-                    if (count($arr)) {
-                        for ($i = 0; $i < count($arr); $i++) {
-                            if (($ct->article_id == $arr[$i]->article_id) && (str_contains($arr[$i]->all_parents, $ct->all_parents))) {
-                                $found = true;
-                                break;
+                        $found = false;
+                        if (count($arr)) {
+                            for ($i = 0; $i < count($arr); $i++) {
+                                if (($ct->article_id == $arr[$i]->article_id) && (str_contains($arr[$i]->all_parents, $ct->all_parents))) {
+                                    $found = true;
+                                    break;
+                                }
                             }
+                        }
+
+                        if (!$found) {
+                            array_push($arr, $ct);
                         }
                     }
 
-                    if (!$found) {
-                        array_push($arr, $ct);
-                    }
-                }
 
+                    // Find random indexes based on probility levels to max max_lucky_members_chain limit
+                    $newArr = [];
 
-                // Find random indexes based on probility levels to max max_lucky_members_chain limit
-                $newArr = [];
+                    $randomItemIndex =  $this->randProb($arr, $maxLevelsLimit);
+                    array_push($newArr, $arr[$randomItemIndex]);
 
-                for ($i = 0; $i < config('website.max_lucky_members_chain'); $i++) {
-                    if (count($arr)) {
-                        $randomItemIndex =  $this->randProb($arr, $maxLevelsLimit);
-                        array_push($newArr, $arr[$randomItemIndex]);
-                        unset($arr[$randomItemIndex]);
-                    }
-                }
+                    // for ($i = 0; $i < config('website.max_lucky_members_chain'); $i++) {
+                    //     if (count($arr)) {
+                    //         $randomItemIndex =  $this->randProb($arr, $maxLevelsLimit);
+                    //         array_push($newArr, $arr[$randomItemIndex]);
+                    //         unset($arr[$randomItemIndex]);
+                    //     }
+                    // }
 
-                // Limit all chains to max max_lucky_members_chain limit
-                // $newArr = array_slice($newArr, 0, config('website.max_lucky_members_chain'));
+                    foreach ($newArr as $ct) {
 
-                foreach ($newArr as $ct) {
+                        $article = Article::findOrFail($ct->article_id);
+                        $articleShare = ArticleShare::where('id', $ct->root_id)->firstOrFail();
+                        $user = User::findOrFail($articleShare->referee_id);
 
-                    $article = Article::findOrFail($ct->article_id);
-                    $articleShare = ArticleShare::where('id', $ct->root_id)->firstOrFail();
-                    $user = User::findOrFail($articleShare->referee_id);
+                        if ($admin->balance >= $article->price) {
 
-                    if ($admin->balance >= $article->price) {
-
-                        $parents = DB::select("with recursive cte as (
+                            $parents = DB::select("with recursive cte as (
                         (select id, referee_id, referrer_id, 1 lvl, article_id from article_share WHERE lucky_sharer = false AND is_paid = false AND id = " . $ct->root_id . " LIMIT " . $maxDirectChildsLimit . ")
                         union all
                         (select t.id, t.referee_id, t.referrer_id, lvl + 1, t.article_id
                         from cte c
-                        inner join article_share t on t.referee_id = c.referrer_id WHERE lucky_sharer = false AND is_paid = false AND c.lvl <= " . $maxLevelsLimit . "-1  LIMIT " . $maxDirectChildsLimit . ")
+                        inner join article_share t on t.referee_id = c.referrer_id WHERE lucky_sharer = false AND is_paid = false AND c.lvl <= " . $maxLevelsLimit . "-2  LIMIT " . $maxDirectChildsLimit . ")
                     )
                     SELECT * FROM cte");
 
-                        $shareIds = [];
-                        foreach ($parents as $parent) {
-                            array_push($shareIds, $parent->id);
+                            $shareIds = [];
+                            foreach ($parents as $parent) {
+                                array_push($shareIds, $parent->id);
+                            }
+
+                            if (count($shareIds)) {
+                                ArticleShare::whereIn('id', $shareIds)->update([
+                                    'is_paid' => 1,
+                                    'lucky_sharer' => 1
+                                ]);
+                            }
+
+                            $userInvestments = [
+                                'user_id' => $user->id,
+                                'author_id' => $article->user_id,
+                                'amount' => $article->price,
+                            ];
+
+                            $this->addToBondingCurve($user, $article->user_id, $article->price, $article, $admin, $userInvestments);
+                        } else {
+                            return $this->sendError(['balance' => 'You dont have enough balance!'], true);
                         }
-
-                        if (count($shareIds)) {
-                            ArticleShare::whereIn('id', $shareIds)->update([
-                                'is_paid' => 1,
-                                'lucky_sharer' => 1
-                            ]);
-                        }
-
-                        $userInvestments = [
-                            'user_id' => $user->id,
-                            'author_id' => $article->user_id,
-                            'amount' => $article->price,
-                        ];
-
-                        $this->addToBondingCurve($user, $article->user_id, $article->price, $article, $admin, $userInvestments);
-
-                        SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $user->id . ' } }"><b>' . $user->name . '</b></a> just invested <b>' . $article->price . ' CPHR</b>.', 'user_id' => $article->user_id]);
-                    } else {
-                        return $this->sendError(['balance' => 'You dont have enough balance!'], true);
                     }
                 }
             }
@@ -1149,7 +1147,14 @@ class ApiController extends BaseController
             'article_id' => ['required', 'exists:articles,id']
         ]);
 
-        $articleShares = ArticleShare::where('article_id', $fields['article_id'])->where('lucky_sharer', true)->where('is_paid', true)->where(function ($query) {
+        $this->article_share_seen(ArticleShare::where('lucky_sharer', true)->where('is_paid', true), $fields['article_id']);
+
+        return $this->sendResponse([]);
+    }
+
+    public function article_share_seen($query, $article_id)
+    {
+        $articleShares = $query->where('article_id', $article_id)->where(function ($query) {
             return $query->where(function ($q) {
                 return $q->where('referrer_id', auth()->user()->id)->where('lucky_sharer_seen_referrer_id', '=', null);
             })->orWhere(function ($q) {
@@ -1171,8 +1176,6 @@ class ApiController extends BaseController
                 }
             }
         }
-
-        return $this->sendResponse([]);
     }
 
     // public function getLiquidationDays($article)
@@ -1195,7 +1198,8 @@ class ApiController extends BaseController
      */
     public function get_other_user_investments(Request $request, $shouldReturnResponse = true)
     {
-        User::doesnthave('block_user')->findOrFail($request->user_id);
+        $user = User::findOrFail($request->user_id);
+        $this->isBlocked($request->user_id);
 
         // $userStats = DB::select(DB::raw('SELECT author_id,
         // COALESCE(((SELECT SUM(x.amt) FROM (SELECT amount as amt,author_id FROM user_profile_investments UNION ALL SELECT price as amt,author_id FROM article_user_paids) as x WHERE x.author_id = t.author_id)), 0) as total_investments,
@@ -1219,18 +1223,18 @@ class ApiController extends BaseController
         // FROM user_investments t WHERE author_id = ' . $request->user_id . ' LIMIT 1'));
 
         $userStats = DB::select(DB::raw('SELECT author_id,
-        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_investments as amt,author_id FROM total_user_investments) as x WHERE x.author_id = t.author_id)), 0) as total_investments,
-        COALESCE(((SELECT COUNT(DISTINCT x.user_id) FROM (SELECT user_id,author_id FROM total_user_investments) as x WHERE x.author_id = t.author_id)), 0) as total_investors,
-        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_investments as amt,author_id,user_id FROM total_user_investments) as x WHERE x.author_id = t.author_id AND x.user_id = ' . auth()->user()->id .
+        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_tokens as amt,author_id FROM total_user_investments) as x WHERE x.author_id = t.author_id)), 0) as total_investments,
+        COALESCE(((SELECT COUNT(DISTINCT x.user_id) FROM (SELECT user_id,author_id,total_tokens FROM total_user_investments) as x WHERE x.author_id = t.author_id AND x.total_tokens != 0)), 0) as total_investors,
+        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_tokens as amt,author_id,user_id FROM total_user_investments) as x WHERE x.author_id = t.author_id AND x.user_id = ' . auth()->user()->id .
             ')), 0) as user_total_investments
-        FROM total_user_investments t WHERE author_id = ' . $request->user_id . ' AND t.total_investments != 0  LIMIT 1'));
+        FROM total_user_investments t WHERE author_id = ' . $request->user_id . ' AND t.total_tokens != 0  LIMIT 1'));
 
         $userStats = count($userStats) ? $userStats[0] : null;
 
         if ($userStats) {
             $userStats->total_stakes = 0;
             if ($userStats->total_investments) {
-                $userStats->total_stakes = round((($userStats->user_total_investments / $userStats->total_investments) * 100), config('website.total_stakes_decimal_points'));
+                $userStats->total_stakes = ($userStats->user_total_investments / $userStats->total_investments) * 100;
             }
         } else {
             $userStats = (object) [];
@@ -1240,7 +1244,7 @@ class ApiController extends BaseController
             $userStats->total_stakes = 0;
         }
 
-        if ($shouldReturnResponse) return $this->sendResponse($userStats);
+        if ($shouldReturnResponse) return $this->sendResponse([$userStats, $this->getTotalTokensOfAuthor($user->id)]);
         else return $userStats;
     }
 
@@ -1277,17 +1281,17 @@ class ApiController extends BaseController
 
         $userStats = DB::select(DB::raw('SELECT author_id, user_id, t.updated_at, users.id as id,
         users.name as title, users.pfp as pfp,
-        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_investments as amt,author_id FROM total_user_investments) as x WHERE x.author_id = t.author_id)), 0) as total_investments,
-        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_investments as amt,author_id,user_id FROM total_user_investments) as x WHERE x.author_id = t.author_id AND x.user_id = ' . auth()->user()->id . ')), 0) as user_total_investments,
+        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_tokens as amt,author_id FROM total_user_investments) as x WHERE x.author_id = t.author_id)), 0) as total_investments,
+        COALESCE(((SELECT SUM(x.amt) FROM (SELECT total_tokens as amt,author_id,user_id FROM total_user_investments) as x WHERE x.author_id = t.author_id AND x.user_id = ' . auth()->user()->id . ')), 0) as user_total_investments,
         (select count(*) from `users` inner join `follows` on `follows`.`id` = `users`.`id` where t.author_id = `follows`.`followed_id`) as `user_followers_count`,
         (select count(*) from `users` inner join `follows` on `follows`.`id` = `users`.`id` where t.author_id = `follows`.`follower_id`) as `user_followed_count`,
         (select image_url from articles WHERE articles.user_id = users.id AND articles.is_published = 1 ORDER BY articles.date_posted DESC LIMIT 1) as image_url
-        FROM total_user_investments t INNER JOIN users ON users.id = t.author_id AND user_id = ' . auth()->user()->id . ' AND t.total_investments != 0 ORDER BY t.updated_at DESC'));
+        FROM total_user_investments t INNER JOIN users ON users.id = t.author_id AND user_id = ' . auth()->user()->id . ' AND t.total_tokens != 0 ORDER BY t.updated_at DESC'));
 
 
         foreach ($userStats as $userStat) {
 
-            $userStat->total_stakes = round(($userStat->user_total_investments / $userStat->total_investments) * 100, config('website.total_stakes_decimal_points'));
+            $userStat->total_stakes = ($userStat->user_total_investments / $userStat->total_investments) * 100;
 
             $userStat->user = (object) [
                 'id' => $userStat->id,
@@ -1300,7 +1304,7 @@ class ApiController extends BaseController
             unset($userStat->pfp);
         }
 
-        if ($shouldReturnResponse) return $this->sendResponse($userStats);
+        if ($shouldReturnResponse) return $this->sendResponse([$userStats, $this->getTotalTokensOfAuthor(auth()->user()->id)]);
         else return $userStats;
     }
 
@@ -1371,6 +1375,8 @@ class ApiController extends BaseController
 
             SendUserNotification::dispatch(['text' => 'Welcome to Cypher! <a :to="{ name: \'drafts\' }"><b>Get started here</b></a>.', 'user_id' => $user->id]);
 
+            // $user->notify(new WelcomeEmailNotification($user));
+
             return $this->sendResponse(['id' => $user->id, 'name' => $user->name, 'token' => $user->createToken('API Token')->plainTextToken]);
         }
     }
@@ -1434,7 +1440,7 @@ class ApiController extends BaseController
         }
 
         // Check if user is blocked
-        $this->checkIfUserIsBlocked($user->id);
+        $this->isBlocked($user->id, true);
 
         if ($auth->balance >= $fields['cphr']) {
             $auth->balance -= $fields['cphr'];
@@ -1443,7 +1449,7 @@ class ApiController extends BaseController
             $user->balance += $fields['cphr'];
             $user->update();
 
-            SendUserNotification::dispatch(['text' => '<b>' . $auth->name . '</b> sent <b>' . $fields['cphr'] . ' CPHR</b>.', 'user_id' => $user->id]);
+            SendUserNotification::dispatch(['text' => '<a :to="{ name: \'profile\', params: { userId: ' . $auth->id . ' } }"><b>' . $auth->name . '</b></a> sent <b>' . round($fields['cphr'], config('website.rounddecimalpoints'))  . ' CPHR</b>.', 'user_id' => $user->id]);
         } else {
             return $this->sendError(['balance' => 'You dont have enough balance!'], true);
         }
@@ -1470,27 +1476,25 @@ class ApiController extends BaseController
             auth()->user()->block_user_func()->detach($user->id);
         } else {
             auth()->user()->block_user_func()->attach($user->id);
+
+            // Cashout all investments of auth user from that author
+            $totalUserInvestment = TotalUserInvestment::where('author_id', $user->id)->where('user_id', auth()->user()->id)->where('total_tokens', '!=', 0)->first();
+            if ($totalUserInvestment) {
+                $request->merge(['tokens' => $totalUserInvestment->total_tokens]);
+                $this->cashout($request, null, 0);
+            }
+
+            // Cashout all investments of author from auth user
+            $totalUserInvestment = TotalUserInvestment::where('author_id', auth()->user()->id)->where('user_id', $user->id)->where('total_tokens', '!=', 0)->first();
+            if ($totalUserInvestment) {
+                $request->merge(['tokens' => $totalUserInvestment->total_tokens]);
+                $request->merge(['user_id' => auth()->user()->id]);
+                $this->cashout($request, $user->id, 0);
+            }
         }
 
         return $this->sendResponse([]);
     }
-
-    /**
-     * Send notification.
-     *
-     */
-
-    // public function sendNotification($msg, $userId)
-    // {
-    //     $notification = new Notification();
-    //     $notification->text = $msg;
-    //     $notification->save();
-
-    //     $userNotification = new UserNotification();
-    //     $userNotification->notification_id = $notification->id;
-    //     $userNotification->user_id = $userId;
-    //     $userNotification->save();
-    // }
 
     public function getLiquidationDaysQuery($returnString = false)
     {
@@ -1503,16 +1507,16 @@ class ApiController extends BaseController
     }
 
     // If you edit this function dont forget to edit same function in frontend mixin.js
-    public function isArticleFree($article, $checkForReferrals = 1)
+    public function isArticleFree($article, $includeSomeConditions = 1)
     {
         $is_article_free = false;
         if (auth()->user() && auth()->user()->id == $article->user_id) {
             $is_article_free = true;
         } else if ($article->remaining_liquidation_days == 0) {
             $is_article_free = true;
-        } else if ($article->is_paid_by_user_count) {
+        } else if ($includeSomeConditions && $article->is_paid_by_user_count) {
             $is_article_free = true;
-        } else if ($checkForReferrals && $article->is_paid_by_referrals_count) {
+        } else if ($includeSomeConditions && $article->is_paid_by_referrals_count) {
             $is_article_free = true;
         } else if ($article->price <= 0) {
             $is_article_free = true;
@@ -1520,25 +1524,24 @@ class ApiController extends BaseController
         return $is_article_free;
     }
 
-    public function checkIfUserIsBlocked($user_id)
-    {
-        $isBlocked = BlockUser::where('user_1', getAuthId())->where('user_2', $user_id)->exists();
-        if ($isBlocked) {
-            return $this->sendError(['user' => ['This user is blocked by you!']], true);
-        }
-        return false;
-    }
-
     public function calculateUpperbound($lowerbound, $result)
     {
         return pow((($result + (2 / 3) * pow($lowerbound, 3 / 2)) * 3) / 2, 2 / 3);
     }
 
+    // If you change contact value dont forget to update in mixin also
     public function calculateIntegralWithConstant($lowerbound, $upperbound)
     {
-        return round(0.8 * (
+        return 0.8 * (
             (2 / 3) * pow($upperbound, 3 / 2) - (2 / 3) * pow($lowerbound, 3 / 2)
-        ));
+        );
+    }
+
+    public function calculateIntegral($lowerbound, $upperbound)
+    {
+        return (
+            (2 / 3) * pow($upperbound, 3 / 2) - (2 / 3) * pow($lowerbound, 3 / 2)
+        );
     }
 
     public function getSuperAdmin()
@@ -1572,6 +1575,57 @@ class ApiController extends BaseController
         }
 
         return null;
+    }
+
+    public function blockedUserIds()
+    {
+        $authId = getAuthId();
+
+        $blockedUserIds = [];
+
+        if ($authId) {
+            $blockedUserIds = BlockUser::where('user_1', $authId)->orWhere('user_2', $authId)->select('user_1', 'user_2')->get();
+            $blockedUserIds = collect($blockedUserIds->toArray())->flatten()->all();
+            $blockedUserIds = array_unique($blockedUserIds);
+            if (($key = array_search($authId, $blockedUserIds)) !== false) {
+                unset($blockedUserIds[$key]);
+            }
+            $blockedUserIds = array_values($blockedUserIds);
+        }
+
+        return $blockedUserIds;
+    }
+
+    public function isBlocked($user_id, $shouldReturnResponse = false)
+    {
+        $authId = getAuthId();
+
+        $isBlocked = false;
+
+        if ($authId && $authId != $user_id) {
+            $isBlocked = BlockUser::where(function ($q) use ($user_id, $authId) {
+                $q->where('user_1', $authId);
+                $q->where('user_2', $user_id);
+            })->orWhere(function ($q) use ($user_id, $authId) {
+                $q->where('user_1', $user_id);
+                $q->where('user_2', $authId);
+            })->exists();
+
+            if ($isBlocked) {
+                if (!$shouldReturnResponse) {
+                    abort(404);
+                } else {
+                    return $this->sendError(['user' => ['This user is blocked by you!']], true);
+                }
+            }
+        }
+
+        return $isBlocked;
+    }
+
+    public function getTotalTokensOfAuthor($authorId)
+    {
+        return BondingCurve::where('author_id', $authorId)->sum('tokens');
     }
 
     /**

@@ -202,6 +202,20 @@ export default {
       return r;
     },
 
+    calculateIntegral($lowerbound, $upperbound)
+    {
+        return this.toFixedAmount2(
+            (2 / 3) * Math.pow($upperbound, 3 / 2) - (2 / 3) * Math.pow($lowerbound, 3 / 2)
+        );
+    },
+
+    calculateIntegralWithConstant($lowerbound, $upperbound)
+    {
+        return this.toFixedAmount2(
+             0.8 * ((2 / 3) * Math.pow($upperbound, 3 / 2) - (2 / 3) * Math.pow($lowerbound, 3 / 2))
+        );
+    },
+
     checkPreviousPage() {
       return this.$router.options.history.state.back ? true : false;
     },
@@ -266,9 +280,14 @@ export default {
       return window.max_article_tags;
     },
 
-    user_balance($balance) {
-      return $balance.toFixed(2);
+    toFixedAmount($amount) {
+      return Number($amount.toFixed(2));
     },
+
+    toFixedAmount2($amount) {
+      return Number($amount.toFixed(4));
+    },
+
     is_logged_in() {
       this.sendApiRequest("is_logged_in", {}).then((response) => {
         if(response != -1) {
