@@ -190,7 +190,8 @@ export default {
     },
 
     getFullUrl(route) {
-      return new URL(route, window.location.href).href;
+      return window.webRoot + route.replace(/^\//, '');
+      // return new URL(route, window.location.href).href;
     },
 
     getUserProfileRoute(user_id, query = null) {
@@ -281,11 +282,11 @@ export default {
     },
 
     toFixedAmount($amount) {
-      return Number($amount.toFixed(2));
+      return Number(Number($amount).toFixed(2));
     },
 
     toFixedAmount2($amount) {
-      return Number($amount.toFixed(4));
+      return Number(Number($amount).toFixed(4));
     },
 
     is_logged_in() {

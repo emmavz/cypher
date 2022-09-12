@@ -1411,9 +1411,7 @@ class ApiController extends BaseController
      */
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
         $request->user()->currentAccessToken()->delete();
-
         return $this->sendResponse([]);
     }
 
@@ -1637,14 +1635,13 @@ class ApiController extends BaseController
     public function facebookshare(Request $request, $article_id, $user_id, $version)
     {
         $article = Article::where('id', $article_id)->where('is_published', 1)->firstOrFail();
-        $user = User::findOrFail($user_id);
 
         $ref = \Request::server('HTTP_REFERER');
         if ((strpos($ref, 'l.facebook') > -1) || (strpos($ref, 'lm.facebook') > -1)) {
-            return redirect()->to(env('VUE_URL') . '/article/' . $article_id . '/' . $user->referral_token);
+            return redirect()->to(env('VUE_URL') . '/article/' . $article_id);
         }
 
-        return view('front.facebookshare', ['article' => $article, 'user' => $user, 'v' => $version]);
+        return view('front.facebookshare', ['article' => $article, 'v' => $version, 'user_id' => $user_id]);
     }
 
     /**

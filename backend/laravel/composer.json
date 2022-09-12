@@ -12,7 +12,7 @@
         "intervention/image": "^2.7",
         "laracasts/utilities": "^3.2",
         "laravel/framework": "^8.75",
-        "laravel/sanctum": "^2.15",
+        "laravel/sanctum": "*",
         "laravel/tinker": "^2.5",
         "realrashid/sweet-alert": "^4.1",
         "spatie/laravel-permission": "^5.5",

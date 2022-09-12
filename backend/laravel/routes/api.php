@@ -21,6 +21,7 @@ Route::post('signin', [ApiController::class, 'signin']);
 Route::post('signup', [ApiController::class, 'signup']);
 Route::post('is_logged_in', [ApiController::class, 'is_logged_in']);
 Route::post('lucky_day', [ApiController::class, 'lucky_day']);
+Route::get('{article_id}/{user_id}/{version}/facebookshare', [ApiController::class, 'facebookshare'])->name('api.facebookshare');
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -47,7 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('cashout', [ApiController::class, 'cashout']);
     Route::post('get_other_user_investments', [ApiController::class, 'get_other_user_investments']);
     Route::post('get_user_investments', [ApiController::class, 'get_user_investments']);
-    Route::get('{article_id}/{user_id}/{version}/facebookshare', [ApiController::class, 'facebookshare'])->name('api.facebookshare');
     Route::post('get_edit_user_profile', [ApiController::class, 'get_edit_user_profile']);
     Route::post('update_user_profile', [ApiController::class, 'update_user_profile']);
     Route::post('logout', [ApiController::class, 'logout']);
