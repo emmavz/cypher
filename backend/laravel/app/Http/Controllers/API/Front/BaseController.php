@@ -16,7 +16,8 @@ class BaseController extends Controller
      */
     public function sendResponse($result, $status = 200)
     {
-        return response()->json($result, $status);
+        // return response()->json($result, $status);
+        return response()->json($result, $status, [], JSON_NUMERIC_CHECK);
     }
 
 
@@ -40,11 +41,10 @@ class BaseController extends Controller
         //     $response = $errorMessages;
         // }
 
-        if($exceptions) {
+        if ($exceptions) {
             throw ValidationException::withMessages($errorMessages);
-        }
-        else {
-            return response()->json($errorMessages, $status);
+        } else {
+            return response()->json($errorMessages, $status, [], JSON_NUMERIC_CHECK);
         }
     }
 }

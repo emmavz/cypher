@@ -5,7 +5,7 @@
     "dev": "vite --port 8888",
     "build": "vite build",
     "preview": "vite preview --port 8888",
-    "__build__": "vite build --base=/cypher/frontend/website/dist/"
+    "__build__": "vite build --base=/clients/elahi/cypher/"
   },
   "dependencies": {
     "@vee-validate/rules": "^4.5.11",

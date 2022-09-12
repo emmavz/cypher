@@ -16,5 +16,4 @@ class PageController extends Controller
     {
         return view('front.index');
     }
-    
 }
